@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>Timeline Jan Anthonie Bruijn</title>
+  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="d3.layout.timeline.js" charset="utf-8" type="text/javascript"></script>
+  <style type="text/css">
+  h1 {
+    font: 25px sans-serif;
+    margin-left: 20px;
+    margin-top: 40px;
+  }
+
+  text {
+    font: 13px sans-serif;
+  }
+
+  </style>
+  <script type="text/javascript">
+//example database: company,positionis,start,end,sector,sourceis,typeis
+//"Educatie, Big Improvement Day","Lid kerngroep","01/01/2010","3/15/2016","Education","pdc","Organization"
+
+
+types = ["Other services activities","Health care","Financial intermediation","Education","Electricity, gas and water supply"];
+
+colorScale = d3.scale.ordinal()
+  .domain(types)
+  .range(["#78C27E", "#DF242B", "#63B0B6",  "#FF805C", "#F9C250"]);
+
+var w = 900;
+var h = 350;
+var radius = 4;
+var padding = 20;
+
+d3.csv("cvbruijn.csv", function (dataset) {
+
+  var svgContainer = d3.select("body")
+    .append("svg")
+    .attr({
+      width: w + (2 * padding),
+      height: h + (2 * padding)
+    })
+    .style("border", "1px solid black")
+    ;
+
+  var timeline = d3.layout.timeline()
+    .size([w,h])
+    .extent(["01/01/1989", "3/15/2016"])
+    .padding(3)
+    .maxBandHeight(10); // height bands
+  var showTimeAxis = true, // variable, meerdere vars door komma's
+    beginning = 0,
+    ending = 0,
+    width = null,
+    height = null,
+    orient = "bottom"
+    ;
+var timelinedataset = timeline(dataset);
+//draw bars & dots
+  types.forEach(function (type, i) {
+    onlyThisType = dataset.filter(function(d) {return d.sector === type});
+    theseBands = timeline(onlyThisType);
+
+    var bars = d3.select("svg")
+      .append("g")
+      .selectAll("rect")
+      .data(theseBands)
+      .enter()
+      .append("rect")
+      .attr({
+        x: function (d) {return d.start + padding; }, // startpoint plus extra left padding 
+        y: function (d) {return h - d.dy + padding; }, // to move from top to bottom
+        height: function (d) {return d.dy; }, //meaning d.dy??
+        width: function (d) {return d.end - d.start; },
+        fill: function (d) {return colorScale(d.sector); }
+      })
+      ;
+
+    var info = d3.select("svg") //pakt alleen de eerst omdat hij kijkt naar sectoren en niet naar punten..
+      .append("g")
+      .selectAll("text")
+      .data(theseBands)
+      .enter()
+      .append("text")
+      .text(function (d) {return d.company})
+      .attr({
+        x: function (d) {return ((d.end - d.start)/ 2) + d.start + padding; },
+        y: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }
+      })
+      ;
+
+    var dots = d3.select("svg")
+      .append("g")
+      .selectAll("circle")
+      .data(theseBands)
+      .enter()
+      .append("circle")
+      .attr({
+        r: radius, //radius
+        cx: function (d) {return ((d.end - d.start)/ 2) + d.start + padding; }, // startpoint
+        cy: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }, // positioning 
+        fill: function (d) {return colorScale(d.sector); }
+        }) 
+      ;
+
+//todo what to do with 2 or more points behind each other? / dynamic sector colorcoding 
+//triangles and scales: http://bl.ocks.org/mbostock/3244058
+
+  })
+})
+
+</script>
+</head>
+<body>
+<div id="viz">
+  <h1>Timeline Jan Anthonie Bruijn</h1>
+  
+</div>
+</body>
+</html> 
