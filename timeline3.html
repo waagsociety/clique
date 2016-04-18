@@ -33,6 +33,7 @@ var h = 350;
 var radius = 4;
 var padding = 20;
 
+
 d3.csv("cvbruijn.csv", function (dataset) {
 
   var svgContainer = d3.select("body")
@@ -49,6 +50,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .extent(["01/01/1989", "3/15/2016"])
     .padding(3)
     .maxBandHeight(10); // height bands
+
   var showTimeAxis = true, // variable, meerdere vars door komma's
     beginning = 0,
     ending = 0,
@@ -56,8 +58,48 @@ d3.csv("cvbruijn.csv", function (dataset) {
     height = null,
     orient = "bottom"
     ;
-var timelinedataset = timeline(dataset);
-//draw bars & dots
+
+  var timelinedataset = timeline(dataset); //draw bars & dots
+
+  var xScaleTime = d3.time.scale() // input domain , output range
+    .domain([d3.min(dataset, function(d) { return d[3]; }), d3.max(dataset, function(d) { return d[4]; })])
+    .range([padding, w + padding]);
+
+  console.log(xScaleTime(05/10/2001));
+
+  var xAxisTime = d3.svg.axis()
+    .scale(xScaleTime)
+    .orient("bottom")
+    .ticks(d3.time.year, 1)
+    .tickFormat(d3.time.format('%Y'))
+    .tickSize(0)
+    ;
+
+ var xAxis = d3.select("svg")
+    .append("g")
+    .call(xAxisTime)
+    .attr("class","axis")
+    ;
+
+  var yScaleTime = d3.time.scale()
+    .domain([0 , d3.max(dataset, function(d) { return d[4]; })-d3.min(dataset, function(d) { return d[3]; })])
+    .range(padding + h, padding)
+    ;
+
+  var yAxisTime = d3.svg.axis()
+    .scale(yScaleTime)
+    .orient("left")
+    .ticks(d3.time.year, 1);
+    ;
+
+var yAxis = d3.select("svg")
+    .append("g")
+    .call(yAxisTime)
+    .attr("class","axis")
+    ;
+
+
+  //DRAW ELEMENTS: points, timelines, text connected to the points
   types.forEach(function (type, i) {
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
     theseBands = timeline(onlyThisType);
@@ -96,18 +138,23 @@ var timelinedataset = timeline(dataset);
       .data(theseBands)
       .enter()
       .append("circle")
+      .style("opacity", 0.6)
       .attr({
         r: radius, //radius
         cx: function (d) {return ((d.end - d.start)/ 2) + d.start + padding; }, // startpoint
         cy: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }, // positioning 
         fill: function (d) {return colorScale(d.sector); }
         }) 
+
       ;
+
+
 
 //todo what to do with 2 or more points behind each other? / dynamic sector colorcoding 
 //triangles and scales: http://bl.ocks.org/mbostock/3244058
 
   })
+
 })
 
 </script>
