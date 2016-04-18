@@ -12,9 +12,23 @@
     margin-top: 40px;
   }
 
-  text {
-    font: 13px sans-serif;
+  text, .axis {
+    font: 10px sans-serif;
   }
+
+ .axis path {
+  stroke-width: 0;
+  stroke: #000;
+ }
+
+ .axis line {
+  shape-rendering: crispEdges;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+
+
 
   </style>
   <script type="text/javascript">
@@ -68,16 +82,19 @@ d3.csv("cvbruijn.csv", function (dataset) {
 
   var xAxisTime = d3.svg.axis()
     .scale(xScaleTime)
-    .orient("bottom")
+    .orient("bottom") // text orient
     .ticks(d3.time.year, 1)
     .tickFormat(d3.time.format('%Y'))
-    .tickSize(0)
+    .tickSize(3, 1) // inner tick size(value), outer tick size(axis)
     ;
 
  var xAxis = d3.select("svg")
     .append("g")
+    .attr({
+      "transform": "translate(0," + (h + padding) + ")",
+      "class": "x axis"
+    })
     .call(xAxisTime)
-    .attr("class","axis")
     ;
 
   var yScaleTime = d3.scale.linear()
@@ -88,13 +105,17 @@ d3.csv("cvbruijn.csv", function (dataset) {
   var yAxisTime = d3.svg.axis()
     .scale(yScaleTime)
     .orient("left")
-    .ticks(8);
+    .ticks(8)
+    .tickSize(3, 1)
     ;
 
 var yAxis = d3.select("svg")
     .append("g")
+    .attr({
+      "transform": "translate(" + padding + ", 0 )",
+      "class": "y axis"
+    })
     .call(yAxisTime)
-    .attr("class","axis")
     ;
 
 
@@ -118,7 +139,7 @@ var yAxis = d3.select("svg")
       })
       ;
 
-    var info = d3.select("svg") //pakt alleen de eerst omdat hij kijkt naar sectoren en niet naar punten..
+    var info = d3.select("svg") 
       .append("g")
       .selectAll("text")
       .data(theseBands)
