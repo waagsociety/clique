@@ -66,8 +66,6 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
     .range([padding, w + padding]);
 
-  // console.log(xScaleTime(timeFormat.parse('05/10/2001')));
-
   var xAxisTime = d3.svg.axis()
     .scale(xScaleTime)
     .orient("bottom")
@@ -82,15 +80,15 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .attr("class","axis")
     ;
 
-  var yScaleTime = d3.time.scale()
-    .domain([0 , d3.max(dataset, function(d) { return d[4]; })-d3.min(dataset, function(d) { return d[3]; })])
-    .range(padding + h, padding)
+  var yScaleTime = d3.scale.linear()
+    .domain([0 , d3.max(dataset, function(d) { return Math.ceil((new Date(dateFormat.parse(d.end)).getTime() - new Date(dateFormat.parse(d.start)).getTime()) / (1000 * 60 * 60 * 24 * 365)) })])
+    .range([padding + h, padding])
     ;
 
   var yAxisTime = d3.svg.axis()
     .scale(yScaleTime)
     .orient("left")
-    .ticks(d3.time.year, 1);
+    .ticks(8);
     ;
 
 var yAxis = d3.select("svg")
