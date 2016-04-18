@@ -59,13 +59,14 @@ d3.csv("cvbruijn.csv", function (dataset) {
     orient = "bottom"
     ;
 
+  var dateFormat = d3.time.format('%m/%d/%Y');
   var timelinedataset = timeline(dataset); //draw bars & dots
 
   var xScaleTime = d3.time.scale() // input domain , output range
-    .domain([d3.min(dataset, function(d) { return d[3]; }), d3.max(dataset, function(d) { return d[4]; })])
+    .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
     .range([padding, w + padding]);
 
-  console.log(xScaleTime(05/10/2001));
+  // console.log(xScaleTime(timeFormat.parse('05/10/2001')));
 
   var xAxisTime = d3.svg.axis()
     .scale(xScaleTime)
@@ -111,7 +112,7 @@ var yAxis = d3.select("svg")
       .enter()
       .append("rect")
       .attr({
-        x: function (d) {return d.start + padding; }, // startpoint plus extra left padding 
+        x: function (d) {return d.start + padding; }, // startpoint plus extra left padding
         y: function (d) {return h - d.dy + padding; }, // to move from top to bottom
         height: function (d) {return d.dy; }, //meaning d.dy??
         width: function (d) {return d.end - d.start; },
@@ -142,15 +143,15 @@ var yAxis = d3.select("svg")
       .attr({
         r: radius, //radius
         cx: function (d) {return ((d.end - d.start)/ 2) + d.start + padding; }, // startpoint
-        cy: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }, // positioning 
+        cy: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }, // positioning
         fill: function (d) {return colorScale(d.sector); }
-        }) 
+        })
 
       ;
 
 
 
-//todo what to do with 2 or more points behind each other? / dynamic sector colorcoding 
+//todo what to do with 2 or more points behind each other? / dynamic sector colorcoding
 //triangles and scales: http://bl.ocks.org/mbostock/3244058
 
   })
@@ -162,7 +163,7 @@ var yAxis = d3.select("svg")
 <body>
 <div id="viz">
   <h1>Timeline Jan Anthonie Bruijn</h1>
-  
+
 </div>
 </body>
-</html> 
+</html>
