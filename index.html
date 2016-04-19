@@ -76,6 +76,9 @@ d3.csv("cvbruijn.csv", function (dataset) {
   var dateFormat = d3.time.format('%m/%d/%Y');
   var timelinedataset = timeline(dataset); //draw bars & dots
 
+
+// scales & axes
+
   var xScaleTime = d3.time.scale() // input domain , output range
     .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
     .range([padding, w + padding]);
@@ -88,7 +91,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .tickSize(3, 1) // inner tick size(value), outer tick size(axis)
     ;
 
- var xAxis = d3.select("svg")
+ var xAxisT = d3.select("svg")
     .append("g")
     .attr({
       "transform": "translate(0," + (h + padding) + ")",
@@ -109,7 +112,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .tickSize(3, 1)
     ;
 
-var yAxis = d3.select("svg")
+var yAxisT = d3.select("svg")
     .append("g")
     .attr({
       "transform": "translate(" + padding + ", 0 )",
@@ -124,6 +127,13 @@ var yAxis = d3.select("svg")
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
     theseBands = timeline(onlyThisType);
 
+    var xPoint = function (d) {return ((d.end - d.start)/ 2) + d.start + padding; };
+    var yPoint = function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; };
+    var dxStart = function (d) {return d.start + padding; }; // startpoint plus extra left padding
+    var dyBar = function (d) {return h - d.dy + padding; }; // to move from top to bottom
+    var dxEnd = function (d) {return d.end + padding; };
+    var sectorfill = function (d) {return colorScale(d.sector); };
+
     var bars = d3.select("svg")
       .append("g")
       .selectAll("rect")
@@ -131,11 +141,11 @@ var yAxis = d3.select("svg")
       .enter()
       .append("rect")
       .attr({
-        x: function (d) {return d.start + padding; }, // startpoint plus extra left padding
-        y: function (d) {return h - d.dy + padding; }, // to move from top to bottom
-        height: function (d) {return d.dy; }, //meaning d.dy??
-        width: function (d) {return d.end - d.start; },
-        fill: function (d) {return colorScale(d.sector); }
+        "x": dxStart,
+        "y": dyBar,
+        "height": function (d) {return d.dy; }, //meaning d.dy??
+        "width": function (d) {return d.end - d.start; },
+        "fill": sectorfill
       })
       ;
 
@@ -147,11 +157,11 @@ var yAxis = d3.select("svg")
       .append("text")
       .text(function (d) {return d.company})
       .attr({
-        x: function (d) {return ((d.end - d.start)/ 2) + d.start + padding; },
-        y: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }
-      })
-      ;
+        "x": xPoint,
+        "y": yPoint
+      });
 
+    
     var dots = d3.select("svg")
       .append("g")
       .selectAll("circle")
@@ -160,15 +170,34 @@ var yAxis = d3.select("svg")
       .append("circle")
       .style("opacity", 0.6)
       .attr({
-        r: radius, //radius
-        cx: function (d) {return ((d.end - d.start)/ 2) + d.start + padding; }, // startpoint
-        cy: function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }, // positioning
-        fill: function (d) {return colorScale(d.sector); }
-        })
+        "r": radius, //radius
+        "cx": xPoint, // startpoint
+        "cy": yPoint, // positioning
+        "fill": sectorfill
+        });
 
-      ;
+      //triangle 
 
+    var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
 
+    var lineFunction = d3.svg.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; })
+      .interpolate("linear"); // straight lines
+
+    var triangle = d3.select("svg")
+      .append("g")
+      .selectAll("lines")
+      .data(theseBands)
+      .enter()
+      .append("path")
+      .attr({
+        "d": lineFunction(trianglePoints),
+        "stroke": sectorfill,
+        "stroke-width": 2
+      });
+
+    
 
 //todo what to do with 2 or more points behind each other? / dynamic sector colorcoding
 //triangles and scales: http://bl.ocks.org/mbostock/3244058
