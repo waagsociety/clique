@@ -127,12 +127,12 @@ var yAxisT = d3.select("svg")
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
     theseBands = timeline(onlyThisType);
 
-    var xPoint = function (d) {return ((d.end - d.start)/ 2) + d.start + padding; };
-    var yPoint = function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; };
-    var dxStart = function (d) {return d.start + padding; }; // startpoint plus extra left padding
+    var xPoint = function (d) {return ((d.end - d.start)/ 2) + d.start + padding; }; // x top-triangle point
+    var yPoint = function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }; // y top triangle point
+    var dxStart = function (d) {return d.start + padding; }; // startpoint bar plus extra left padding
     var dyBar = function (d) {return h - d.dy + padding; }; // to move from top to bottom
-    var dxEnd = function (d) {return d.end + padding; };
-    var sectorfill = function (d) {return colorScale(d.sector); };
+    var dxEnd = function (d) {return d.end + padding; }; // endpoint bar
+    var sectorfill = function (d) {return colorScale(d.sector); }; // color sector
 
     var bars = d3.select("svg")
       .append("g")
@@ -178,9 +178,18 @@ var yAxisT = d3.select("svg")
 
       //triangle 
 
-    var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
+    for(var key in theseBands){
+      var d = theseBands[key]
 
-    var lineFunction = d3.svg.line()
+      var xPoint = ((d.end - d.start)/ 2) + d.start + padding; // x top-triangle point
+      var yPoint =  h - ((d.end - d.start)/ 2) - d.dy + padding;  // y top triangle point
+      var dxStart = d.start + padding;// startpoint bar plus extra left padding
+      var dyBar = h - d.dy + padding; // to move from top to bottom
+      var dxEnd = d.end + padding; // endpoint bar
+
+      var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
+
+      var lineFunction = d3.svg.line()
       .x(function(d) { return d.x; })
       .y(function(d) { return d.y; })
       .interpolate("linear"); // straight lines
@@ -194,8 +203,16 @@ var yAxisT = d3.select("svg")
       .attr({
         "d": lineFunction(trianglePoints),
         "stroke": sectorfill,
-        "stroke-width": 2
-      });
+        "stroke-width": 1,
+        "fill-opacity": 0
+      })
+      .style("stroke-dasharray", ("3, 3"))
+      ;
+    }
+
+    /*var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
+    */
+    
 
     
 
