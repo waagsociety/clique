@@ -43,9 +43,12 @@ colorScale = d3.scale.ordinal()
   .range(["#78C27E", "#DF242B", "#63B0B6",  "#FF805C", "#F9C250"]);
 
 var w = 900;
-var h = 350;
+var h = 400;
 var radius = 4;
 var padding = 20;
+var marginleft = 200;
+var marginbottom = 200;
+var htimeline = (w - marginleft) / 2
 
 
 d3.csv("cvbruijn.csv", function (dataset) {
@@ -54,13 +57,13 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .append("svg")
     .attr({
       width: w + (2 * padding),
-      height: h + (2 * padding)
+      height: htimeline + (2 * padding) + marginbottom
     })
     .style("border", "1px solid black")
     ;
 
   var timeline = d3.layout.timeline()
-    .size([w,h])
+    .size([w - marginleft,htimeline])
     .extent(["01/01/1989", "3/15/2016"])
     .padding(3)
     .maxBandHeight(10); // height bands
@@ -81,7 +84,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
 
   var xScaleTime = d3.time.scale() // input domain , output range
     .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
-    .range([padding, w + padding]);
+    .range([padding + marginleft, w + padding]);
 
   var xAxisTime = d3.svg.axis()
     .scale(xScaleTime)
@@ -94,15 +97,23 @@ d3.csv("cvbruijn.csv", function (dataset) {
  var xAxisT = d3.select("svg")
     .append("g")
     .attr({
-      "transform": "translate(0," + (h + padding) + ")",
+      "transform": "translate(0 ," + (htimeline + padding) + ")",
       "class": "x axis"
     })
     .call(xAxisTime)
+    .append("text") 
+    .text("Time in years")
+    .attr("transform", "translate(" + (w - marginleft + padding) + " ," + (padding + 5) + ")")
     ;
 
+
+
+//.domain([0 , d3.max(dataset, function(d) { return Math.ceil((new Date(dateFormat.parse(d.end)).getTime() - new Date(dateFormat.parse(d.start)).getTime()) / (1000 * 60 * 60 * 24 * 365)) })])
+
   var yScaleTime = d3.scale.linear()
-    .domain([0 , d3.max(dataset, function(d) { return Math.ceil((new Date(dateFormat.parse(d.end)).getTime() - new Date(dateFormat.parse(d.start)).getTime()) / (1000 * 60 * 60 * 24 * 365)) })])
-    .range([padding + h, padding])
+    .domain([0 , ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
+      ])
+    .range([htimeline + padding , padding])
     ;
 
   var yAxisTime = d3.svg.axis()
@@ -115,11 +126,17 @@ d3.csv("cvbruijn.csv", function (dataset) {
 var yAxisT = d3.select("svg")
     .append("g")
     .attr({
-      "transform": "translate(" + padding + ", 0 )",
+      "transform": "translate(" + (padding + marginleft) + ", 0 )",
       "class": "y axis"
     })
     .call(yAxisTime)
-    ;
+    .append("text") 
+    .text("Duration in years")
+    .attr({
+        "x": -125,
+        "y": -25,
+        "transform": "rotate(-90)"
+      });
 
 
   //DRAW ELEMENTS: points, timelines, text connected to the points
@@ -127,12 +144,13 @@ var yAxisT = d3.select("svg")
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
     theseBands = timeline(onlyThisType);
 
-    var xPoint = function (d) {return ((d.end - d.start)/ 2) + d.start + padding; }; // x top-triangle point
-    var yPoint = function (d) {return h - ((d.end - d.start)/ 2) - d.dy + padding; }; // y top triangle point
-    var dxStart = function (d) {return d.start + padding; }; // startpoint bar plus extra left padding
-    var dyBar = function (d) {return h - d.dy + padding; }; // to move from top to bottom
-    var dxEnd = function (d) {return d.end + padding; }; // endpoint bar
+    var xPoint = function (d) {return ((d.end - d.start)/ 2) + d.start + padding + marginleft; }; // x top-triangle point
+    var yPoint = function (d) {return htimeline - ((d.end - d.start)/ 2) + padding ; }; // y top triangle point
+    var dxStart = function (d) {return d.start + padding + marginleft; }; // startpoint bar plus extra left padding
+    var dxEnd = function (d) {return d.end + padding + marginleft; }; // endpoint bar
     var sectorfill = function (d) {return colorScale(d.sector); }; // color sector
+
+    // bars
 
     var bars = d3.select("svg")
       .append("g")
@@ -142,12 +160,14 @@ var yAxisT = d3.select("svg")
       .append("rect")
       .attr({
         "x": dxStart,
-        "y": dyBar,
+        "y": htimeline + padding, // to move from top to bottom
         "height": function (d) {return d.dy; }, //meaning d.dy??
         "width": function (d) {return d.end - d.start; },
         "fill": sectorfill
       })
       ;
+
+    //text
 
     var info = d3.select("svg") 
       .append("g")
@@ -161,7 +181,8 @@ var yAxisT = d3.select("svg")
         "y": yPoint
       });
 
-    
+    // dots
+
     var dots = d3.select("svg")
       .append("g")
       .selectAll("circle")
@@ -181,11 +202,11 @@ var yAxisT = d3.select("svg")
     for(var key in theseBands){
       var d = theseBands[key]
 
-      var xPoint = ((d.end - d.start)/ 2) + d.start + padding; // x top-triangle point
-      var yPoint =  h - ((d.end - d.start)/ 2) - d.dy + padding;  // y top triangle point
-      var dxStart = d.start + padding;// startpoint bar plus extra left padding
-      var dyBar = h - d.dy + padding; // to move from top to bottom
-      var dxEnd = d.end + padding; // endpoint bar
+      var xPoint = ((d.end - d.start)/ 2) + d.start + padding + marginleft; // x top-triangle point
+      var yPoint =  htimeline - ((d.end - d.start)/ 2)  + padding ;  // y top triangle point
+      var dxStart = d.start + padding + marginleft;// startpoint bar plus extra left padding
+      var dyBar = htimeline  + padding ; // to move from top to bottom
+      var dxEnd = d.end + padding + marginleft; // endpoint bar
 
       var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
 
