@@ -103,7 +103,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .call(xAxisTime)
     .append("text") 
     .text("Time in years")
-    .attr("transform", "translate(" + (w - marginleft + padding) + " ," + (padding + 5) + ")")
+    .attr("transform", "translate(" + (w - padding - 50) + " ," + (padding + 8) + ")")
     ;
 
 
@@ -178,24 +178,42 @@ var textlabelParty = d3.select("svg")
 
     // political party
 
-      var barparty = d3.select("svg")
+    var barparty = d3.select("svg")
       .append("g")
       .selectAll("rect")
       .data(theseBands)
       .enter()
       .append("rect")
-      .filter(function(d){return d.typeis === 'Political Party'})
+      .filter(function (d) {return d.typeis === 'Political Party'})
       .attr({
         "x": dxStart,
-        "y": htimeline + padding + 40, // to move from top to bottom
-        "height": function (d) {return d.dy; }, //meaning d.dy??
+        "y": (function (d) {return htimeline + padding + d.y}), // positioning bars below each other in one category function (d) {return (h - d)}
+        //"y": htimeline + padding + 40, // to move from top to bottom
+        "transform": "translate(0," + (40 + (i * 24)) + ")", //positioning bars, height in between
+        "height": function (d) {return d.dy; }, 
         "width": function (d) {return d.end - d.start; },
         "fill": sectorfill
       })
       ;
 
+    //text political party info
 
-    //text
+    var infoparty = d3.select("svg") 
+      .append("g")
+      .selectAll("text")
+      .data(theseBands)
+      .enter()
+      .append("text")
+      .filter(function (d) {return d.typeis === 'Political Party'})
+      .text(function (d) {return d.company})
+      .attr({
+        "x": dxStart,
+        "y": (function (d) {return htimeline + padding + d.y}),
+        "transform": "translate(0," + (47 + (i * 20)) + ")"
+      });
+
+
+    //texttimeline
 
     var info = d3.select("svg") 
       .append("g")
