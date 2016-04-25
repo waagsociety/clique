@@ -35,17 +35,16 @@
 //example database: company,positionis,start,end,sector,sourceis,typeis
 //"Educatie, Big Improvement Day","Lid kerngroep","01/01/2010","3/15/2016","Education","pdc","Organization"
 
-
-types = ["Other services activities","Health care","Financial intermediation","Education","Electricity, gas and water supply"];
+var types = [];
 
 colorScale = d3.scale.ordinal()
   .domain(types)
-  .range(["#78C27E", "#DF242B", "#63B0B6",  "#FF805C", "#F9C250"]);
+  .range(["#f1c7dd", "#0b326b", "#f5bd42", "#7bcbc0",   "#f05129",  "#b7cc94", "#e3337e", "#827775", "#966eac", "#b09977",]);
 
 var w = 900;
 var h = 400;
 var radius = 4;
-var padding = 20;
+var paddingdoc = 20;
 var marginleft = 200;
 var marginbottom = 200;
 var htimeline = (w - marginleft) / 2
@@ -53,11 +52,17 @@ var htimeline = (w - marginleft) / 2
 
 d3.csv("cvbruijn.csv", function (dataset) {
 
+  dataset.forEach(function(data){
+    if (types.indexOf(data.sector) === -1) {
+      types.push(data.sector);
+    }
+  });
+
   var svgContainer = d3.select("body")
     .append("svg")
     .attr({
-      width: w + (2 * padding),
-      height: htimeline + (2 * padding) + marginbottom
+      width: w + (2 * paddingdoc),
+      height: htimeline + (2 * paddingdoc) + marginbottom
     })
     .style("border", "1px solid black")
     ;
@@ -65,8 +70,8 @@ d3.csv("cvbruijn.csv", function (dataset) {
   var timeline = d3.layout.timeline()
     .size([w - marginleft,htimeline])
     .extent(["01/01/1989", "3/15/2016"])
-    .padding(3)
-    .maxBandHeight(10); // height bands
+    .padding(4)
+    .maxBandHeight(12); // height bands
 
   var showTimeAxis = true, // variable, meerdere vars door komma's
     beginning = 0,
@@ -84,7 +89,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
 
   var xScaleTime = d3.time.scale() // input domain , output range
     .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
-    .range([padding + marginleft, w + padding]);
+    .range([paddingdoc + marginleft, w + paddingdoc]);
 
   var xAxisTime = d3.svg.axis()
     .scale(xScaleTime)
@@ -97,13 +102,13 @@ d3.csv("cvbruijn.csv", function (dataset) {
  var xAxisT = d3.select("svg")
     .append("g")
     .attr({
-      "transform": "translate(0 ," + (htimeline + padding) + ")",
+      "transform": "translate(0 ," + (htimeline + paddingdoc) + ")",
       "class": "x axis"
     })
     .call(xAxisTime)
     .append("text") 
     .text("Time in years")
-    .attr("transform", "translate(" + (w - padding - 50) + " ," + (padding + 8) + ")")
+    .attr("transform", "translate(" + (w - paddingdoc - 50) + " ," + (paddingdoc + 8) + ")")
     ;
 
 
@@ -113,7 +118,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
   var yScaleTime = d3.scale.linear()
     .domain([0 , ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
       ])
-    .range([htimeline + padding , padding])
+    .range([htimeline + paddingdoc , paddingdoc])
     ;
 
   var yAxisTime = d3.svg.axis()
@@ -126,7 +131,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
 var yAxisT = d3.select("svg")
     .append("g")
     .attr({
-      "transform": "translate(" + (padding + marginleft) + ", 0 )",
+      "transform": "translate(" + (paddingdoc + marginleft) + ", 0 )",
       "class": "y axis"
     })
     .call(yAxisTime)
@@ -143,20 +148,20 @@ var textlabelParty = d3.select("svg")
     .text("Political Party")
     .attr({
         "x": marginleft - 60,
-        "y": padding + htimeline + 45 
+        "y": paddingdoc + htimeline + 48 
       });
 
 
   //DRAW ELEMENTS: points, timelines, text connected to the points
-  types.forEach(function (type, i) {
+  types.forEach(function(type, i) {
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
     theseBands = timeline(onlyThisType);
 
-    var xPoint = function (d) {return ((d.end - d.start)/ 2) + d.start + padding + marginleft; }; // x top-triangle point
-    var yPoint = function (d) {return htimeline - ((d.end - d.start)/ 2) + padding ; }; // y top triangle point
-    var dxStart = function (d) {return d.start + padding + marginleft; }; // startpoint bar plus extra left padding
-    var dxEnd = function (d) {return d.end + padding + marginleft; }; // endpoint bar
-    var sectorfill = function (d) {return colorScale(d.sector); }; // color sector
+    var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
+    var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc ; }; // y top triangle point
+    var dxStart = function(d) {return d.start + paddingdoc + marginleft; }; // startpoint bar plus extra left padding
+    var dxEnd = function(d) {return d.end + paddingdoc + marginleft; }; // endpoint bar
+    var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
 
     // bars
     
@@ -166,17 +171,17 @@ var textlabelParty = d3.select("svg")
       .data(theseBands)
       .enter()
       .append("rect")
-      .filter(function (d) {return d.typeis !== 'Political Party'})
+      .filter(function(d) {return d.typeis !== 'Political Party'})
       .attr({
         "x": dxStart,
-        "y": htimeline + padding, // to move from top to bottom
-        "height": function (d) {return d.dy; }, //meaning d.dy??
-        "width": function (d) {return d.end - d.start; },
+        "y": htimeline + paddingdoc, // to move from top to bottom
+        "height": function(d) {return d.dy; }, //meaning d.dy??
+        "width": function(d) {return d.end - d.start; },
         "fill": sectorfill
-      })
+        })
       ;
 
-    // political party
+    // political party bars
 
     var barparty = d3.select("svg")
       .append("g")
@@ -184,16 +189,14 @@ var textlabelParty = d3.select("svg")
       .data(theseBands)
       .enter()
       .append("rect")
-      .filter(function (d) {return d.typeis === 'Political Party'})
+      .filter(function(d) {return d.typeis === 'Political Party'})
       .attr({
         "x": dxStart,
-        "y": (function (d) {return htimeline + padding + d.y}), // positioning bars below each other in one category function (d) {return (h - d)}
-        //"y": htimeline + padding + 40, // to move from top to bottom
-        "transform": "translate(0," + (40 + (i * 24)) + ")", //positioning bars, height in between
-        "height": function (d) {return d.dy; }, 
-        "width": function (d) {return d.end - d.start; },
+        "y": function(d) {return 40 + htimeline + paddingdoc + d.y}, // positioning bars below each other in one category function (d) {return (h - d)}
+        "height": function(d) {return d.dy; }, //
+        "width": function(d) {return d.end - d.start; },
         "fill": sectorfill
-      })
+        })
       ;
 
     //text political party info
@@ -204,13 +207,13 @@ var textlabelParty = d3.select("svg")
       .data(theseBands)
       .enter()
       .append("text")
-      .filter(function (d) {return d.typeis === 'Political Party'})
-      .text(function (d) {return d.company})
+      .filter(function(d) {return d.typeis === 'Political Party'})
+      .text(function(d) {return d.company})
       .attr({
         "x": dxStart,
-        "y": (function (d) {return htimeline + padding + d.y}),
-        "transform": "translate(0," + (47 + (i * 20)) + ")"
-      });
+        "y": (function(d) {return 47 + htimeline + paddingdoc + d.y}),
+        })
+      ;
 
 
     //texttimeline
@@ -221,12 +224,13 @@ var textlabelParty = d3.select("svg")
       .data(theseBands)
       .enter()
       .append("text")
-      .filter(function (d) {return d.typeis !== 'Political Party'})
-      .text(function (d) {return d.company})
+      .filter(function(d) {return d.typeis !== 'Political Party'})
+      .text(function(d) {return d.company})
       .attr({
         "x": xPoint,
         "y": yPoint
-      });
+        })
+      ;
 
     // dots
 
@@ -243,21 +247,22 @@ var textlabelParty = d3.select("svg")
         "cx": xPoint, // startpoint
         "cy": yPoint, // positioning
         "fill": sectorfill
-        });
+        })
+      ;
 
       //triangle 
 
     theseBands
-      .filter(function (b) {
+      .filter(function(b) {
         return b.typeis !== 'Political Party';
       })
-      .forEach(function (d) {
+      .forEach(function(d) {
     
-        var xPoint = ((d.end - d.start)/ 2) + d.start + padding + marginleft; // x top-triangle point
-        var yPoint =  htimeline - ((d.end - d.start)/ 2)  + padding ;  // y top triangle point
-        var dxStart = d.start + padding + marginleft;// startpoint bar plus extra left padding
-        var dyBar = htimeline  + padding ; // to move from top to bottom
-        var dxEnd = d.end + padding + marginleft; // endpoint bar
+        var xPoint = ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; // x top-triangle point
+        var yPoint =  htimeline - ((d.end - d.start)/ 2)  + paddingdoc ;  // y top triangle point
+        var dxStart = d.start + paddingdoc + marginleft;// startpoint bar plus extra left padding
+        var dyBar = htimeline  + paddingdoc ; // to move from top to bottom
+        var dxEnd = d.end + paddingdoc + marginleft; // endpoint bar
 
         var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
 
@@ -277,10 +282,11 @@ var textlabelParty = d3.select("svg")
             "stroke": sectorfill,
             "stroke-width": 1,
             "fill-opacity": 0
-          })
+            })
           .style("stroke-dasharray", ("3, 3"))
           ;
-    });
+      })
+    ;
 
     
 
