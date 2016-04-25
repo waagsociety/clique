@@ -27,7 +27,10 @@
   stroke-width: 1px;
 }
 
-
+  .legendtitle {
+    font: 12px sans-serif;
+    font-weight: bold;
+  }
 
 
   </style>
@@ -45,12 +48,14 @@ var w = 900;
 var h = 400;
 var radius = 4;
 var paddingdoc = 20;
-var marginleft = 200;
+var marginleft = 240;
 var marginbottom = 200;
 var htimeline = (w - marginleft) / 2
 
 
 d3.csv("cvbruijn.csv", function (dataset) {
+
+  // array sectors to determine colors -------> counter? Biggest first? 
 
   dataset.forEach(function(data){
     if (types.indexOf(data.sector) === -1) {
@@ -58,6 +63,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
     }
   });
 
+  // img timeline
   var svgContainer = d3.select("body")
     .append("svg")
     .attr({
@@ -110,10 +116,6 @@ d3.csv("cvbruijn.csv", function (dataset) {
     .text("Time in years")
     .attr("transform", "translate(" + (w - paddingdoc - 50) + " ," + (paddingdoc + 8) + ")")
     ;
-
-
-
-//.domain([0 , d3.max(dataset, function(d) { return Math.ceil((new Date(dateFormat.parse(d.end)).getTime() - new Date(dateFormat.parse(d.start)).getTime()) / (1000 * 60 * 60 * 24 * 365)) })])
 
   var yScaleTime = d3.scale.linear()
     .domain([0 , ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
@@ -215,7 +217,6 @@ var textlabelParty = d3.select("svg")
         })
       ;
 
-
     //texttimeline
 
     var info = d3.select("svg") 
@@ -288,14 +289,58 @@ var textlabelParty = d3.select("svg")
       })
     ;
 
-    
-
-    
-
-//todo what to do with 2 or more points behind each other? / dynamic sector colorcoding
-//triangles and scales: http://bl.ocks.org/mbostock/3244058
-
   })
+
+// legend
+  
+  var legendRectSize = 15;
+  var legendSpacing = 5;
+
+  var legendtitle = d3.select("svg")
+    .append("text")
+    .text("Sectors")
+    .attr({
+      "class": "legendtitle",
+      "x": paddingdoc,
+      "y": paddingdoc + 6
+    })
+  ;
+
+  var legendexplain = d3.select("svg")
+    .append("text")
+    .text("Click to show/hide")
+    .attr({
+      "class": "legendexplain",
+      "x": paddingdoc,
+      "y": paddingdoc * 2
+    })
+  ;
+
+  var legend = d3.select("svg")
+    .append("g")
+    .selectAll("g")
+    .data(colorScale.domain())
+    .enter()
+    .append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) {
+        var height = legendRectSize;
+        var x = paddingdoc;
+        var y = (paddingdoc * 2.5) + i * (height + legendSpacing);
+        return "translate(" + x + "," + y + ")";
+      })
+    ;
+
+  legend.append("rect")
+    .attr("width", legendRectSize)
+    .attr("height", legendRectSize)
+    .style("fill", colorScale)
+    .style("stroke", colorScale);
+
+  legend.append("text")
+    .attr("x", legendRectSize + legendSpacing)
+    .attr("y", legendRectSize - legendSpacing + 2)
+    .text(function(d) { return d; });
 
 })
 
