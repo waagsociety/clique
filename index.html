@@ -270,6 +270,16 @@ var timeLegend = function(dataset) { // legend
         var y = (paddingdoc * 2.5) + i * (height + legendSpacing);
         return "translate(" + x + "," + y + ")";
       })
+    .on("click", function(d) {
+      var active = this.active ? true : false;
+      var opacity = active ? 0.6 : 0;
+      var visibility = active ? "visible" : "hidden";
+      this.active = !active;
+      d3.selectAll('.dot-' + d.replace(/\W/gi, '-').toLowerCase()).each(function() {
+        this.style.opacity = opacity;
+        this.setAttribute("visibility", visibility);
+      });
+    })
     ;
 
   legend.append("rect")
@@ -283,16 +293,7 @@ var timeLegend = function(dataset) { // legend
     .attr("x", legendRectSize + legendSpacing)
     .attr("y", legendRectSize - legendSpacing + 2)
     .text(function(d) { return d; })
-    .on("click", function(d) {
-      var active = this.active ? true : false;
-      var opacity = active ? 0.6 : 0;
-      var visibility = active ? "visible" : "hidden";
-      this.active = !active;
-      d3.selectAll('.dot-' + d.replace(/\W/gi, '-').toLowerCase()).each(function() {
-        this.style.opacity = opacity;
-        this.setAttribute("visibility", visibility);
-      });
-    })
+    
     ;
 
 } // end timeLegend
