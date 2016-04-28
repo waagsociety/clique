@@ -1,0 +1,51 @@
+h1 {
+    font: 25px sans-serif;
+    margin-left: 20px;
+    margin-top: 40px;
+  }
+
+  text {
+    font: 10px sans-serif;
+  }
+
+  .axis text {
+    font: 8px sans-serif;
+  }
+
+ .axis path {
+  stroke-width: 0;
+  stroke: #000;
+ }
+
+ .axis line {
+  shape-rendering: crispEdges;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+.legendtitle {
+  font: 12px sans-serif;
+  font-weight: bold;
+}
+
+p.bgtexttime {
+  width: 200px;
+  font: 10px sans-serif;
+  background-color: #FFF;
+  padding: 5px;
+  border: solid 1px;
+}
+
+.legend:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+g.legend:hover{
+    
+  }
+
+/*circle[id^=dot-]:hover {
+  stroke: #000;
+  stroke-width: 1;
+}*/
