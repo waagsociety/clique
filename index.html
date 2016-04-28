@@ -44,17 +44,28 @@ p.bgtexttime {
   border: solid 1px;
 }
 
+.legend:hover {
+  cursor: pointer;
+}
+
+g.legend:hover{
+    opacity: 0.5;
+  }
+
+circle[id^=dot-]:hover {
+  stroke: #000;
+  stroke-width: 1;
+}
+
+
+
 
   </style>
   <script type="text/javascript">
 //example database: company,positionis,start,end,sector,sourceis,typeis
 //"Educatie, Big Improvement Day","Lid kerngroep","01/01/2010","3/15/2016","Education","pdc","Organization"
 
-var types = [];
 
-colorScale = d3.scale.ordinal()
-  .domain(types)
-  .range(["#f1c7dd", "#0b326b", "#f5bd42", "#7bcbc0",   "#f05129",  "#b7cc94", "#e3337e", "#827775", "#966eac", "#b09977",]);
 
 var w = 900;
 var h = 400;
@@ -64,6 +75,16 @@ var marginleft = 240;
 var marginbottom = 200;
 var htimeline = (w - marginleft) / 2
 
+var idcounterdot = 0
+var idcounterbar = 0
+var idcountertxt = 0
+var idcountertri = 0
+
+var types = [];
+
+colorScale = d3.scale.ordinal()
+  .domain(types)
+  .range(["#f1c7dd", "#0b326b", "#f5bd42", "#7bcbc0",   "#f05129",  "#b7cc94", "#e3337e", "#827775", "#966eac", "#b09977",]);
 
 d3.csv("cvbruijn.csv", function (dataset) {
 
@@ -78,6 +99,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
 
   console.log(JSON.stringify(clean));
   */ 
+
 
   // array sectors to determine colors -------> counter? Biggest first? 
 
@@ -178,11 +200,6 @@ var textlabelParty = d3.select("svg")
         "y": paddingdoc + htimeline + 48 
       });
 
-  var idcounterdot = 0
-  var idcounterbar = 0
-  var idcountertxt = 0
-  var idcountertri = 0
-
   //DRAW ELEMENTS: points, timelines, text connected to the points
   types.forEach(function(type, i) {
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
@@ -195,7 +212,6 @@ var textlabelParty = d3.select("svg")
     var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
 
     // bars
-    
 
     var bars = d3.select("svg")
       .append("g")
@@ -257,44 +273,6 @@ var textlabelParty = d3.select("svg")
       })
       ;
 
-    
-
-
-    // dots
-
-    var dots = d3.select("svg")
-      .append("g")
-      .selectAll("circle")
-      .data(theseBands)
-      .enter()
-      .append("circle")
-      .filter(function(d){return d.typeis !== 'Political Party'})
-      .style({
-        "opacity": 0.6
-      })
-      .attr({
-        "r": radius, //radius
-        "cx": xPoint, // startpoint
-        "cy": yPoint, // positioning
-        "fill": sectorfill,
-        "class": function(d) {return "dot-" + d.sector.replace(/\W/gi, '-').toLowerCase()},
-        "id": function(d) {
-              idcounterdot += 1;
-              return "dot-" + idcounterdot; 
-              }
-        })
-      .on("mouseover", function(d) {
-        var active = this.active ? true : false;
-        var opacity = active ? 1 : 0;
-        d3.selectAll('#bar-' + idcounterdot).forEach(function() {
-        this.style.opacity = opacity;
-        })
-      })
-      ;
-
-
-
-
       //triangle 
 
     theseBands
@@ -335,11 +313,84 @@ var textlabelParty = d3.select("svg")
             })
           .style({
             "stroke-dasharray": ("3, 3"),
-            "opacity": 1
+            "opacity": 0
           })
           ;
       })
     ;
+
+
+    // dots
+
+    var dots = d3.select("svg")
+      .append("g")
+      .selectAll("circle")
+      .data(theseBands)
+
+    ;
+
+// transition werkt niet...
+
+    dots.transition()
+      // .delay(function(d, i) {
+      //   return i * 100;
+      //   })
+      // .duration(3000)
+      // .ease("linear")
+      .attr({
+        "r": radius, //radius
+        "cx": xPoint, // startpoint
+        "cy": yPoint, // positioning
+        "fill": sectorfill,
+          })
+    ;
+
+    dots.enter()
+      .append("circle")
+      .filter(function(d){return d.typeis !== 'Political Party'})
+      .style({
+        "opacity": 0.6,
+        "cursor" : "pointer"
+      })
+      .attr({
+        "r": radius, //radius
+        "cx": xPoint, // startpoint
+        "cy": yPoint, // positioning
+        "fill": sectorfill,
+        "class": function(d) {return "dot-" + d.sector.replace(/\W/gi, '-').toLowerCase()},
+        "id": function(d) {
+              idcounterdot += 1;
+              return "dot-" + idcounterdot; 
+              }
+          })
+      .on("mouseover", function(d) {
+        var active = this.active ? true : false;
+        var opacity = active ? 0 : 1;
+        d3.select("#bar-" + this.id.substr(4,5)).each(function() {
+        this.style.opacity = opacity;
+          })
+        d3.select("#txt-" + this.id.substr(4,5)).each(function() {
+        this.style.opacity = opacity;
+          })
+        d3.select("#tri-" + this.id.substr(4,5)).each(function() {
+        this.style.opacity = opacity;
+          })
+        })
+      .on("mouseout", function(d) {
+        var active = this.active ? true : false;
+        var opacity = active ? 1 : 0;
+        d3.select("#bar-" + this.id.substr(4,5)).each(function() {
+        this.style.opacity = opacity;
+          })
+        d3.select("#txt-" + this.id.substr(4,5)).each(function() {
+        this.style.opacity = opacity;
+          })
+        d3.select("#tri-" + this.id.substr(4,5)).each(function() {
+        this.style.opacity = opacity;
+          })
+        })
+      ;
+
 
     //texttimeline
     
@@ -384,6 +435,7 @@ var textlabelParty = d3.select("svg")
   })
 
 // legend
+// todo: check if domain is not empty (because of moving the political party items)
   
   var legendRectSize = 15;
   var legendSpacing = 5;
