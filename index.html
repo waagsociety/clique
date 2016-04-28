@@ -152,10 +152,10 @@ var timeElements = function(dataset) {
     dots.enter()
       .append("circle")
       .filter(function(d){return d.typeis !== 'Political Party'})
-      .style({
-        "opacity": 0.6,
-        "cursor" : "pointer"
-      })
+      // .style({
+      //   "opacity": 0.6,
+      //   "cursor" : "pointer"
+      // })
       .attr({
         "r": radius, //radius
         "cx": xPoint, // startpoint
@@ -286,15 +286,16 @@ var timeLegend = function(dataset) { // legend
     .on("click", function(d) {
       var active = this.active ? true : false;
       var opacity = active ? 0.6 : 0;
+      var visibility = active ? "visible" : "hidden";
       this.active = !active;
       d3.selectAll('.dot-' + d.replace(/\W/gi, '-').toLowerCase()).each(function() {
         this.style.opacity = opacity;
+        this.setAttribute("visibility", visibility);
       });
     })
     ;
 
 } // end timeLegend
-
 
 // draw everything on the page
 
