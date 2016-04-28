@@ -152,10 +152,10 @@ var timeElements = function(dataset) {
     dots.enter()
       .append("circle")
       .filter(function(d){return d.typeis !== 'Political Party'})
-      // .style({
-      //   "opacity": 0.6,
-      //   "cursor" : "pointer"
-      // })
+      .style({
+        "opacity": 0.6,
+        "cursor" : "pointer"
+      })
       .attr({
         "r": radius, //radius
         "cx": xPoint, // startpoint
