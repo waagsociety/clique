@@ -36,14 +36,7 @@ p.bgtexttime {
   border: solid 1px;
 }
 
-.legend:hover {
-  cursor: pointer;
-  opacity: 0.5;
-}
 
-g.legend:hover{
-    
-  }
 
 /*circle[id^=dot-]:hover {
   stroke: #000;

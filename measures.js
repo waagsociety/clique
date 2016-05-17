@@ -1,18 +1,23 @@
-var w = 900;
+var w = 1100;
 var h = 400;
-var radius = 4;
+var radius = 6;
 var paddingdoc = 20;
+var margintop = 10;
 var marginleft = 240;
+var marginright = 150;
 var marginbottom = 200;
-var htimeline = (w - marginleft) / 2
+var htimeline = (w - marginleft - marginright) / 2
 
 var idcounterdot = 0
 var idcounterbar = 0
 var idcountertxt = 0
 var idcountertri = 0
+var idcounterbarpp = 0
+var idcountertxtpp = 0
+
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
-var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc ; }; // y top triangle point
+var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop ; }; // y top triangle point
 var dxStart = function(d) {return d.start + paddingdoc + marginleft; }; // startpoint bar plus extra left padding
 var dxEnd = function(d) {return d.end + paddingdoc + marginleft; }; // endpoint bar
 var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
@@ -24,7 +29,7 @@ colorScale = d3.scale.ordinal()
   .range(["#f1c7dd", "#0b326b", "#f5bd42", "#7bcbc0",   "#f05129",  "#b7cc94", "#e3337e", "#827775", "#966eac", "#b09977",]);
 
 var timeline = d3.layout.timeline()
-    .size([w - marginleft,htimeline])
+    .size([w - marginleft - marginright,htimeline])
     .extent(["01/01/1989", "3/15/2016"])
     .padding(4)
     .maxBandHeight(12); // height bands
@@ -62,7 +67,7 @@ var timeAxes = function(dataset) {
     .append("svg")
     .attr({
       width: w + (2 * paddingdoc),
-      height: htimeline + (2 * paddingdoc) + marginbottom
+      height: htimeline + (2 * paddingdoc) + marginbottom + margintop
     })
     .style("border", "1px solid black")
     ;
@@ -82,7 +87,7 @@ var timeAxes = function(dataset) {
 
   var xScaleTime = d3.time.scale() // input domain , output range
     .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
-    .range([paddingdoc + marginleft, w + paddingdoc]);
+    .range([paddingdoc + marginleft, w + paddingdoc - marginright]); // change in figures as well!!
 
   var xAxisTime = d3.svg.axis()
     .scale(xScaleTime)
@@ -96,19 +101,19 @@ var timeAxes = function(dataset) {
  var xAxisT = d3.select("svg")
     .append("g")
     .attr({
-      "transform": "translate(0 ," + (htimeline + paddingdoc) + ")",
+      "transform": "translate(0 ," + (htimeline + paddingdoc + margintop) + ")",
       "class": "x axis"
     })
     .call(xAxisTime)
     .append("text") 
     .text("Time in years")
-    .attr("transform", "translate(" + (w - paddingdoc - 50) + " ," + (paddingdoc + 8) + ")")
+    .attr("transform", "translate(" + (w - paddingdoc - marginright - 50) + " ," + (paddingdoc + 8) + ")")
     ;
 
   var yScaleTime = d3.scale.linear()
     .domain([0 , ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
       ])
-    .range([htimeline + paddingdoc , paddingdoc])
+    .range([htimeline + margintop + paddingdoc, paddingdoc + margintop])
     ;
 
   var yAxisTime = d3.svg.axis()
@@ -128,8 +133,8 @@ var yAxisT = d3.select("svg")
     .append("text") 
     .text("Duration in years")
     .attr({
-        "x": -125,
-        "y": -25,
+        "x": -105 - paddingdoc - margintop,
+        "y": -5 - paddingdoc,
         "transform": "rotate(-90)"
       });
 
@@ -138,7 +143,7 @@ var textlabelParty = d3.select("svg")
     .text("Political Party")
     .attr({
         "x": marginleft - 60,
-        "y": paddingdoc + htimeline + 48 
+        "y": paddingdoc + htimeline + margintop + 48 
       });
 
 };

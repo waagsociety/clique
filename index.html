@@ -25,7 +25,7 @@ var timeElements = function(dataset) {
     .filter(function(d) {return d.typeis !== 'Political Party'})
     .attr({
       "x": dxStart,
-      "y": htimeline + paddingdoc, // to move from top to bottom
+      "y": htimeline + paddingdoc + margintop, // to move from top to bottom
       "height": function(d) {return d.dy; }, //meaning d.dy??
       "width": function(d) {return d.end - d.start; },
       "fill": sectorfill,
@@ -38,44 +38,8 @@ var timeElements = function(dataset) {
     })
     ;
 
-  // political party bars
-
-    var barparty = d3.select("svg")
-      .append("g")
-      .selectAll("rect")
-      .data(theseBands)
-      .enter()
-      .append("rect")
-      .filter(function(d) {return d.typeis === 'Political Party'})
-      .attr({
-        "x": dxStart,
-        "y": function(d) {return 40 + htimeline + paddingdoc + d.y}, // positioning bars below each other in one category function (d) {return (h - d)}
-        "height": function(d) {return d.dy; }, //
-        "width": function(d) {return d.end - d.start; },
-        "fill": d3.rgb("#AAA")
-      })
-      ;
-
-    //text political party info
-
-    var infoparty = d3.select("svg") 
-      .append("g")
-      .selectAll("text")
-      .data(theseBands)
-      .enter()
-      .append("text")
-      .filter(function(d) {return d.typeis === 'Political Party'})
-      .text(function(d) {return d.company})
-      .attr({
-        "x": dxStart,
-        "y": (function(d) {return 47 + htimeline + paddingdoc + d.y})
-      })
-      .style({
-        "opacity": 0
-      })
-      ;
-
-      //triangle 
+  
+    //triangles
 
     theseBands
       .filter(function(b) {
@@ -84,9 +48,9 @@ var timeElements = function(dataset) {
       .forEach(function(d) {
     
         var xPoint = ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; // x top-triangle point
-        var yPoint =  htimeline - ((d.end - d.start)/ 2)  + paddingdoc ;  // y top triangle point
+        var yPoint =  htimeline - ((d.end - d.start)/ 2)  + paddingdoc + margintop ;  // y top triangle point
         var dxStart = d.start + paddingdoc + marginleft;// startpoint bar plus extra left padding
-        var dyBar = htimeline  + paddingdoc ; // to move from top to bottom
+        var dyBar = htimeline + margintop + paddingdoc ; // to move from top to bottom
         var dxEnd = d.end + paddingdoc + marginleft; // endpoint bar
 
         var trianglePoints = [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
@@ -116,7 +80,8 @@ var timeElements = function(dataset) {
             "pointer-events": "visible" // can only be targeted when visibility is set to visible
             })
           .style({
-            "stroke-dasharray": ("3, 3")
+            "stroke-dasharray": ("3, 3"),
+            "opacity": 0.4
           })
           ;
       })
@@ -148,13 +113,15 @@ var timeElements = function(dataset) {
     ;
 
     var show = ["#bar-", "#tri-", "#txt-"]
+    var showpp = ["#txtpp-"]
     
     dots.enter()
       .append("circle")
       .filter(function(d){return d.typeis !== 'Political Party'})
       .style({
-        "opacity": 0.6,
-        "cursor" : "pointer"
+        "opacity": 1,
+        "cursor" : "pointer",
+        "z-index": "10"
       })
       .attr({
         "r": radius, //radius
@@ -192,8 +159,7 @@ var timeElements = function(dataset) {
 
     //texttimeline
     
-    var texttimeline = d3.select("svg");
-    texttimeline
+    var texttimeline = d3.select("svg")
       .append("g")
       .selectAll("text")
       .data(theseBands)
@@ -214,6 +180,10 @@ var timeElements = function(dataset) {
           "visibility": "hidden",
           "pointer-events": "visible" // can only be targeted when visibility is set to visible
       })
+      .style({
+        "z-index": "20",
+        "position": "absolute"
+      })
       .each(function(d) {
         var bbox = this.getBBox();
 
@@ -229,6 +199,85 @@ var timeElements = function(dataset) {
       })
       ;
 
+      // political party bars
+
+    var barparty = d3.select("svg")
+      .append("g")
+      .selectAll("rect")
+      .data(theseBands)
+      .enter()
+      .append("rect")
+      .filter(function(d) {return d.typeis === 'Political Party'})
+      .attr({
+        "x": dxStart,
+        "y": function(d) {return 40 + htimeline + margintop + paddingdoc + d.y}, // positioning bars below each other in one category function (d) {return (h - d)}
+        "height": function(d) {return d.dy; }, //
+        "width": function(d) {return d.end - d.start; },
+        "fill": d3.rgb("#AAA"),
+        "id": function(d) {
+              idcounterbarpp += 1;
+              return "barpp-" + idcounterbarpp; 
+            },
+        "pointer-events": "visible"
+      })
+      .on("mouseover", function(d) {
+        var active = this.active ? true : false;
+        var visibility = active ? "hidden" : "visible";
+        var obj = this.id.substr(6,7);
+        showpp.forEach(function(s){
+          d3.select(s + obj).each(function() {  
+          this.setAttribute("visibility", visibility);
+          });
+        });
+      })
+      .on("mouseout", function(d) {
+        var active = this.active ? true : false;
+        var visibility = active ? "visible" : "hidden";
+        var obj = this.id.substr(6,7);
+        showpp.forEach(function(s){
+          d3.select(s + obj).each(function() {  
+          this.setAttribute("visibility", visibility);
+          });
+        });
+      })
+      ;
+
+    //text political party info
+
+    var infoparty = d3.select("svg") 
+      .append("g")
+      .selectAll("text")
+      .data(theseBands)
+      .enter()
+      .append("foreignObject")
+      .filter(function(d) {return d.typeis === 'Political Party'})
+      .html(function(d) {
+        return "<p class='bgtexttime'>Political Party: " + d.company + " <br/> Position: " + d.positionis + "</p>";
+        })
+      .attr({
+        "x": (function(d) {return (d.end - d.start) / 2 + d.start + paddingdoc + marginleft }),
+        "y": (function(d) {return 47 + htimeline + margintop + paddingdoc + d.y - 3}),
+        "id": function(d) {
+              idcountertxtpp += 1;
+              return "txtpp-" + idcountertxtpp; 
+            },
+        "visibility": "hidden",
+        "pointer-events": "visible"
+      })
+      .style({
+        "opacity": 1
+      })
+      .each(function(d) {
+        var bbox = this.getBBox();
+
+        d3.select(this.parentNode)
+          .insert("rect", "text")
+          .attr("width", bbox.width + 1) 
+          .attr("height", bbox.height + 1);
+      })
+      ;
+
+
 } // end timeElements
 
 var timeLegend = function(dataset) { // legend
@@ -243,7 +292,7 @@ var timeLegend = function(dataset) { // legend
     .attr({
       "class": "legendtitle",
       "x": paddingdoc,
-      "y": paddingdoc + 6
+      "y": paddingdoc + margintop + 6
     })
   ;
 
@@ -253,7 +302,7 @@ var timeLegend = function(dataset) { // legend
     .attr({
       "class": "legendexplain",
       "x": paddingdoc,
-      "y": paddingdoc * 2
+      "y": paddingdoc * 2 + margintop
     })
   ;
 
@@ -267,17 +316,37 @@ var timeLegend = function(dataset) { // legend
       .attr("transform", function(d, i) {
         var height = legendRectSize;
         var x = paddingdoc;
-        var y = (paddingdoc * 2.5) + i * (height + legendSpacing);
+        var y = (paddingdoc * 2.5) + i * (height + legendSpacing) + margintop;
         return "translate(" + x + "," + y + ")";
       })
+    .on("mouseover", function(d){
+      d3.select(this)
+      .each(function(){
+        this.style.opacity = 0.6;
+      });
+    })
+    .on("mouseout", function(d){
+      var active = this.active ? true : false;
+      var opacityItem = active ? 0.3 : 1;
+      d3.select(this)
+      .each(function(){
+        this.style.opacity = opacityItem;
+      });
+    })
     .on("click", function(d) {
       var active = this.active ? true : false;
-      var opacity = active ? 0.6 : 0;
+      var opacityDots = active ? 1 : 0;
+      var opacityItem = active ? 1 : 0.3;
       var visibility = active ? "visible" : "hidden";
       this.active = !active;
-      d3.selectAll('.dot-' + d.replace(/\W/gi, '-').toLowerCase()).each(function() {
-        this.style.opacity = opacity;
+      d3.selectAll('.dot-' + d.replace(/\W/gi, '-').toLowerCase())
+      .each(function() {
+        this.style.opacity = opacityDots;
         this.setAttribute("visibility", visibility);
+      });
+      d3.select(this)
+      .each(function(){
+        this.style.opacity = opacityItem;
       });
     })
     ;
