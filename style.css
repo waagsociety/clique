@@ -36,7 +36,12 @@ p.bgtexttime {
   border: solid 1px;
 }
 
-
+.tooltip {
+  position: absolute;
+  width: 200px;
+  height: 28px;
+  pointer-events: none;
+}
 
 /*circle[id^=dot-]:hover {
   stroke: #000;

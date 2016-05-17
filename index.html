@@ -94,30 +94,31 @@ var timeElements = function(dataset) {
       .append("g")
       .selectAll("circle")
       .data(theseBands)
+      .enter()
+      .append("circle")
+      .filter(function(d){return d.typeis !== 'Political Party'})
+      .style({
+        "opacity": 0,
+      })
     ;
 
 // transition werkt niet...
 
     dots.transition()
-      // .delay(function(d, i) {
-      //   return i * 100;
-      //   })
-      // .duration(3000)
+       .delay(function(d, i) {
+        return i * 1000;
+        })
+      .duration(3000)
       // .ease("linear")
-      .attr({
-        "r": radius, //radius
-        "cx": xPoint, // startpoint
-        "cy": yPoint, // positioning
-        "fill": sectorfill,
-          })
     ;
 
-    var show = ["#bar-", "#tri-", "#txt-"]
+    var show = ["#bar-", "#tri-"]
     var showpp = ["#txtpp-"]
-    
-    dots.enter()
-      .append("circle")
-      .filter(function(d){return d.typeis !== 'Political Party'})
+    var tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    dots
       .style({
         "opacity": 1,
         "cursor" : "pointer",
@@ -136,29 +137,45 @@ var timeElements = function(dataset) {
         "pointer-events": "visible" // can only be targeted when visibility is set to visible
           })
       .on("mouseover", function(d) {
-        var active = this.active ? true : false;
-        var visibility = active ? "hidden" : "visible";
-        var obj = this.id.substr(4,5);
-        show.forEach(function(s){
-          d3.select(s + obj).each(function() {  
-          this.setAttribute("visibility", visibility);
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+
+          var format = d3.time.format("%d/%m/%Y");
+          tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: " + d['positionis'] + " <br/> Period: " + format(new Date(d['originalStart'])) + " - " + format(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+          //triangle and bar
+          var active = this.active ? true : false;
+          var visibility = active ? "hidden" : "visible";
+          var obj = this.id.substr(4,5);
+          show.forEach(function(s){
+            d3.select(s + obj).each(function() {  
+            this.setAttribute("visibility", visibility);
+            });
           });
-        });
+      })
+      .on("mousemove", function(d){
+        tooltip.style("left", (d3.event.pageX + 5) + "px")
+            .style("top", (d3.event.pageY - 85) + "px");
       })
       .on("mouseout", function(d) {
-        var active = this.active ? true : false;
-        var visibility = active ? "visible" : "hidden";
-        var obj = this.id.substr(4,5);
-        show.forEach(function(s){
-          d3.select(s + obj).each(function() {  
-          this.setAttribute("visibility", visibility);
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+          // triangle and bar
+          var active = this.active ? true : false;
+          var visibility = active ? "visible" : "hidden";
+          var obj = this.id.substr(4,5);
+          show.forEach(function(s){
+            d3.select(s + obj).each(function() {  
+            this.setAttribute("visibility", visibility);
+            });
           });
-        });
       })
+
       ;
 
     //texttimeline
-    
+    /*
     var texttimeline = d3.select("svg")
       .append("g")
       .selectAll("text")
@@ -198,7 +215,7 @@ var timeElements = function(dataset) {
           .attr("height", bbox.height + 1);
       })
       ;
-
+*/
       // political party bars
 
     var barparty = d3.select("svg")
@@ -221,6 +238,13 @@ var timeElements = function(dataset) {
         "pointer-events": "visible"
       })
       .on("mouseover", function(d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+          
+          var format = d3.time.format("%d/%m/%Y");
+          tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: " + d['positionis'] + " <br/> Period: " + format(new Date(d['originalStart'])) + " - " + format(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+
         var active = this.active ? true : false;
         var visibility = active ? "hidden" : "visible";
         var obj = this.id.substr(6,7);
@@ -230,7 +254,15 @@ var timeElements = function(dataset) {
           });
         });
       })
+      .on("mousemove", function(d){
+        tooltip.style("left", (d3.event.pageX + 5) + "px")
+            .style("top", (d3.event.pageY - 30) + "px");
+      })
       .on("mouseout", function(d) {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+
         var active = this.active ? true : false;
         var visibility = active ? "visible" : "hidden";
         var obj = this.id.substr(6,7);
@@ -244,38 +276,38 @@ var timeElements = function(dataset) {
 
     //text political party info
 
-    var infoparty = d3.select("svg") 
-      .append("g")
-      .selectAll("text")
-      .data(theseBands)
-      .enter()
-      .append("foreignObject")
-      .filter(function(d) {return d.typeis === 'Political Party'})
-      .html(function(d) {
-        return "<p class='bgtexttime'>Political Party: " + d.company + " <br/> Position: " + d.positionis + "</p>";
-        })
-      .attr({
-        "x": (function(d) {return (d.end - d.start) / 2 + d.start + paddingdoc + marginleft }),
-        "y": (function(d) {return 47 + htimeline + margintop + paddingdoc + d.y - 3}),
-        "id": function(d) {
-              idcountertxtpp += 1;
-              return "txtpp-" + idcountertxtpp; 
-            },
-        "visibility": "hidden",
-        "pointer-events": "visible"
-      })
-      .style({
-        "opacity": 1
-      })
-      .each(function(d) {
-        var bbox = this.getBBox();
+    // var infoparty = d3.select("svg") 
+    //   .append("g")
+    //   .selectAll("text")
+    //   .data(theseBands)
+    //   .enter()
+    //   .append("foreignObject")
+    //   .filter(function(d) {return d.typeis === 'Political Party'})
+    //   .html(function(d) {
+    //     return "<p class='bgtexttime'>Political Party: " + d.company + " <br/> Position: " + d.positionis + "</p>";
+    //     })
+    //   .attr({
+    //     "x": (function(d) {return (d.end - d.start) / 2 + d.start + paddingdoc + marginleft }),
+    //     "y": (function(d) {return 47 + htimeline + margintop + paddingdoc + d.y - 3}),
+    //     "id": function(d) {
+    //           idcountertxtpp += 1;
+    //           return "txtpp-" + idcountertxtpp; 
+    //         },
+    //     "visibility": "hidden",
+    //     "pointer-events": "visible"
+    //   })
+    //   .style({
+    //     "opacity": 1
+    //   })
+    //   .each(function(d) {
+    //     var bbox = this.getBBox();
 
-        d3.select(this.parentNode)
-          .insert("rect", "text")
-          .attr("width", bbox.width + 1) 
-          .attr("height", bbox.height + 1);
-      })
-      ;
+    //     d3.select(this.parentNode)
+    //       .insert("rect", "text")
+    //       .attr("width", bbox.width + 1) 
+    //       .attr("height", bbox.height + 1);
+    //   })
+    //   ;
 
 
 } // end timeElements
