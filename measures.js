@@ -9,11 +9,14 @@ var marginbottom = 200;
 var htimeline = (w - marginleft - marginright) / 2
 
 var idcounterdot = 0
+var counterdot = 0
 var idcounterbar = 0
 var idcountertxt = 0
 var idcountertri = 0
 var idcounterbarpp = 0
 var idcountertxtpp = 0
+var show = ["#bar-", "#tri-"]
+var showpp = ["#txtpp-"]
 
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point

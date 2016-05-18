@@ -14,6 +14,7 @@
 //"Educatie, Big Improvement Day","Lid kerngroep","01/01/2010","3/15/2016","Education","pdc","Organization"
 
 var timeElements = function(dataset) {
+  
   // bars
 
   var bars = d3.select("svg")
@@ -100,30 +101,6 @@ var timeElements = function(dataset) {
       .style({
         "opacity": 0,
       })
-    ;
-
-// transition werkt niet...
-
-    dots.transition()
-       .delay(function(d, i) {
-        return i * 1000;
-        })
-      .duration(3000)
-      // .ease("linear")
-    ;
-
-    var show = ["#bar-", "#tri-"]
-    var showpp = ["#txtpp-"]
-    var tooltip = d3.select("body").append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
-
-    dots
-      .style({
-        "opacity": 1,
-        "cursor" : "pointer",
-        "z-index": "10"
-      })
       .attr({
         "r": radius, //radius
         "cx": xPoint, // startpoint
@@ -136,6 +113,28 @@ var timeElements = function(dataset) {
             },
         "pointer-events": "visible" // can only be targeted when visibility is set to visible
           })
+    ;
+
+// transition dots
+
+    dots.transition()
+      .delay(function(d) {  
+        counterdot += 1;
+        return counterdot * 100;
+      })
+      .ease("linear")
+      .style({
+        "opacity": 1,
+        "cursor" : "pointer",
+        "z-index": "10"
+      })
+    ;
+
+    var tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    dots 
       .on("mouseover", function(d) {
           tooltip.transition()
             .duration(200)
@@ -171,51 +170,8 @@ var timeElements = function(dataset) {
             });
           });
       })
-
       ;
 
-    //texttimeline
-    /*
-    var texttimeline = d3.select("svg")
-      .append("g")
-      .selectAll("text")
-      .data(theseBands)
-      .enter()
-      .append("foreignObject")
-      .filter(function(d) {return d.typeis !== 'Political Party'})
-      .html(function(d) {
-        return "<p class='bgtexttime'>Company: " + d.company + " <br/> Position: " + d.positionis + "</p>";
-        })
-      .attr({
-        "x": xPoint,
-        "y": yPoint,
-        "fill": d3.rgb("#000"),
-        "class": function(d) {return "txt-" + d.sector.replace(/\W/gi, '-').toLowerCase()},
-        "id": function(d) {
-          idcountertxt += 1;
-          return "txt-" + idcountertxt; },
-          "visibility": "hidden",
-          "pointer-events": "visible" // can only be targeted when visibility is set to visible
-      })
-      .style({
-        "z-index": "20",
-        "position": "absolute"
-      })
-      .each(function(d) {
-        var bbox = this.getBBox();
-
-        d3.select(this.parentNode)
-          .insert("rect", "text")
-          // .style("fill", "#FFF")
-          // .style("stroke-width", 1)
-          // .style("stroke", "#000")
-          // .attr("x", bbox.x )
-          // .attr("y", bbox.y )
-          .attr("width", bbox.width + 1) 
-          .attr("height", bbox.height + 1);
-      })
-      ;
-*/
       // political party bars
 
     var barparty = d3.select("svg")
@@ -273,42 +229,6 @@ var timeElements = function(dataset) {
         });
       })
       ;
-
-    //text political party info
-
-    // var infoparty = d3.select("svg") 
-    //   .append("g")
-    //   .selectAll("text")
-    //   .data(theseBands)
-    //   .enter()
-    //   .append("foreignObject")
-    //   .filter(function(d) {return d.typeis === 'Political Party'})
-    //   .html(function(d) {
-    //     return "<p class='bgtexttime'>Political Party: " + d.company + " <br/> Position: " + d.positionis + "</p>";
-    //     })
-    //   .attr({
-    //     "x": (function(d) {return (d.end - d.start) / 2 + d.start + paddingdoc + marginleft }),
-    //     "y": (function(d) {return 47 + htimeline + margintop + paddingdoc + d.y - 3}),
-    //     "id": function(d) {
-    //           idcountertxtpp += 1;
-    //           return "txtpp-" + idcountertxtpp; 
-    //         },
-    //     "visibility": "hidden",
-    //     "pointer-events": "visible"
-    //   })
-    //   .style({
-    //     "opacity": 1
-    //   })
-    //   .each(function(d) {
-    //     var bbox = this.getBBox();
-
-    //     d3.select(this.parentNode)
-    //       .insert("rect", "text")
-    //       .attr("width", bbox.width + 1) 
-    //       .attr("height", bbox.height + 1);
-    //   })
-    //   ;
-
 
 } // end timeElements
 
