@@ -43,6 +43,10 @@ p.bgtexttime {
   pointer-events: none;
 }
 
+.dottxt {
+    font: 8px sans-serif;
+  }
+
 /*circle[id^=dot-]:hover {
   stroke: #000;
   stroke-width: 1;

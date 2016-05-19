@@ -24,6 +24,9 @@ var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc
 var dxStart = function(d) {return d.start + paddingdoc + marginleft; }; // startpoint bar plus extra left padding
 var dxEnd = function(d) {return d.end + paddingdoc + marginleft; }; // endpoint bar
 var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
+var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft - (radius / 2) + 1; }; // x top-triangle point
+var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop +  (radius / 2) + 1; }; // y top triangle point
+
 
 var types = [];
 
