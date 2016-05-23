@@ -78,7 +78,7 @@ var timeline = d3.layout.timeline()
 
 var sectorTypes = function(dataset){
   dataset.forEach(function(data){
-    if (types.indexOf(data.sector) === -1) {
+    if (data.typeis != "Political Party" && types.indexOf(data.sector) === -1 ) {
       types.push(data.sector);
     }
   });
