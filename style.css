@@ -43,8 +43,8 @@ p.bgtexttime {
   pointer-events: none;
 }
 
-.dottxt {
-    font: 8px sans-serif;
+[class^="dottxt"] {
+    font: 9px sans-serif;
   }
 
 /*circle[id^=dot-]:hover {

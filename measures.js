@@ -17,6 +17,7 @@ var idcounterbarpp = 0
 var idcountertxtpp = 0
 var show = ["#bar-", "#tri-"]
 var showpp = ["#txtpp-"]
+var xy = {}; // save datapoints
 
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
@@ -24,9 +25,27 @@ var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc
 var dxStart = function(d) {return d.start + paddingdoc + marginleft; }; // startpoint bar plus extra left padding
 var dxEnd = function(d) {return d.end + paddingdoc + marginleft; }; // endpoint bar
 var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
-var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft - (radius / 2) + 1; }; // x top-triangle point
-var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop +  (radius / 2) + 1; }; // y top triangle point
+var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft - (radius / 2) + 0.5 ; }; // x top-triangle point
+var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop +  (radius / 2); }; // y top triangle point
 
+var dottxtfunc = function(d) {
+  
+  if ( this.getAttribute("visibility") == "hidden"){
+    return "";
+  }
+  var current = (xPoint(d) + "," + yPoint(d)); // 
+  
+  var mylabel = xy[current]; // get the index of current data point in array arr
+  //debugger
+  if ( mylabel === undefined ) { // if index is -1, then no match found. unique data point
+    xy[current] = 1; // push point onto array
+    return "";
+
+  } else {
+    xy[current] = xy[current] + 1; // push point onto array
+    return xy[current] + "";
+  }
+}
 
 var types = [];
 
