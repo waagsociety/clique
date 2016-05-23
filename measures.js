@@ -45,7 +45,7 @@ var dottxtfunc = function(d) {
     xy[current] = xy[current] + 1; // push point onto array
     return xy[current] + "";
   }
-}
+};
 
 var types = [];
 

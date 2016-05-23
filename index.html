@@ -366,10 +366,11 @@ var timeLegend = function(dataset) { // legend
   legend.append("text")
     .attr("x", legendRectSize + legendSpacing)
     .attr("y", legendRectSize - legendSpacing + 2)
-    .text(function(d) { return d; })
-    
+    .text(function(d) {
+      var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.typeis != "Political Party"});
+      return d + " (" + onlyThisType.length + ")"; 
+    })
     ;
-
 } // end timeLegend
 
 // draw everything on the page
@@ -383,6 +384,7 @@ d3.csv("cvbruijn.csv", function (dataset) {
   //DRAW ELEMENTS: points, timelines, text connected to the points
   types.forEach(function(type, i) {
     onlyThisType = dataset.filter(function(d) {return d.sector === type});
+    
     theseBands = timeline(onlyThisType);
 
     var drawElements = timeElements(dataset);
