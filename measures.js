@@ -110,8 +110,11 @@ var timeAxes = function(dataset) {
 
   // scales & axes
 
+  var xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), 
+                    d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
+
   var xScaleTime = d3.time.scale() // input domain , output range
-    .domain([d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), d3.max(dataset, function(d) { return dateFormat.parse(d.end); })])
+    .domain(xTimeExtent)
     .range([paddingdoc + marginleft, w + paddingdoc - marginright]); // change in figures as well!!
 
   var xAxisTime = d3.svg.axis()
@@ -135,9 +138,12 @@ var timeAxes = function(dataset) {
     .attr("transform", "translate(" + (w - paddingdoc - marginright - 50) + " ," + (paddingdoc + 8) + ")")
     ;
 
+  yDurationExtent = [0 , 
+                  ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
+      ];
+
   var yScaleTime = d3.scale.linear()
-    .domain([0 , ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
-      ])
+    .domain(yDurationExtent)
     .range([htimeline + margintop + paddingdoc, paddingdoc + margintop])
     ;
 
@@ -170,5 +176,25 @@ var textlabelParty = d3.select("svg")
         "x": marginleft - 60,
         "y": paddingdoc + htimeline + margintop + 48 
       });
+
+// var brush = d3.svg.brush()
+//     .x(xScaleTime)
+//     .extent(xTimeExtent)
+//     .on("brushend", function() {
+//     if (!d3.event.sourceEvent) return; // only transition after input
+//     var extent0 = brush.extent(),
+//         extent1 = extent0.map(d3.time.year.round);
+
+//     // if empty when rounded, use floor & ceil instead
+//     if (extent1[0] >= extent1[1]) {
+//       extent1[0] = d3.time.year.floor(extent0[0]);
+//       extent1[1] = d3.time.year.ceil(extent0[1]);
+//     }
+
+//     d3.select(this).transition()
+//         .call(brush.extent(extent1))
+//         .call(brush.event);
+//   })
+//     ;
 
 };

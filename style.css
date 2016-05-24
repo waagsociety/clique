@@ -47,6 +47,12 @@ p.bgtexttime {
     font: 9px sans-serif;
   }
 
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
 /*circle[id^=dot-]:hover {
   stroke: #000;
   stroke-width: 1;
