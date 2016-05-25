@@ -1,12 +1,14 @@
-var w = 1100;
-var h = 400;
-var radius = 6;
-var paddingdoc = 20;
-var margintop = 10;
-var marginleft = 240;
-var marginright = 150;
-var marginbottom = 200;
-var htimeline = (w - marginleft - marginright) / 2
+const w = 1100;
+const h = 400;
+const radius = 6;
+const paddingdoc = 20;
+const margintop = 10;
+const marginleft = 240;
+const marginright = 150;
+const marginbottom = 200;
+const htimeline = (w - marginleft - marginright) / 2
+
+const triangleIds = ["bar-", "tri-"]
 
 var idcounterdot = 0
 var counterdot = 0
@@ -15,9 +17,8 @@ var idcountertxt = 0
 var idcountertri = 0
 var idcounterbarpp = 0
 var idcountertxtpp = 0
-var show = ["#bar-", "#tri-"]
-var showpp = ["#txtpp-"]
-var xy = {}; // save datapoints
+
+
 
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
@@ -28,28 +29,10 @@ var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
 var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft - (radius / 2) + 0.5 ; }; // x top-triangle point
 var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop +  (radius / 2); }; // y top triangle point
 
-var dottxtfunc = function(d) {
-  
-  if ( this.getAttribute("visibility") == "hidden"){
-    return "";
-  }
-  var current = (xPoint(d) + "," + yPoint(d)); // 
-  
-  var mylabel = xy[current]; // get the index of current data point in array arr
-  //debugger
-  if ( mylabel === undefined ) { // if index is -1, then no match found. unique data point
-    xy[current] = 1; // push point onto array
-    return "";
-
-  } else {
-    xy[current] = xy[current] + 1; // push point onto array
-    return xy[current] + "";
-  }
-};
 
 var types = [];
 
-colorScale = d3.scale.ordinal()
+var colorScale = d3.scale.ordinal()
   .domain(types)
   .range(["#f1c7dd", "#0b326b", "#f5bd42", "#7bcbc0",   "#f05129",  "#b7cc94", "#e3337e", "#827775", "#966eac", "#b09977",]);
 
@@ -59,7 +42,7 @@ var timeline = d3.layout.timeline()
     .padding(4)
     .maxBandHeight(12); // height bands
 
-// trim data... 
+// trim data...
  /*
    var clean = dataset.map(function(d) {
     var cleanD = {};
@@ -70,11 +53,37 @@ var timeline = d3.layout.timeline()
   });
 
   console.log(JSON.stringify(clean));
-  */ 
+  */
+
+function startClique(filename) {
+
+  d3.csv(filename, function (dataset) {
+
+  sectorTypes(dataset);
+
+  timeAxes(dataset);
+
+  theseBands = timeline(dataset);
+  timeElements(theseBands);
+    //var drawBrush = brushing(dataset);
+
+    // var gBrush = d3.select("svg")
+    //   .append("g")
+    //   .attr("class", "brush")
+    //   .call(brush)
+    //   .call(brush.event);
+
+    // gBrush.selectAll("rect")
+    //   .attr("height", height);
 
 
+    timeLegend(dataset);
 
-// array sectors to determine colors -------> counter? Biggest first? 
+  });
+}
+
+
+// array sectors to determine colors -------> counter? Biggest first?
 
 var sectorTypes = function(dataset){
   dataset.forEach(function(data){
@@ -106,11 +115,11 @@ var timeAxes = function(dataset) {
     ;
 
   var dateFormat = d3.time.format('%m/%d/%Y');
-  var timelinedataset = timeline(dataset); //draw bars & dots
+  //timeline(dataset); //draw bars & dots
 
   // scales & axes
 
-  var xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }), 
+  var xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
                     d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
 
   var xScaleTime = d3.time.scale() // input domain , output range
@@ -133,12 +142,12 @@ var timeAxes = function(dataset) {
       "class": "x axis"
     })
     .call(xAxisTime)
-    .append("text") 
+    .append("text")
     .text("Time in years")
     .attr("transform", "translate(" + (w - paddingdoc - marginright - 50) + " ," + (paddingdoc + 8) + ")")
     ;
 
-  yDurationExtent = [0 , 
+  yDurationExtent = [0 ,
                   ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
       ];
 
@@ -161,7 +170,7 @@ var yAxisT = d3.select("svg")
       "class": "y axis"
     })
     .call(yAxisTime)
-    .append("text") 
+    .append("text")
     .text("Duration in years")
     .attr({
         "x": -105 - paddingdoc - margintop,
@@ -170,11 +179,11 @@ var yAxisT = d3.select("svg")
       });
 
 var textlabelParty = d3.select("svg")
-    .append("text") 
+    .append("text")
     .text("Political Party")
     .attr({
         "x": marginleft - 60,
-        "y": paddingdoc + htimeline + margintop + 48 
+        "y": paddingdoc + htimeline + margintop + 48
       });
 
 // var brush = d3.svg.brush()

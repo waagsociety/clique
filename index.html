@@ -3,73 +3,35 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <title>Timeline Jan Anthonie Bruijn</title>
-  <script src="//d3js.org/d3.v3.min.js" charset="utf-8" type="text/javascript"></script>
-  <script src="d3.layout.timeline.js" charset="utf-8" type="text/javascript"></script>
-  <link href="style.css" rel="stylesheet" type="text/css">
-  <style type="text/css"></style>
-  
-  <script src="measures.js" charset="utf-8" type="text/javascript"></script>
-  <script src="timeelements.js" charset="utf-8" type="text/javascript"></script>
-  <script src="timelegend.js" charset="utf-8" type="text/javascript"></script>
+
+  <script src="d3/d3.min.js" charset="utf-8" type="text/javascript"></script>
+  <script src="d3/d3.layout.timeline.js" charset="utf-8" type="text/javascript"></script>
+
+  <script src="js/measures.js" charset="utf-8" type="text/javascript"></script>
+  <script src="js/timeelements.js" charset="utf-8" type="text/javascript"></script>
+  <script src="js/timelegend.js" charset="utf-8" type="text/javascript"></script>
 
   <script type="text/javascript">
 //example database: company,positionis,start,end,sector,sourceis,typeis
 //"Educatie, Big Improvement Day","Lid kerngroep","01/01/2010","3/15/2016","Education","pdc","Organization"
 
-
-
 // brush data selection
 // var brushing = function(dataset){
 
-// } 
+// }
 // end brushing
-
-
-
 // draw everything on the page
-
-d3.csv("cvbruijn.csv", function (dataset) {
-
-  var determineSector = sectorTypes(dataset);
-
-  var drawAxes = timeAxes(dataset);
-
-
-
-  //DRAW ELEMENTS: points, timelines, text connected to the points
-  types.forEach(function(type, i) {
-    onlyThisType = dataset.filter(function(d) {return d.sector === type});
-    
-    theseBands = timeline(onlyThisType);
-  
-
-    var drawElements = timeElements(dataset);
-    
-
-
-  });
-  //var drawBrush = brushing(dataset);
-
-  // var gBrush = d3.select("svg")
-  //   .append("g")
-  //   .attr("class", "brush")
-  //   .call(brush)
-  //   .call(brush.event);
-
-  // gBrush.selectAll("rect")
-  //   .attr("height", height);
-
-
-  var drawLegend = timeLegend(dataset);
-
-});
+startClique("cvbruijn.csv")
 
 </script>
+
+<link href="css/style.css" rel="stylesheet" type="text/css">
+
 </head>
+
 <body>
 <div id="viz">
   <h1>Timeline Jan Anthonie Bruijn</h1>
-
 </div>
 </body>
 </html>

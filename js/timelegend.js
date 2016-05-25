@@ -1,9 +1,12 @@
 var timeLegend = function(dataset) { // legend
 
-  var legendRectSize = 15;
-  var legendSpacing = 5;
+  const legendRectSize = 15;
+  const legendSpacing = 5;
 
-  var legendtitle = d3.select("svg")
+  var legendSelector = d3.select("svg")
+                        .append("g");
+
+  var legendtitle = legendSelector
     .append("text")
     .text("Sectors")
     .attr({
@@ -13,7 +16,7 @@ var timeLegend = function(dataset) { // legend
     })
   ;
 
-  var legendexplain = d3.select("svg")
+  var legendexplain = legendSelector
     .append("text")
     .text("Click to show/hide")
     .attr({
@@ -23,19 +26,19 @@ var timeLegend = function(dataset) { // legend
     })
   ;
 
-  var legend = d3.select("svg")
-    .append("g")
-    .selectAll("g")
+  var legend = legendSelector
+    .selectAll("g.legenditem")
     .data(colorScale.domain())
     .enter()
     .append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) {
-        var height = legendRectSize;
-        var x = paddingdoc;
-        var y = (paddingdoc * 2.5) + i * (height + legendSpacing) + margintop;
-        return "translate(" + x + "," + y + ")";
-      })
+    .attr("class","legenditem")
+    .attr("transform", function(d, i) {
+      this.active = true;
+      var height = legendRectSize;
+      var x = paddingdoc;
+      var y = (paddingdoc * 2.5) + i * (height + legendSpacing) + margintop;
+      return "translate(" + x + "," + y + ")";
+    })
     .on("mouseover", function(d){
       d3.select(this)
       .each(function(){
@@ -43,27 +46,23 @@ var timeLegend = function(dataset) { // legend
       });
     })
     .on("mouseout", function(d){
-      var active = this.active ? true : false;
-      var opacityItem = active ? 0.3 : 1;
-      d3.select(this)
-      .each(function(){
-        this.style.opacity = opacityItem;
-      });
+      var opacityItem = this.active ? 1 : 0.3;
+      this.style.opacity = opacityItem;
     })
     .on("click", function(d) {
-      var active = this.active ? true : false;
-      var opacityDots = active ? 1 : 0;
-      var opacityItem = active ? 1 : 0.3;
-      var visibility = active ? "visible" : "hidden";
-      this.active = !active;
+      this.active = !this.active;
+      var opacityItem = this.active ? 1 : 0.3;
+      var visibility = this.active ? "visible" : "hidden";
+
+      this.style.opacity = opacityItem;
+
       d3.selectAll('.dot-' + d.replace(/\W/gi, '-').toLowerCase())
       .each(function() {
-        this.style.opacity = opacityDots;
         this.setAttribute("visibility", visibility);
       });
 
-      //recalculate dottxt 
-      
+      //recalculate dottxt
+
       d3.selectAll('.dottxt-' + d.replace(/\W/gi, '-').toLowerCase())
       .each(function(){
         this.setAttribute("visibility", visibility);
@@ -72,15 +71,9 @@ var timeLegend = function(dataset) { // legend
       xy = {}; // save datapoints
       d3.selectAll('*[class^="dottxt"]')
       .text(dottxtfunc);
-      
-
-      d3.select(this)
-      .each(function(){
-        this.style.opacity = opacityItem;
-      });
     })
     ;
-    
+
   legend.append("rect")
     .attr("width", legendRectSize)
     .attr("height", legendRectSize)
@@ -93,7 +86,7 @@ var timeLegend = function(dataset) { // legend
     .attr("y", legendRectSize - legendSpacing + 2)
     .text(function(d) {
       var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.typeis != "Political Party"});
-      return d + " (" + onlyThisType.length + ")"; 
+      return d + " (" + onlyThisType.length + ")";
     })
     ;
 } // end timeLegend
