@@ -1,10 +1,9 @@
-var timeLegend = function(dataset) { // legend
+var timeLegend = function(dataset,svg) { // legend
 
   const legendRectSize = 15;
   const legendSpacing = 5;
 
-  var legendSelector = d3.select("svg")
-                        .append("g");
+  var legendSelector = svg.append("g");
 
   var legendtitle = legendSelector
     .append("text")

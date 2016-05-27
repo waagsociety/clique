@@ -13,7 +13,7 @@ function dottxtfunc (d) {
   //debugger
   if ( mylabel === undefined ) { // if index is -1, then no match found. unique data point
     xy[current] = 1; // push point onto array
-    return "";
+    return "1";
 
   } else {
     //debugger
@@ -23,8 +23,22 @@ function dottxtfunc (d) {
 };
 
 
-function timeElements (theseBands) {
 
+function timeElements (dataset,svg) {
+
+  var idcounterdot = 0;
+  var counterdot = 0;
+  var idcounterbar = 0;
+  var idcountertri = 0;
+  var idcounterbarpp = 0;
+
+  var timeline = d3.layout.timeline()
+      .size([w - marginleft - marginright,htimeline])
+      .extent(xTimeExtent)
+      .padding(4)
+      .maxBandHeight(12); // height bands
+
+  var theseBands = timeline(dataset);
   // bars
 
   var noPolPartydata = theseBands.filter(function(b) {
@@ -35,8 +49,7 @@ function timeElements (theseBands) {
                   return b.typeis === 'Political Party';
               });
 
-  var bars = d3.select("svg")
-    .append("g")
+  svg.append("g")
     .attr({
         "class": "gbar"
       })
@@ -79,39 +92,37 @@ function timeElements (theseBands) {
 
 
 
-    d3.select("svg")
-        .append("g")
-        .attr({
-          "class": "gtri"
-        })
-        .selectAll("path")
-        .data(noPolPartydata)
-        .enter()
-        .append("path")
-        .attr({
-            "d": function(d) {
-              return lineFunction(makeTrianglePoints(d));
+    svg.append("g")
+      .attr({
+        "class": "gtri"
+      })
+      .selectAll("path")
+      .data(noPolPartydata)
+      .enter()
+      .append("path")
+      .attr({
+          "d": function(d) {
+            return lineFunction(makeTrianglePoints(d));
+          },
+          "stroke": sectorfill,
+          "stroke-width": 1,
+          "fill-opacity": 0,
+          "class": function(d) {return triangleIds[1] + d.sector.replace(/\W/gi, '-').toLowerCase()},
+          "id": function(d) {
+            idcountertri += 1;
+            return triangleIds[1] + idcountertri;
             },
-            "stroke": sectorfill,
-            "stroke-width": 1,
-            "fill-opacity": 0,
-            "class": function(d) {return triangleIds[1] + d.sector.replace(/\W/gi, '-').toLowerCase()},
-            "id": function(d) {
-              idcountertri += 1;
-              return triangleIds[1] + idcountertri;
-              },
-            "visibility": "hidden",
-            "pointer-events": "visible" // can only be targeted when visibility is set to visible
-        })
-        .style({
-          "stroke-dasharray": ("3, 3"),
-          "opacity": 0.4
-        })
-        ;
+          "visibility": "hidden",
+          "pointer-events": "visible" // can only be targeted when visibility is set to visible
+      })
+      .style({
+        "stroke-dasharray": ("3, 3"),
+        "opacity": 0.4
+      })
+      ;
 
 
-    var compoundDotContainer = d3.select("svg")
-      .append("g")
+    var compoundDotContainer = svg.append("g")
       .selectAll("g")
       .data(noPolPartydata)
       .enter()
@@ -152,77 +163,30 @@ function timeElements (theseBands) {
       })
     ;
 
-    dots
-      .on("mouseover", function(d) {
-        tooltip.style("left", (d3.event.pageX + 5) + "px")
-            .style("top", (d3.event.pageY - 85) + "px");
+    dots.on("mouseover", function(d) {
+      tooltip.style("left", (d3.event.pageX + 5) + "px")
+          .style("top", (d3.event.pageY - 85) + "px");
 
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", .9);
 
-        tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: "
-            + d['positionis'] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
-            + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
-        //triangle and bar
-        var obj = this.id.substr(4,5);
-        debugger
-        triangleIds.forEach(function(s){
-          d3.select("#" + s + obj).
-          each(function (t){
-            this.setAttribute("visibility", "visible");
-          });
-        })
+      tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: "
+          + d['positionis'] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
+          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+      //triangle and bar
+      var obj = this.id.substr(4,5);
+      //debugger
+      triangleIds.forEach(function(s){
+        d3.select("#" + s + obj).
+        each(function (t){
+          this.setAttribute("visibility", "visible");
+        });
       })
-      .on("click", function(d) {
-        debugger
-        if( this.parentNode.childNodes[1].textContent.length > 0){
-          tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-            // triangle and bar
-            var obj = this.id.substr(4,5);
-            triangleIds.forEach(function(s){
-              d3.select("#" + s + obj).
-              each(function (t){
-                this.setAttribute("visibility", "hidden");
-              });
-            })
-          this.setAttribute("visibility", "hidden");
-          this.parentNode.childNodes[1].setAttribute("visibility", "hidden");
-        }else{
-          tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-            // triangle and bar
-            var obj = this.id.substr(4,5);
-            triangleIds.forEach(function(s){
-              d3.select("#" + s + obj).
-              each(function (t){
-                this.setAttribute("visibility", "hidden");
-              });
-            })
-          d3.selectAll('*[class^="dot-"]').
-          each(function (t){
-            this.setAttribute("visibility", "visible");
-          });
-          d3.selectAll('*[class^="dottxt-"]').
-          each(function (t){
-            this.setAttribute("visibility", "visible");
-          });
-        }
-        // triangleIds.forEach(function(s){
-        //   d3.select("#" + s + obj).
-        //   each(function (t){
-        //     this.setAttribute("visibility", "hidden");
-        //   });
-        //})
-      })
-      .on("mousemove", function(d){
-        debugger
-      })
-      .on("mouseout", function(d) {
-        debugger
+    })
+    .on("click", function(d) {
+      //debugger
+      if( this.parentNode.childNodes[1].textContent !== "1"){
         tooltip.transition()
           .duration(500)
           .style("opacity", 0);
@@ -234,14 +198,60 @@ function timeElements (theseBands) {
               this.setAttribute("visibility", "hidden");
             });
           })
+        this.setAttribute("visibility", "hidden");
+        this.parentNode.childNodes[1].setAttribute("visibility", "hidden");
+      }else{
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+          // triangle and bar
+          var obj = this.id.substr(4,5);
+          triangleIds.forEach(function(s){
+            d3.select("#" + s + obj).
+            each(function (t){
+              this.setAttribute("visibility", "hidden");
+            });
+          })
+        d3.selectAll('*[class^="dot-"]').
+        each(function (t){
+          this.setAttribute("visibility", "visible");
+        });
+        d3.selectAll('*[class^="dottxt-"]').
+        each(function (t){
+          this.setAttribute("visibility", "visible");
+        });
+      }
+      // triangleIds.forEach(function(s){
+      //   d3.select("#" + s + obj).
+      //   each(function (t){
+      //     this.setAttribute("visibility", "hidden");
+      //   });
+      //})
+    })
+    .on("mousemove", function(d){
+      //debugger
+    })
+    .on("mouseout", function(d) {
+      //debugger
+      tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+        // triangle and bar
+        var obj = this.id.substr(4,5);
+        triangleIds.forEach(function(s){
+          d3.select("#" + s + obj).
+          each(function (t){
+            this.setAttribute("visibility", "hidden");
+          });
+        })
 
-          // d3.selectAll('*[class^="dot-"]').
-          // each(function (t){
-          //   this.setAttribute("visibility", "visible");
-          // });
+        // d3.selectAll('*[class^="dot-"]').
+        // each(function (t){
+        //   this.setAttribute("visibility", "visible");
+        // });
 
-      })
-    ;
+    })
+  ;
 
 
     xy = {}; // reset datapoints
@@ -283,8 +293,7 @@ function timeElements (theseBands) {
 
       // political party bars
 
-    var barparty = d3.select("svg")
-      .append("g")
+    svg.append("g")
       .selectAll("rect")
       .data(isPolPartydata)
       .enter()
@@ -310,10 +319,10 @@ function timeElements (theseBands) {
                     + shortFormat(new Date(d['originalStart'])) + " - " + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
 
         var obj = this.id.substr(6,7);
-        showpp.forEach(function(s){
-          d3.select(s + obj).each(function() {
-          this.setAttribute("visibility", "visible");
-          });
+
+        d3.select(ppText + obj).each(function() {
+        this.setAttribute("visibility", "visible");
+
         });
       })
       .on("mousemove", function(d){
@@ -326,10 +335,10 @@ function timeElements (theseBands) {
           .style("opacity", 0);
 
         var obj = this.id.substr(6,7);
-        showpp.forEach(function(s){
-          d3.select(s + obj).each(function() {
-          this.setAttribute("visibility", "hidden");
-          });
+
+        d3.select(ppText + obj).each(function() {
+        this.setAttribute("visibility", "hidden");
+
         });
       })
     ;
