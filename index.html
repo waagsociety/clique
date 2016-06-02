@@ -4,7 +4,11 @@
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <title>Timeline Jan Anthonie Bruijn</title>
 
+  <link href="css/reset.css" rel="stylesheet" type="text/css">
   <link href="css/style.css" rel="stylesheet" type="text/css">
+
+  <script src="https://use.typekit.net/kdv7wym.js"></script>
+  <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
   <script src="d3/d3.min.js" charset="utf-8" type="text/javascript"></script>
   <script src="d3/d3.layout.timeline.js" charset="utf-8" type="text/javascript"></script>
@@ -30,8 +34,41 @@ startClique("cvbruijn.csv")
 </head>
 
 <body>
-<div id="viz">
-  <h1>Timeline Jan Anthonie Bruijn</h1>
-</div>
+
+  <header class="header clearfix">
+    <div class="container">
+      <div class="logo">
+        <a href=""><img src="img/TNL_logoClique_wit.svg" alt="Clique" height="31" width="79"></a>
+      </div>
+
+      <div class="searchperson">
+        <form>
+          <input type="text" class="search input" style="font-family:brandon-grotesque;color:white" placeholder="Search...">
+          <button id="submit" type="submit">
+              <svg class="magnifier" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 409.6 409.6">
+              <path class="mag-1" d="M398.35,344.05l-94-94a180.78,180.78,0,0,1-54.3,54.3l94,94a38.4,38.4,0,1,0,54.3-54.3h0Zm0,0"/>
+              <path class="mag-1" d="M307.2,153.6A153.6,153.6,0,1,0,153.6,307.2,153.6,153.6,0,0,0,307.2,153.6h0ZM153.6,268.8A115.2,115.2,0,1,1,268.8,153.6,115.33,115.33,0,0,1,153.6,268.8h0Zm0,0"/>
+              <path class="mag-1" d="M64,153.6H89.6a64.07,64.07,0,0,1,64-64V64A89.71,89.71,0,0,0,64,153.6h0Zm0,0"/>
+              </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="container">
+      <div id="viz">
+        <h1>Timeline Jan Anthonie Bruijn</h1>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      text
+    </div>
+  </footer>
+
 </body>
 </html>
