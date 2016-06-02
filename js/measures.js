@@ -69,7 +69,7 @@ function startClique(filename) {
 
   egoDataSet = {};
   linkedDataSet = {};
-  d3.select("div#viz").append("h1").html( "Timeline " + name );
+  //d3.select("div#viz").append("h1").html( "Timeline " + name );
 
   var myUrl = tnPersonEndPoint + encodeURIComponent(name);
 
