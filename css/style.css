@@ -44,9 +44,21 @@ section:first-of-type {
     background-color: #58595B;
 }
 
+.footer p {
+    color: #FFF;
+    font: 0.8em "brandon-grotesque", sans-serif;
+    margin-top: 10px;
+}
+
+em {
+  font-weight: bold;
+  font-style: normal;
+}
+
 .footer .container {
   height: 165px;
   background: url(../img/TNL_logoClique_bgfooter.png) top right no-repeat;
+  text-align: right;
 }
 
 .logo {
@@ -76,11 +88,6 @@ section:first-of-type {
   height: 32px;
 }
 
-input.search[type="text"]
-{
-  font: "brandon-grotesque" 12px #FFF;
-}
-
 #submit svg path{
   fill: #FFF;
 }
@@ -97,8 +104,9 @@ h1 {
 }
 
 text {
-    font: sans-serif 10px ;
+    font-size: 12px ;
     font-family: "brandon-grotesque";
+    font-weight: bold;
     color: #58595B;
 }
 
