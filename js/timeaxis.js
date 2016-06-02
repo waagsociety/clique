@@ -83,6 +83,8 @@ function brushes (xTimeAxis,svg){
       .extent(xTimeExtent)
       .on("brushend", brushended);
 
+  debugger
+
   var gBrush = svg.append("g")
       .attr({
         "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop - height) + " )",
@@ -96,17 +98,23 @@ function brushes (xTimeAxis,svg){
 
   function brushended() {
     if (!d3.event.sourceEvent) return; // only transition after input
-    var extent0 = brush.extent(),
-        extent1 = extent0.map(d3.time.year.round);
+    var initialExtent = brush.extent(),
+        roundedExtent = initialExtent.map(d3.time.year.round);
 
     // if empty when rounded, use floor & ceil instead
-    if (extent1[0] >= extent1[1]) {
-      extent1[0] = d3.time.year.floor(extent0[0]);
-      extent1[1] = d3.time.year.ceil(extent0[1]);
+    if (roundedExtent[0] >= roundedExtent[1]) {
+      roundedExtent[0] = d3.time.year.floor(initialExtent[0]);
+      roundedExtent[1] = d3.time.year.ceil(initialExtent[1]);
     }
-    //debugger
+
     d3.select(this).transition()
-        .call(brush.extent(extent1))
+        .call(brush.extent(roundedExtent))
         .call(brush.event);
+    createEgoData(roundedExtent);
+
   }
 };
+
+function createEgoData(extent){
+  setEgoData(jsonData);
+}

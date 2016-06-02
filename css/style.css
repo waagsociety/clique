@@ -4,23 +4,23 @@ h1 {
     margin-top: 40px;
   }
 
-  text {
-    font: 10px sans-serif;
-  }
+text {
+  font: 10px sans-serif;
+}
 
-  .axis text {
-    font: 8px sans-serif;
-  }
+.axis text {
+  font: 8px sans-serif;
+}
 
- .axis path {
-  stroke-width: 0;
-  stroke: #000;
- }
+.axis path {
+stroke-width: 0;
+stroke: #000;
+}
 
- .axis line {
-  shape-rendering: crispEdges;
-  stroke: #000;
-  stroke-width: 1px;
+.axis line {
+shape-rendering: crispEdges;
+stroke: #000;
+stroke-width: 1px;
 }
 
 .legendtitle {
@@ -58,6 +58,24 @@ p.bgtexttime {
 }
 .grid .minor.tick line {
   stroke-opacity: .5;
+}
+
+.node circle {
+  cursor: pointer;
+  stroke: #3182bd;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+line.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
 }
 
 /*circle[id^=dot-]:hover {
