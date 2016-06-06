@@ -80,8 +80,8 @@ function brushes (xTimeAxis,svg){
 
   var brush = d3.svg.brush()
       .x(xTimeScale)
-      .extent(xTimeExtent)
-      .on("brushend", brushended);
+      .on("brushend", brushended)
+      .clear();
 
   debugger
 
@@ -90,8 +90,8 @@ function brushes (xTimeAxis,svg){
         "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop - height) + " )",
         "class": "brush"
       })
-      .call(brush)
-      .call(brush.event);
+      .call(brush);
+//      .call(brush.event);
 
   gBrush.selectAll("rect")
       .attr("height", height);

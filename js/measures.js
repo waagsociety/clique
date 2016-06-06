@@ -131,8 +131,8 @@ function getRelations(theUrl){
         );
 
       }
-      getCompanySectors();
       done++
+      getCompanySectors();
       mergeDatasets();
     }
   });
@@ -149,10 +149,14 @@ function makeSectorCallback(index) {
         //console.log("Type " + response[i].pit.type)
         if(response[i].pit.type === "tnl:Sector"){
           egoDataSet["companies"][index].sector = response[i].pit.name;
+          done++
+          mergeDatasets();
           return
         }
       }
       egoDataSet["companies"][index].sector = "Other services activities";
+      done++
+      mergeDatasets();
     }
   }
 }
@@ -226,7 +230,7 @@ function getLinkedPeople(theUrl){
 
 function mergeDatasets() {
 
-  if (done != 2){
+  if (done != (2 + egoDataSet["companies"].length)){
     return;
   }
 
