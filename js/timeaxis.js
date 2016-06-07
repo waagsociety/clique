@@ -83,8 +83,6 @@ function brushes (xTimeAxis,svg){
       .on("brushend", brushended)
       .clear();
 
-  debugger
-
   var gBrush = svg.append("g")
       .attr({
         "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop - height) + " )",
@@ -116,5 +114,5 @@ function brushes (xTimeAxis,svg){
 };
 
 function createEgoData(extent){
-  setEgoData(jsonData);
+  setEgoData(egoDataSet);
 }

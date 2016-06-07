@@ -80,10 +80,12 @@ function startClique(filename) {
 
       var id = response[0][0].pit.id;
       var name = response[0][0].pit.name;
+      var personType = response[0][0].pit.type;
 
       egoDataSet["id"] = id;
       egoDataSet["name"] = name;
-      egoDataSet["companies"] = [];
+      egoDataSet["type"] = personType;
+      egoDataSet["_children"] = [];
 
       var myUrl = tnRelationEndPoint + encodeURIComponent(id);
       done = 0;
@@ -103,30 +105,30 @@ function getRelations(theUrl){
     }else if (response != null) {
 
       for (index = 0; index < response.length; ++index) {
-        var company = response[index].pit.name;
+        var name = response[index].pit.name;
         var id = response[index].pit.id;
-        var positionis = response[index].relation.type;
+        var position = response[index].relation.type;
         var start = response[index].relation.since;
         var end = response[index].relation.until;
-        var sourceis = response[index].pit.dataset;
-        var typeis = response[index].pit.type;
+        var source = response[index].pit.dataset;
+        var type = response[index].pit.type;
 
         start = (start != "" ? start : defaultStartDate);
         end = (end != "" ? end : defaultEndDate);
 
         // https://api.transparantnederland.nl/search?id=urn:hgid:pdc/vvd
-        egoDataSet["companies"].push(
+        egoDataSet["_children"].push(
           {
-            "company"       : company,
+            "name"       : name,
             "id"            : id,
-            "positionis"    : positionis,
+            "position"    : position,
             "positionLabel" : null,
             "start"         : start,
             "end"           : end,
             "sector"        : "",
-            "sourceis"      : sourceis,
-            "typeis"        : typeis,
-            "linkedPeople"  : []
+            "source"      : source,
+            "type"        : type,
+            "_children"  : []
           }
         );
 
@@ -148,13 +150,13 @@ function makeSectorCallback(index) {
       for(i=0;i<response.length;++i){
         //console.log("Type " + response[i].pit.type)
         if(response[i].pit.type === "tnl:Sector"){
-          egoDataSet["companies"][index].sector = response[i].pit.name;
+          egoDataSet["_children"][index].sector = response[i].pit.name;
           done++
           mergeDatasets();
           return
         }
       }
-      egoDataSet["companies"][index].sector = "Other services activities";
+      egoDataSet["_children"][index].sector = "Other service activities";
       done++
       mergeDatasets();
     }
@@ -163,13 +165,13 @@ function makeSectorCallback(index) {
 
 function getCompanySectors(){
 
-  for(index=0;index<egoDataSet["companies"].length;++index){
-    var id = egoDataSet["companies"][index].id;
+  for(index=0;index<egoDataSet["_children"].length;++index){
+    var id = egoDataSet["_children"][index].id;
 
     var theUrl = tnRelationEndPoint + encodeURIComponent(id);
 
     var myfunct = makeSectorCallback(index);
-    //debugger
+
     d3.json(theUrl,myfunct);
 
   }
@@ -181,45 +183,44 @@ function getLinkedPeople(theUrl){
 
     }else if (response != null) {
       for (index = 0; index < response.length; ++index) {
-        var personId = response[index][0].pit.id;
-        var personName = response[index][0].pit.name;
-        var personType = response[index][0].pit.type; // must be person
+        var id = response[index][0].pit.id;
+        var name = response[index][0].pit.name;
+        var type = response[index][0].pit.type; // must be person
 
         var element = {};
-        element["id"] = personId;
-        element["name"] = personName;
-        element["type"] = personType;
-        element["companies"] = [];
+        element["id"] = id;
+        element["name"] = name;
+        element["type"] = type;
 
-        var companyName = response[index][0].relation.to_name
-        var companyId = response[index][0].relation.to;
-        var positionis = response[index][0].relation.type;
-        var positionLabel = response[index][0].pit.data.waarde;
-        var start = response[index][0].relation.since;
-        var end = response[index][0].relation.until;
-        var sourceis = response[index][0].pit.dataset;
-        // var typeis = response[index].pit.type;
-        var typeis = null;
+        var relationName = response[index][0].relation.to_name
+        var relationId = response[index][0].relation.to;
+        var relationPosition = response[index][0].relation.type;
+        var relationPositionLabel = response[index][0].pit.data.waarde;
+        var relationStart = response[index][0].relation.since;
+        var relationEnd = response[index][0].relation.until;
+        var relationsource = response[index][0].pit.dataset;
+        // response[index][0].relation.type is the type of relation,
+        // not the type of the related to, we will set this later on
+        var relationType = response[index][0].relation.type;
 
         // https://api.transparantnederland.nl/search?id=urn:hgid:pdc/vvd
-        element["companies"].push(
+        element["relation"] =
           {
-            "company"       : companyName,
-            "id"            : companyId,
-            "positionis"    : positionis,
-            "positionLabel" : positionLabel,
-            "start"         : start,
-            "end"           : end,
-            "sourceis"      : sourceis,
-            "typeis"        : typeis,
-            "linkedPeople"  : []
-          }
-        );
+            "name"          : relationName,
+            "id"            : relationId  ,
+            "position"      : relationPosition,
+            "positionLabel" : relationPositionLabel,
+            "start"         : relationStart,
+            "end"           : relationEnd,
+            "source"        : relationsource,
+            "relationType"  : relationType,
+            "type"          : null
+          };
 
-        if(linkedDataSet[companyId] === undefined){
-          linkedDataSet[companyId] = [];
+        if(linkedDataSet[relationId] === undefined){
+          linkedDataSet[relationId] = [];
         }
-        linkedDataSet[companyId].push(element);
+        linkedDataSet[relationId].push(element);
       }
       done++
       mergeDatasets();
@@ -230,20 +231,22 @@ function getLinkedPeople(theUrl){
 
 function mergeDatasets() {
 
-  if (done != (2 + egoDataSet["companies"].length)){
+  if (done != (2 + egoDataSet["_children"].length)){
     return;
   }
 
-  for(index=0;index<egoDataSet.companies.length;++index){
-    var companyId = egoDataSet.companies[index].id;
-    if(linkedDataSet[companyId] !== undefined){
-      for(index1=0;index1<linkedDataSet[companyId].length;++index1){
-
-        egoDataSet.companies[index].linkedPeople.push(linkedDataSet[companyId][index1]);
+  for(index=0;index<egoDataSet._children.length;++index){
+    var childId = egoDataSet._children[index].id;
+    if(linkedDataSet[childId] !== undefined){
+      for(index1=0;index1<linkedDataSet[childId].length;++index1){
+        // Set the type of the _children using the type of the parent node
+        // They need to be the same because this is the relation
+        linkedDataSet[childId][index1].relation.type = egoDataSet._children[index].type;
+        egoDataSet._children[index]._children.push(linkedDataSet[childId][index1]);
       }
     }
   }
-  makeGraphics(egoDataSet.companies)
+  makeGraphics(egoDataSet._children)
 }
 
 function makeGraphics(dataset) {
@@ -278,8 +281,6 @@ function makeGraphics(dataset) {
     ;
 
   initEgonetwork(svgContainer2,width,height);
-  setEgoData(dataset);
-
 }
 
 // array sectors to determine colors -------> counter? Biggest first?
@@ -301,8 +302,6 @@ function setScales(dataset){
   // scales & axes
   xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
                     d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
-
-  debugger
 
   xTimeScale = d3.time.scale() // input domain , output range
     .domain(xTimeExtent)

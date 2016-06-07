@@ -1,7 +1,7 @@
 
 var linkDistance = 80;
 var charge = -120;
-var gravity = .05;
+var gravity = .1;
 var root;
 var force;
 var link;
@@ -60,15 +60,21 @@ function tick() {
 
 function initEgonetwork (svg,width,height){
 
+  var display = svg.append("g")
+  .attr({
+    "class": "graph"
+  })
+
   force = d3.layout.force()
+      .size([width, height])
       .linkDistance(linkDistance)
       .charge(charge)
       .gravity(gravity)
       .size([width, height])
       .on("tick", tick);
 
-  link = svg.selectAll(".link"),
-      node = svg.selectAll(".node");
+  link = display.selectAll(".link"),
+      node = display.selectAll(".node");
 
 }
 
@@ -95,8 +101,13 @@ function flatten(root) {
   var nodes = [], i = 0;
 
   function recurse(node) {
-    if (node.children) node.children.forEach(recurse);
-    if (!node.id) node.id = ++i;
+    if (!node.id){
+      node.id = ++i;
+    }
+    if (node.children){
+      node.children.forEach(recurse);
+    }
+
     nodes.push(node);
   }
 

@@ -10,13 +10,12 @@ function dottxtfunc (d) {
   var current = (xPoint(d) + "," + yPoint(d)); //
 
   var mylabel = xy[current]; // get the index of current data point in array arr
-  //debugger
+
   if ( mylabel === undefined ) { // if index is -1, then no match found. unique data point
     xy[current] = 1; // push point onto array
     return "1";
 
   } else {
-    //debugger
     xy[current] = xy[current] + 1; // push point onto array
     return xy[current] + "";
   }
@@ -176,7 +175,7 @@ function timeElements (dataset,svg) {
           + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
       //triangle and bar
       var obj = this.id.substr(4,5);
-      //debugger
+
       triangleIds.forEach(function(s){
         d3.select("#" + s + obj).
         each(function (t){
@@ -185,7 +184,7 @@ function timeElements (dataset,svg) {
       })
     })
     .on("click", function(d) {
-      //debugger
+
       if( this.parentNode.childNodes[1].textContent !== "1"){
         tooltip.transition()
           .duration(500)
@@ -229,10 +228,8 @@ function timeElements (dataset,svg) {
       //})
     })
     .on("mousemove", function(d){
-      //debugger
     })
     .on("mouseout", function(d) {
-      //debugger
       tooltip.transition()
         .duration(500)
         .style("opacity", 0);
