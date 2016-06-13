@@ -2,7 +2,8 @@ const w = 1100;
 const h = 400;
 const radius = 6;
 const paddingdoc = 20;
-const margintop = 10;
+const margintop = 50;
+const titlespacing = 24
 const marginleft = 240;
 const marginright = 150;
 const marginbottom = 200;
@@ -39,12 +40,12 @@ var yTimeScale;
 
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
-var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop ; }; // y top triangle point
+var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop + titlespacing; }; // y top triangle point
 var dxStart = function(d) {return d.start + paddingdoc + marginleft; }; // startpoint bar plus extra left padding
 var dxEnd = function(d) {return d.end + paddingdoc + marginleft; }; // endpoint bar
 var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
 var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft - (radius / 2) + 0.5 ; }; // x top-triangle point
-var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop +  (radius / 2); }; // y top triangle point
+var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop + titlespacing + (radius / 2); }; // y top triangle point
 
 
 var types = [];
@@ -280,13 +281,13 @@ function makeGraphics(dataset) {
 
   timeLegend(dataset,svgContainer1);
 
-  var svgContainer2 = d3.select("body")
+  var svgContainer2 = d3.select("#viz")
     .append("svg")
     .attr({
-      width: width,
-      height: height
+      width: w + (2 * paddingdoc),
+      height: htimeline + (2 * paddingdoc) + marginbottom + margintop + titlespacing
     })
-    .style("border", "1px solid black")
+    .style("border", "0 solid black")
     ;
 
   initEgonetwork(svgContainer2,width,height);
@@ -356,7 +357,7 @@ function setScales(dataset){
 
   yTimeScale = d3.scale.linear()
     .domain(yTimeExtent)
-    .range([htimeline + margintop + paddingdoc, paddingdoc + margintop])
+    .range([htimeline + margintop + titlespacing + paddingdoc, paddingdoc + margintop + titlespacing])
     ;
 
 

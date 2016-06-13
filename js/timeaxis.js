@@ -48,7 +48,7 @@ function timeAxes (dataset,svg) {
 
  svg.append("g")
     .attr({
-      "transform": "translate(0 ," + (htimeline + paddingdoc + margintop) + ")",
+      "transform": "translate(0 ," + (htimeline + paddingdoc + margintop + titlespacing) + ")",
       "class": "x axis"
     })
     .call(xTimeAxis)
@@ -74,7 +74,7 @@ function timeAxes (dataset,svg) {
     .append("text")
     .text("Duration in years")
     .attr({
-        "x": -105 - paddingdoc - margintop,
+        "x": -105 - paddingdoc - margintop - titlespacing,
         "y": -5 - paddingdoc,
         "transform": "rotate(-90)"
       });
@@ -83,7 +83,7 @@ function timeAxes (dataset,svg) {
     .text("Political Party")
     .attr({
         "x": marginleft - 60,
-        "y": paddingdoc + htimeline + margintop + 48
+        "y": paddingdoc + htimeline + margintop + titlespacing + 48
       });
 
       brushes(xTimeAxis,svg);
@@ -91,7 +91,7 @@ function timeAxes (dataset,svg) {
 
 function brushes (xTimeAxis,svg){
 
-  var height = htimeline ;
+  var height = htimeline;
 
   // svg.append("g")
   //   .attr("class", "x grid")
@@ -110,7 +110,7 @@ function brushes (xTimeAxis,svg){
 
   var gBrush = svg.append("g")
       .attr({
-        "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop - height) + " )",
+        "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop + titlespacing - height) + " )",
         "class": "brush"
       })
       .call(brush);

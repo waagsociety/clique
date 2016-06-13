@@ -5,13 +5,35 @@ var timeLegend = function(dataset,svg) { // legend
 
   var legendSelector = svg.append("g");
 
+  var titlegraph = legendSelector
+    .append("text")
+    ;
+
+  titlegraph.append("tspan")
+    .text("Jan Anthonie Bruijn") // function name!
+    .attr({
+      "class": "titlename",
+      "x": paddingdoc,
+      "y": paddingdoc + margintop
+    })
+    ;
+
+  titlegraph.append("tspan")
+    .text(" / timeline")
+    .attr({
+      "class": "titlegraph",
+      "y": paddingdoc + margintop
+    })
+    ;
+
+
   var legendtitle = legendSelector
     .append("text")
     .text("Sectors")
     .attr({
       "class": "legendtitle",
       "x": paddingdoc,
-      "y": paddingdoc + margintop + 6
+      "y": paddingdoc + margintop + 30
     })
   ;
 
@@ -21,7 +43,7 @@ var timeLegend = function(dataset,svg) { // legend
     .attr({
       "class": "legendexplain",
       "x": paddingdoc,
-      "y": paddingdoc * 2 + margintop
+      "y": paddingdoc + margintop + 43
     })
   ;
 
@@ -35,7 +57,7 @@ var timeLegend = function(dataset,svg) { // legend
       this.active = true;
       var height = legendRectSize;
       var x = paddingdoc;
-      var y = (paddingdoc * 2.5) + i * (height + legendSpacing) + margintop;
+      var y = paddingdoc + i * (height + legendSpacing) + margintop + 60;
       return "translate(" + x + "," + y + ")";
     })
     .on("mouseover", function(d){

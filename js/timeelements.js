@@ -58,7 +58,7 @@ function timeElements (dataset,svg) {
     .append("rect")
     .attr({
       "x": dxStart,
-      "y": htimeline + paddingdoc + margintop, // to move from top to bottom
+      "y": htimeline + paddingdoc + margintop + titlespacing, // to move from top to bottom
       "height": function(d) {return d.dy; }, //meaning d.dy??
       "width": function(d) {return d.end - d.start; },
       "fill": sectorfill,
@@ -74,9 +74,9 @@ function timeElements (dataset,svg) {
 
     function makeTrianglePoints(d){
       var xPoint = ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; // x top-triangle point
-      var yPoint =  htimeline - ((d.end - d.start)/ 2)  + paddingdoc + margintop ;  // y top triangle point
+      var yPoint =  htimeline - ((d.end - d.start)/ 2)  + paddingdoc + margintop + titlespacing ;  // y top triangle point
       var dxStart = d.start + paddingdoc + marginleft;// startpoint bar plus extra left padding
-      var dyBar = htimeline + margintop + paddingdoc ; // to move from top to bottom
+      var dyBar = htimeline + margintop + titlespacing + paddingdoc ; // to move from top to bottom
       var dxEnd = d.end + paddingdoc + marginleft; // endpoint bar
       return [ { "x": dxStart,   "y": dyBar},  { "x": xPoint,   "y": yPoint}, { "x": dxEnd,   "y": dyBar} ];
     }
@@ -297,7 +297,7 @@ function timeElements (dataset,svg) {
       .append("rect")
       .attr({
         "x": dxStart,
-        "y": function(d) {return 40 + htimeline + margintop + paddingdoc + d.y}, // positioning bars below each other in one category function (d) {return (h - d)}
+        "y": function(d) {return 40 + htimeline + margintop + titlespacing + paddingdoc + d.y}, // positioning bars below each other in one category function (d) {return (h - d)}
         "height": function(d) {return d.dy; }, //
         "width": function(d) {return d.end - d.start; },
         "fill": d3.rgb("#AAA"),
