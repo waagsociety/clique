@@ -170,9 +170,9 @@ function timeElements (dataset,svg) {
         .duration(200)
         .style("opacity", .9);
 
-      tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: "
-          + d['positionis'] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
-          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+      tooltip.html("<p class='bgtexttime'>Company: " + d['name'] + " <br/> Position: "
+          + d['position'] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
+          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['source'] + "</p>");
       //triangle and bar
       var obj = this.id.substr(4,5);
 

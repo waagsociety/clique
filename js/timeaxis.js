@@ -1,5 +1,30 @@
 // draw Axes
 
+var TimeRelEnum = {
+  BEFORE: "before",
+  BEFORESTARTS: "starts",
+  BEFOREOVERLAP: "beforeoverlap",
+  BEFOREEND: "beforeend",
+  BEFOREAFTER: "beforeafter",
+  STARTSOVERLAP: "startsoverlap",
+  STARTSEND: "startsend",
+  STARTSAFTER: "startsafter",
+  OVERLAP: "overlap",
+  OVERLAPEND: "overlapend",
+  OVERLAPAFTER: "overlapafter",
+  ENDAFTER: "endafter",
+  AFTER: "after"
+};
+
+var cliqueStatusEnum = {
+  UNCHANGED: "unchanged",
+  REMOVED: "removed",
+  ADDED: "added",
+  ADDEDREMOVED: "addedremoved"
+};
+
+var displaySet = {};
+
 function timeAxes (dataset,svg) {
   // img timeline
 
@@ -114,5 +139,102 @@ function brushes (xTimeAxis,svg){
 };
 
 function createEgoData(extent){
-  setEgoData(egoDataSet);
+  displaySet.id  = egoDataSet.id;
+  displaySet.name  = egoDataSet.name;
+  displaySet.type  = egoDataSet.type;
+  displaySet._children = filterExtent(egoDataSet,extent);
+  setEgoData(displaySet);
+}
+
+function filterExtent(dataSet,extent){
+  var children = [];
+  for(i=0;i<dataSet._children.length;++i){
+    var timeRelation = TimeRelEnum.BEFORE;
+    var nodeStart = new Date(dataSet._children[i].start);
+    var nodeEnd = new Date(dataSet._children[i].end);
+    if( nodeEnd < extent[0] ){
+      timeRelation = TimeRelEnum.BEFORE;
+    }else if ( nodeEnd === extent[0] ){
+      timeRelation = TimeRelEnum.BEFORESTARTS;
+    }else if ( nodeStart < extent[0] && nodeEnd < extent[1] ){
+      timeRelation = TimeRelEnum.BEFOREOVERLAP;
+    }else if ( nodeStart < extent[0] && nodeEnd === extent[1] ){
+      timeRelation = TimeRelEnum.BEFOREEND;
+    }else if ( nodeStart < extent[0] && nodeEnd > extent[1] ){
+      timeRelation = TimeRelEnum.BEFOREAFTER;
+    }else if ( nodeStart === extent[0] && nodeEnd < extent[1] ){
+      timeRelation = TimeRelEnum.STARTSOVERLAP;
+    }else if ( nodeStart === extent[0] && nodeEnd === extent[1] ){
+      timeRelation = TimeRelEnum.STARTSEND;
+    }else if ( nodeStart === extent[0] && nodeEnd > extent[1] ){
+      timeRelation = TimeRelEnum.STARTSAFTER;
+    }else if ( nodeStart > extent[0] && nodeEnd < extent[1] ){
+      timeRelation = TimeRelEnum.OVERLAP;
+    }else if ( nodeStart > extent[0] && nodeEnd === extent[1] ){
+      timeRelation = TimeRelEnum.OVERLAPEND;
+    }else if ( nodeStart > extent[0] && nodeEnd > extent[1] ){
+      timeRelation = TimeRelEnum.OVERLAPAFTER;
+    }else if ( nodeStart === extent[1] ){
+      timeRelation = TimeRelEnum.ENDAFTER;
+    }else if ( nodeStart > extent[1] ){
+      timeRelation = TimeRelEnum.AFTER;
+    }else{
+
+    }
+    switch(timeRelation) {
+      case TimeRelEnum.BEFORE:
+        //dataSet._children.splice(i,1);
+        break;
+      case TimeRelEnum.BEFORESTARTS:
+        //dataSet._children.splice(i,1);
+        break;
+      case TimeRelEnum.BEFOREOVERLAP:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.REMOVED;
+        break;
+      case TimeRelEnum.BEFOREEND:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED
+        break;
+      case TimeRelEnum.BEFOREAFTER:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
+        break;
+      case TimeRelEnum.STARTSOVERLAP:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.REMOVED;
+        break;
+      case TimeRelEnum.STARTSEND:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
+        break;
+      case TimeRelEnum.STARTSAFTER:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
+        break;
+      case TimeRelEnum.OVERLAP:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDEDREMOVED;
+        break;
+      case TimeRelEnum.OVERLAPEND:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDED;
+        break;
+      case TimeRelEnum.OVERLAPAFTER:
+        children.push(dataSet._children[i]);
+        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDED;
+        break;
+      case TimeRelEnum.ENDAFTER:
+        children.push(dataSet._children[i]);
+        dataSet._children.splice(i,1);
+        break;
+      case TimeRelEnum.AFTER:
+        //dataSet._children.splice(i,1);
+        break;
+      default:
+        console.log("ERROR: unknown time relation:" + timeRelation)
+
+    }
+  }
+  return children;
 }

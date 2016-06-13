@@ -200,7 +200,12 @@ line.link {
   stroke: #9ecae1;
   stroke-width: 1.5px;
 }
-
+#progressbar {
+  margin: 20px;
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
 /*circle[id^=dot-]:hover {
   stroke: #000;
   stroke-width: 1;

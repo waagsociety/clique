@@ -29,6 +29,8 @@ var done = 0;
 //var name="Jan Anthonie Bruijn";
 var name="Femke Halsema";
 
+var bar;
+
 var dateFormat;
 var xTimeExtent;
 var xTimeScale;
@@ -70,6 +72,8 @@ function startClique(filename) {
   egoDataSet = {};
   linkedDataSet = {};
   //d3.select("div#viz").append("h1").html( "Timeline " + name );
+
+  progressBar();
 
   var myUrl = tnPersonEndPoint + encodeURIComponent(name);
 
@@ -231,9 +235,14 @@ function getLinkedPeople(theUrl){
 
 function mergeDatasets() {
 
-  if (done != (2 + egoDataSet["_children"].length)){
+  var elements = 2 + egoDataSet["_children"].length;
+  if (done != elements){
+    bar.animate(done*1.0/elements);  // Number from 0.0 to 1.0
     return;
   }
+
+  d3.select("#progressbar").remove();
+  bar = {};
 
   for(index=0;index<egoDataSet._children.length;++index){
     var childId = egoDataSet._children[index].id;
@@ -283,6 +292,40 @@ function makeGraphics(dataset) {
   initEgonetwork(svgContainer2,width,height);
 }
 
+function progressBar(){
+  // progressbar.js@1.0.0 version is used
+// Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
+
+  bar = new ProgressBar.Circle(progressbar, {
+    color: '#aaa',
+    // This has to be the same size as the maximum width to
+    // prevent clipping
+    strokeWidth: 4,
+    trailWidth: 1,
+    easing: 'easeInOut',
+    duration: 1400,
+    text: {
+      autoStyleContainer: false
+    },
+    from: { color: '#aaa', width: 1 },
+    to: { color: '#333', width: 4 },
+    // Set default step function for all animate calls
+    step: function(state, circle) {
+      circle.path.setAttribute('stroke', state.color);
+      circle.path.setAttribute('stroke-width', state.width);
+
+      var value = Math.round(circle.value() * 100);
+      if (value === 0) {
+        circle.setText('');
+      } else {
+        circle.setText(value);
+      }
+
+    }
+  });
+  bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+  bar.text.style.fontSize = '2rem';
+}
 // array sectors to determine colors -------> counter? Biggest first?
 
 function sectorTypes (dataset){
