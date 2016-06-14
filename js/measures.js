@@ -9,7 +9,7 @@ const marginright = 150;
 const marginbottom = 200;
 const htimeline = (w - marginleft - marginright) / 2
 const width = w + (2 * paddingdoc);
-const height = htimeline + (2 * paddingdoc) + marginbottom + margintop;
+const height = htimeline + (2 * paddingdoc) + marginbottom + margintop + titlespacing;
 const defaultStartDate = "2012-01-01"
 const defaultEndDate = "2016-06-01"
 
@@ -262,7 +262,7 @@ function mergeDatasets() {
 function makeGraphics(dataset) {
 
 
-  var svgContainer1 = d3.select("body")
+  var svgContainer1 = d3.select("#viz")
     .append("svg")
     .attr({
       width: width,
@@ -284,8 +284,8 @@ function makeGraphics(dataset) {
   var svgContainer2 = d3.select("#viz")
     .append("svg")
     .attr({
-      width: w + (2 * paddingdoc),
-      height: htimeline + (2 * paddingdoc) + marginbottom + margintop + titlespacing
+      width: width,
+      height: height
     })
     .style("border", "0 solid black")
     ;
