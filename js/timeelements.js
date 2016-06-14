@@ -10,13 +10,12 @@ function dottxtfunc (d) {
   var current = (xPoint(d) + "," + yPoint(d)); //
 
   var mylabel = xy[current]; // get the index of current data point in array arr
-  //debugger
+
   if ( mylabel === undefined ) { // if index is -1, then no match found. unique data point
     xy[current] = 1; // push point onto array
     return "1";
 
   } else {
-    //debugger
     xy[current] = xy[current] + 1; // push point onto array
     return xy[current] + "";
   }
@@ -171,12 +170,12 @@ function timeElements (dataset,svg) {
         .duration(200)
         .style("opacity", .9);
 
-      tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: "
-          + d['positionis'] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
-          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+      tooltip.html("<p class='bgtexttime'>Company: " + d['name'] + " <br/> Position: "
+          + d['position'].split(':')[1] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
+          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['source'] + "</p>");
       //triangle and bar
       var obj = this.id.substr(4,5);
-      //debugger
+
       triangleIds.forEach(function(s){
         d3.select("#" + s + obj).
         each(function (t){
@@ -185,7 +184,7 @@ function timeElements (dataset,svg) {
       })
     })
     .on("click", function(d) {
-      //debugger
+
       if( this.parentNode.childNodes[1].textContent !== "1"){
         tooltip.transition()
           .duration(500)
@@ -229,10 +228,8 @@ function timeElements (dataset,svg) {
       //})
     })
     .on("mousemove", function(d){
-      //debugger
     })
     .on("mouseout", function(d) {
-      //debugger
       tooltip.transition()
         .duration(500)
         .style("opacity", 0);
