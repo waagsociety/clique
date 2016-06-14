@@ -1,7 +1,7 @@
 * {
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box;
+    box-sizing: border-box; 
 }
 
 html {
@@ -19,7 +19,7 @@ body {
 .container {
   margin: 0 auto;
   max-width: 114em; /* em not functioning?? */
-
+ 
 }
 
 /* The first element after header needs a padding top equal to the height of your header. In this example it's a <section> tag. You may need to update the tag here to reflect your own code */
@@ -75,9 +75,9 @@ em {
   margin-top: 0.5em;
 }
 
-.search {
+.search { 
   padding: 0.2em 0 0 0.2em;
-  margin: 0 0.2em 0.3em 0;
+  margin: 0 0.2em 0.3em 0; 
   height: 1.6em;
   border: 0;
   background-color: #58595B;
@@ -187,35 +187,9 @@ p.bgtexttime {
   stroke-opacity: .5;
 }
 
-<<<<<<< HEAD
-.node circle {
-  cursor: pointer;
-  stroke: #3182bd;
-  stroke-width: 1.5px;
-}
-
-.node text {
-  font: 10px sans-serif;
-  pointer-events: none;
-  text-anchor: middle;
-}
-
-line.link {
-  fill: none;
-  stroke: #9ecae1;
-  stroke-width: 1.5px;
-}
-#progressbar {
-  margin: 20px;
-  width: 200px;
-  height: 200px;
-  position: relative;
-}
-=======
 
 
 
->>>>>>> marieke
 /*circle[id^=dot-]:hover {
   stroke: #000;
   stroke-width: 1;

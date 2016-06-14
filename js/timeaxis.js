@@ -1,30 +1,5 @@
 // draw Axes
 
-var TimeRelEnum = {
-  BEFORE: "before",
-  BEFORESTARTS: "starts",
-  BEFOREOVERLAP: "beforeoverlap",
-  BEFOREEND: "beforeend",
-  BEFOREAFTER: "beforeafter",
-  STARTSOVERLAP: "startsoverlap",
-  STARTSEND: "startsend",
-  STARTSAFTER: "startsafter",
-  OVERLAP: "overlap",
-  OVERLAPEND: "overlapend",
-  OVERLAPAFTER: "overlapafter",
-  ENDAFTER: "endafter",
-  AFTER: "after"
-};
-
-var cliqueStatusEnum = {
-  UNCHANGED: "unchanged",
-  REMOVED: "removed",
-  ADDED: "added",
-  ADDEDREMOVED: "addedremoved"
-};
-
-var displaySet = {};
-
 function timeAxes (dataset,svg) {
   // img timeline
 
@@ -105,136 +80,33 @@ function brushes (xTimeAxis,svg){
 
   var brush = d3.svg.brush()
       .x(xTimeScale)
-      .on("brushend", brushended)
-      .clear();
+      .extent(xTimeExtent)
+      .on("brushend", brushended);
 
   var gBrush = svg.append("g")
       .attr({
         "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop + titlespacing - height) + " )",
         "class": "brush"
       })
-      .call(brush);
-//      .call(brush.event);
+      .call(brush)
+      .call(brush.event);
 
   gBrush.selectAll("rect")
       .attr("height", height);
 
   function brushended() {
     if (!d3.event.sourceEvent) return; // only transition after input
-    var initialExtent = brush.extent(),
-        roundedExtent = initialExtent.map(d3.time.year.round);
+    var extent0 = brush.extent(),
+        extent1 = extent0.map(d3.time.year.round);
 
     // if empty when rounded, use floor & ceil instead
-    if (roundedExtent[0] >= roundedExtent[1]) {
-      roundedExtent[0] = d3.time.year.floor(initialExtent[0]);
-      roundedExtent[1] = d3.time.year.ceil(initialExtent[1]);
+    if (extent1[0] >= extent1[1]) {
+      extent1[0] = d3.time.year.floor(extent0[0]);
+      extent1[1] = d3.time.year.ceil(extent0[1]);
     }
-
+    //debugger
     d3.select(this).transition()
-        .call(brush.extent(roundedExtent))
+        .call(brush.extent(extent1))
         .call(brush.event);
-    createEgoData(roundedExtent);
-
   }
 };
-
-function createEgoData(extent){
-  displaySet.id  = egoDataSet.id;
-  displaySet.name  = egoDataSet.name;
-  displaySet.type  = egoDataSet.type;
-  displaySet._children = filterExtent(egoDataSet,extent);
-  setEgoData(displaySet);
-}
-
-function filterExtent(dataSet,extent){
-  var children = [];
-  for(i=0;i<dataSet._children.length;++i){
-    var timeRelation = TimeRelEnum.BEFORE;
-    var nodeStart = new Date(dataSet._children[i].start);
-    var nodeEnd = new Date(dataSet._children[i].end);
-    if( nodeEnd < extent[0] ){
-      timeRelation = TimeRelEnum.BEFORE;
-    }else if ( nodeEnd === extent[0] ){
-      timeRelation = TimeRelEnum.BEFORESTARTS;
-    }else if ( nodeStart < extent[0] && nodeEnd < extent[1] ){
-      timeRelation = TimeRelEnum.BEFOREOVERLAP;
-    }else if ( nodeStart < extent[0] && nodeEnd === extent[1] ){
-      timeRelation = TimeRelEnum.BEFOREEND;
-    }else if ( nodeStart < extent[0] && nodeEnd > extent[1] ){
-      timeRelation = TimeRelEnum.BEFOREAFTER;
-    }else if ( nodeStart === extent[0] && nodeEnd < extent[1] ){
-      timeRelation = TimeRelEnum.STARTSOVERLAP;
-    }else if ( nodeStart === extent[0] && nodeEnd === extent[1] ){
-      timeRelation = TimeRelEnum.STARTSEND;
-    }else if ( nodeStart === extent[0] && nodeEnd > extent[1] ){
-      timeRelation = TimeRelEnum.STARTSAFTER;
-    }else if ( nodeStart > extent[0] && nodeEnd < extent[1] ){
-      timeRelation = TimeRelEnum.OVERLAP;
-    }else if ( nodeStart > extent[0] && nodeEnd === extent[1] ){
-      timeRelation = TimeRelEnum.OVERLAPEND;
-    }else if ( nodeStart > extent[0] && nodeEnd > extent[1] ){
-      timeRelation = TimeRelEnum.OVERLAPAFTER;
-    }else if ( nodeStart === extent[1] ){
-      timeRelation = TimeRelEnum.ENDAFTER;
-    }else if ( nodeStart > extent[1] ){
-      timeRelation = TimeRelEnum.AFTER;
-    }else{
-
-    }
-    switch(timeRelation) {
-      case TimeRelEnum.BEFORE:
-        //dataSet._children.splice(i,1);
-        break;
-      case TimeRelEnum.BEFORESTARTS:
-        //dataSet._children.splice(i,1);
-        break;
-      case TimeRelEnum.BEFOREOVERLAP:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.REMOVED;
-        break;
-      case TimeRelEnum.BEFOREEND:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED
-        break;
-      case TimeRelEnum.BEFOREAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
-        break;
-      case TimeRelEnum.STARTSOVERLAP:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.REMOVED;
-        break;
-      case TimeRelEnum.STARTSEND:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
-        break;
-      case TimeRelEnum.STARTSAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
-        break;
-      case TimeRelEnum.OVERLAP:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDEDREMOVED;
-        break;
-      case TimeRelEnum.OVERLAPEND:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDED;
-        break;
-      case TimeRelEnum.OVERLAPAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDED;
-        break;
-      case TimeRelEnum.ENDAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children.splice(i,1);
-        break;
-      case TimeRelEnum.AFTER:
-        //dataSet._children.splice(i,1);
-        break;
-      default:
-        console.log("ERROR: unknown time relation:" + timeRelation)
-
-    }
-  }
-  return children;
-}
