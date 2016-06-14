@@ -10,22 +10,13 @@ var timeLegend = function(dataset,svg) { // legend
     ;
 
   titlegraph.append("tspan")
-    .text("Jan Anthonie Bruijn") // function name!
+    .text(name + " / timeline") // function name!
     .attr({
       "class": "titlename",
       "x": paddingdoc,
       "y": paddingdoc + margintop
     })
     ;
-
-  titlegraph.append("tspan")
-    .text(" / timeline")
-    .attr({
-      "class": "titlegraph",
-      "y": paddingdoc + margintop
-    })
-    ;
-
 
   var legendtitle = legendSelector
     .append("text")
@@ -107,7 +98,7 @@ var timeLegend = function(dataset,svg) { // legend
     .attr("y", legendRectSize - legendSpacing + 2)
     .text(function(d) {
       var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.typeis != "Political Party"});
-      return d + " (" + onlyThisType.length + ")";
+      return d.split(';')[0] + " (" + onlyThisType.length + ")";
     })
     ;
 } // end timeLegend
