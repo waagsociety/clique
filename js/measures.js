@@ -80,7 +80,7 @@ function startClique(filename) {
 
   d3.json(myUrl,function(error,response){
     if (error != null){
-
+      handleError("Error in getting " + myUrl + ", " + error);
     }else if (response !=null ){
 
       var id = response[0][0].pit.id;
@@ -106,7 +106,7 @@ function startClique(filename) {
 function getRelations(theUrl){
   d3.json(theUrl,function(error,response){
     if (error != null){
-
+      handleError("Error in getRelations: " + error);
     }else if (response != null) {
 
       for (index = 0; index < response.length; ++index) {
@@ -149,7 +149,7 @@ function makeSectorCallback(index) {
   return function(error,response) {
 
     if (error != null){
-
+      handleError("Error in makeSectorCallback: " + error);
     }else if (response != null) {
       //console.log("Dim reply " + response.length)
       for(i=0;i<response.length;++i){
@@ -185,7 +185,7 @@ function getCompanySectors(){
 function getLinkedPeople(theUrl){
   d3.json(theUrl,function(error,response){
     if (error != null){
-
+      handleError("Error in getLinkedPeople: " + error);
     }else if (response != null) {
       for (index = 0; index < response.length; ++index) {
         var id = response[index][0].pit.id;
@@ -201,8 +201,12 @@ function getLinkedPeople(theUrl){
         var relationId = response[index][0].relation.to;
         var relationPosition = response[index][0].relation.type;
         var relationPositionLabel = response[index][0].pit.data.waarde;
+
         var relationStart = response[index][0].relation.since;
+        relationStart = (relationStart != "" ? relationStart : defaultStartDate);
         var relationEnd = response[index][0].relation.until;
+        relationEnd = (relationEnd != "" ? relationEnd : defaultEndDate);
+
         var relationsource = response[index][0].pit.dataset;
         // response[index][0].relation.type is the type of relation,
         // not the type of the related to, we will set this later on
@@ -361,4 +365,8 @@ function setScales(dataset){
     ;
 
 
+}
+
+function handleError(message){
+  console.log(message);
 }

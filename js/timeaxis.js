@@ -1,4 +1,5 @@
-// draw Axes
+const SECTORNODETYPE = "SECTORNODETYPE";
+const STATUSNODETYPE = "STATUSNODETYPE";
 
 var TimeRelEnum = {
   BEFORE: "before",
@@ -17,10 +18,12 @@ var TimeRelEnum = {
 };
 
 var cliqueStatusEnum = {
-  UNCHANGED: "unchanged",
-  REMOVED: "removed",
-  ADDED: "added",
-  ADDEDREMOVED: "addedremoved"
+  BEFORE: "before",
+  MINUS: "minus",
+  EQUAL: "equal",
+  DURING: "during",
+  PLUS: "plus",
+  NONE: "none"
 };
 
 var displaySet = {};
@@ -139,19 +142,103 @@ function brushes (xTimeAxis,svg){
 };
 
 function createEgoData(extent){
+  displaySet = {};
   displaySet.id  = egoDataSet.id;
   displaySet.name  = egoDataSet.name;
   displaySet.type  = egoDataSet.type;
-  displaySet._children = filterExtent(egoDataSet,extent);
+  displaySet._children = [];
+
+  for(i=0;i<egoDataSet._children.length;++i){
+
+    // Is the node in scope?
+    var timeRelation = filterExtent(egoDataSet._children[i],extent);
+    if (timeRelation === cliqueStatusEnum.NONE){
+      continue;
+    }
+
+    var instNode = {}, instToCopy = egoDataSet._children[i];
+    instNode.id = instToCopy.id;
+    instNode.name = instToCopy.name;
+    instNode.type = instToCopy.type;
+    instNode.position = instToCopy.position;
+    instNode.positionLabel = instToCopy.positionLabel;
+    instNode.sector = instToCopy.sector;
+    instNode.source = instToCopy.source;
+    instNode.start = instToCopy.start;
+    instNode.end = instToCopy.end;
+
+    instNode._children = [];
+
+    var sectorStatusExist = false;
+
+    for (ii=0;ii<displaySet._children.length;++ii){
+
+      if (displaySet._children[ii].name === instToCopy.sector && displaySet._children[ii].cliqueStatus === timeRelation){
+
+        displaySet._children[ii]._children.push(instNode);
+        sectorStatusExist = true;
+        break;
+      }
+    }
+    if (!sectorStatusExist){
+      var sectorNode = {};
+      sectorNode.name = instToCopy.sector;
+      sectorNode.cliqueStatus = timeRelation;
+      sectorNode.type = SECTORNODETYPE;
+      sectorNode._children = [];
+      sectorNode._children.push(instNode);
+      displaySet._children.push(sectorNode);
+    }
+
+    for (j=0;j<instToCopy._children.length;++j){
+
+      timeRelation = filterExtent(instToCopy._children[j].relation,extent);
+      if (timeRelation === cliqueStatusEnum.NONE){
+        continue;
+      }
+      var personNode = {}, personToCopy = instToCopy._children[j];
+      personNode.id = personToCopy.id;
+      personNode.name = personToCopy.name;
+      personNode.type = personToCopy.type;
+      personNode.position = personToCopy.relation.position;
+      personNode.positionLabel = personToCopy.relation.positionLabel;
+      personNode.source = personToCopy.source;
+      personNode.start = personToCopy.relation.start;
+      personNode.end = personToCopy.relation.end;
+
+    }
+
+    var statusExist = false;
+
+    for (ii=0;ii<instNode._children.length;++ii){
+
+      if (instNode._children[ii].name === timeRelation){
+
+        instNode._children[ii]._children.push(personNode);
+        statusExist = true;
+        break;
+      }
+    }
+    if (!statusExist){
+      var statusNode = {};
+      statusNode.name = timeRelation;
+      statusNode.cliqueStatus = timeRelation;
+      statusNode.type = STATUSNODETYPE;
+      statusNode._children = [];
+      statusNode._children.push(personNode);
+      instNode._children.push(statusNode);
+    }
+
+  }
+
   setEgoData(displaySet);
 }
 
-function filterExtent(dataSet,extent){
-  var children = [];
-  for(i=0;i<dataSet._children.length;++i){
+function filterExtent(nodeToFilter,extent){
+
     var timeRelation = TimeRelEnum.BEFORE;
-    var nodeStart = new Date(dataSet._children[i].start);
-    var nodeEnd = new Date(dataSet._children[i].end);
+    var nodeStart = new Date(nodeToFilter.start);
+    var nodeEnd = new Date(nodeToFilter.end);
     if( nodeEnd < extent[0] ){
       timeRelation = TimeRelEnum.BEFORE;
     }else if ( nodeEnd === extent[0] ){
@@ -179,62 +266,51 @@ function filterExtent(dataSet,extent){
     }else if ( nodeStart > extent[1] ){
       timeRelation = TimeRelEnum.AFTER;
     }else{
-
+      handleError("ERROR: uncaugth relation for start " + nodeToFilter.start + ", end " + nodeToFilter.end + ", and extent " + extent);
     }
     switch(timeRelation) {
       case TimeRelEnum.BEFORE:
-        //dataSet._children.splice(i,1);
+        return cliqueStatusEnum.BEFORE;
         break;
       case TimeRelEnum.BEFORESTARTS:
-        //dataSet._children.splice(i,1);
+        return cliqueStatusEnum.MINUS;
         break;
       case TimeRelEnum.BEFOREOVERLAP:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.REMOVED;
+        return cliqueStatusEnum.MINUS;
         break;
       case TimeRelEnum.BEFOREEND:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED
+        return cliqueStatusEnum.MINUS;
         break;
       case TimeRelEnum.BEFOREAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
+        return cliqueStatusEnum.EQUAL;
         break;
       case TimeRelEnum.STARTSOVERLAP:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.REMOVED;
+        return cliqueStatusEnum.DURING;
         break;
       case TimeRelEnum.STARTSEND:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
+        return cliqueStatusEnum.DURING;
         break;
       case TimeRelEnum.STARTSAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.UNCHANGED;
+        return cliqueStatusEnum.PLUS;
         break;
       case TimeRelEnum.OVERLAP:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDEDREMOVED;
+        return cliqueStatusEnum.DURING;
         break;
       case TimeRelEnum.OVERLAPEND:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDED;
+        return cliqueStatusEnum.DURING;
         break;
       case TimeRelEnum.OVERLAPAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children[i].cliqueStatus = cliqueStatusEnum.ADDED;
+        return cliqueStatusEnum.PLUS;
         break;
       case TimeRelEnum.ENDAFTER:
-        children.push(dataSet._children[i]);
-        dataSet._children.splice(i,1);
+        return cliqueStatusEnum.PLUS;
         break;
       case TimeRelEnum.AFTER:
-        //dataSet._children.splice(i,1);
+        return cliqueStatusEnum.NONE;
         break;
       default:
-        console.log("ERROR: unknown time relation:" + timeRelation)
+        handleError("ERROR: unknown time relation: " + timeRelation);
 
     }
-  }
-  return children;
+
 }
