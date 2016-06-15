@@ -208,32 +208,31 @@ function createEgoData(extent){
       personNode.start = personToCopy.relation.start;
       personNode.end = personToCopy.relation.end;
 
-    }
 
-    var statusExist = false;
+      var statusExist = false;
 
-    for (ii=0;ii<instNode._children.length;++ii){
+      for (ii=0;ii<instNode._children.length;++ii){
 
-      if (instNode._children[ii].name === timeRelation){
+        if (instNode._children[ii].cliqueStatus === timeRelation){
 
-        instNode._children[ii]._children.push(personNode);
-        statusExist = true;
-        break;
+          instNode._children[ii]._children.push(personNode);
+          statusExist = true;
+          break;
+        }
+      }
+      if (!statusExist){
+        var statusNode = {};
+        statusNode.name = "";
+        statusNode.cliqueStatus = timeRelation;
+        statusNode.type = STATUSNODETYPE;
+        statusNode.id = statusNode.type + "_" + uniqueNodeIndex++;
+        statusNode._children = [];
+        statusNode._children.push(personNode);
+        instNode._children.push(statusNode);
       }
     }
-    if (!statusExist){
-      var statusNode = {};
-      statusNode.name = timeRelation;
-      statusNode.cliqueStatus = timeRelation;
-      statusNode.type = STATUSNODETYPE;
-      statusNode.id = statusNode.type + "_" + uniqueNodeIndex++;
-      statusNode._children = [];
-      statusNode._children.push(personNode);
-      instNode._children.push(statusNode);
-    }
-
   }
-
+  // setNumberOfChildren(displaySet);
   setEgoData(displaySet);
 }
 
@@ -317,3 +316,12 @@ function filterExtent(nodeToFilter,extent){
     }
 
 }
+
+// function setNumberOfChildren(set){
+//
+//   if (set._children !== undefined && set._children.length >0){
+//     set._children.forEach(setNumberOfChildren);
+//     set.name = set.name + " (" + set._children.length + ")";
+//   }
+//
+// }

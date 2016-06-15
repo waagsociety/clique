@@ -12,9 +12,9 @@ var display;
 
 
 // rest of vars
-var nodeSize = 25;
-var x_browser = 20;
-var y_browser = 25;
+var nodeSize = 18;
+var x_browser = 5;
+var y_browser = 5;
 var increaseIcon = 1.5;
 
 function initEgonetwork (svg, width, height){
@@ -197,7 +197,18 @@ function update() {
       .attr("class", "nodetext")
       .attr("x", x_browser)
       .attr("y", y_browser +15)
-      .text(function(d) { return d.name; });
+      .text(function(d) {
+        if (d.children) {
+          if (d.children.length > 0){
+            return d.name + " (" + d.children.length + ")";
+          }
+        }else if( d._children ){
+          if (d._children.length > 0){
+            return d.name + " (" + d._children.length + ")";
+          }
+        }
+        return d.name;
+      });
 
 
   // Exit any old nodes.
