@@ -13,8 +13,8 @@ var display;
 
 // rest of vars
 var nodeSize = 18;
-var x_browser = 5;
-var y_browser = 5;
+var x_browser = nodeSize/2;
+var y_browser = nodeSize*1.2;
 var increaseIcon = 1.5;
 
 function initEgonetwork (svg, width, height){
@@ -196,7 +196,7 @@ function update() {
   nodeEnter.append("text")
       .attr("class", "nodetext")
       .attr("x", x_browser)
-      .attr("y", y_browser +15)
+      .attr("y", y_browser)
       .text(function(d) {
         if (d.children) {
           if (d.children.length > 0){
