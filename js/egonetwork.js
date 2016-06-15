@@ -12,9 +12,10 @@ var display;
 
 
 // rest of vars
-var maxNodeSize = 25,
-    x_browser = 20,
-    y_browser = 25;
+var nodeSize = 25;
+var x_browser = 20;
+var y_browser = 25;
+var increaseIcon = 1.5;
 
 function initEgonetwork (svg, width, height){
 
@@ -53,19 +54,19 @@ function getImage(d){
   if (d.type === STATUSNODETYPE){
     switch (d.cliqueStatus){
       case cliqueStatusEnum.BEFORE:
-        img = "cir_before";
+        img = "cir_before2";
         break;
       case cliqueStatusEnum.MINUS:
-        img = "cir_minus";
+        img = "cir_minus2";
         break;
       case cliqueStatusEnum.EQUAL:
-        img = "cir_equal";
+        img = "cir_equal2";
         break;
       case cliqueStatusEnum.DURING:
-        img = "cir_during";
+        img = "cir_during2";
         break;
       case cliqueStatusEnum.PLUS:
-        img = "cir_plus";
+        img = "cir_plus2";
         break;
       default:
         handleError("Unkwon clique status: " + d.cliqueStatus);
@@ -74,29 +75,28 @@ function getImage(d){
   }else if (d.type === SECTORNODETYPE){
     switch (d.cliqueStatus){
       case cliqueStatusEnum.BEFORE:
-        img = "sq_before";
+        img = "sq_before2";
         break;
       case cliqueStatusEnum.MINUS:
-        img = "sq_minus";
+        img = "sq_minus2";
         break;
       case cliqueStatusEnum.EQUAL:
-        img = "sq_equal";
+        img = "sq_equal2";
         break;
       case cliqueStatusEnum.DURING:
-        img = "sq_during";
+        img = "sq_during2";
         break;
       case cliqueStatusEnum.PLUS:
-        img = "sq_plus";
+        img = "sq_plus2";
         break;
       default:
         handleError("Unkwon clique status: " + d.cliqueStatus);
     }
   }else if (d.type === "tnl:Person"){
-    img = "cir";
+    img = "cir2";
   }else{
-    img = "sq";
+    img = "sq2";
   }
-
   return img;
 }
 
@@ -125,7 +125,8 @@ function update() {
     path.enter().insert("svg:path")
       .attr("class", "link")
       // .attr("marker-end", "url(#end)")
-      .style("stroke", "#eee");
+      //.style("stroke", "#eee")
+      ;
 
 
   // Exit any old paths.
@@ -151,17 +152,17 @@ function update() {
   //     .style("fill", "#eee");
 
   nodeEnter.append("svg:rect")
-      .attr("width", maxNodeSize)
-      .attr("height", maxNodeSize)
-      .style("fill", function(d) { return "red"});
+      .attr("width", nodeSize)
+      .attr("height", nodeSize)
+      .style("fill", function(d) { return determineColor(d)});
 
   // Append images
   var images = nodeEnter.append("svg:image")
         .attr("xlink:href",  function(d) { return "./img/" + getImage(d) + ".svg";})
         .attr("x", function(d) { return 0;})
         .attr("y", function(d) { return 0;})
-        .attr("height", maxNodeSize)
-        .attr("width", maxNodeSize);
+        .attr("height", nodeSize)
+        .attr("width", nodeSize);
 
   // make the image grow a little on mouse over and add the text details on click
   var setEvents = images
@@ -176,10 +177,10 @@ function update() {
             // select element in current context
             d3.select( this )
               .transition()
-              .attr("x", function(d) { return -maxNodeSize*1.5/2;})
-              .attr("y", function(d) { return -maxNodeSize*1.5/2;})
-              .attr("height", maxNodeSize*1.5)
-              .attr("width", maxNodeSize*1.5);
+              .attr("x", function(d) { return -nodeSize*(increaseIcon-1)/2;})
+              .attr("y", function(d) { return -nodeSize*(increaseIcon-1)/2;})
+              .attr("height", nodeSize*increaseIcon)
+              .attr("width", nodeSize*increaseIcon);
           })
           // set back
           .on( 'mouseleave', function() {
@@ -187,8 +188,8 @@ function update() {
               .transition()
               .attr("x", function(d) { return 0;})
               .attr("y", function(d) { return 0;})
-              .attr("height", maxNodeSize)
-              .attr("width", maxNodeSize);
+              .attr("height", nodeSize)
+              .attr("width", nodeSize);
           });
 
   // Append hero name on roll over next to the node as well
@@ -232,8 +233,8 @@ function tick() {
  * http://bl.ocks.org/mbostock/1129492
  */
 function nodeTransform(d) {
-  d.x =  Math.max(maxNodeSize, Math.min(graphW - (d.imgwidth/2 || 16), d.x));
-    d.y =  Math.max(maxNodeSize, Math.min(graphH - (d.imgheight/2 || 16), d.y));
+  d.x =  Math.max(nodeSize, Math.min(graphW - (d.imgwidth/2 || 16), d.x));
+    d.y =  Math.max(nodeSize, Math.min(graphH - (d.imgheight/2 || 16), d.y));
     return "translate(" + d.x + "," + d.y + ")";
    }
 
@@ -261,13 +262,37 @@ function flatten(root) {
   var i = 0;
 
   function recurse(node) {
-    if (node.children)
+    if (node.children){
       node.children.forEach(recurse);
-    if (!node.id)
+    }
+    if (!node.id){
       node.id = ++i;
+    }
     nodes.push(node);
   }
 
   recurse(root);
   return nodes;
+}
+
+function determineColor(d){
+  if(d.id === root.id){
+    return "#000000";
+  }else if (d.type === SECTORNODETYPE){
+    var result = sectorToNameAndColor(d.name);
+    if (result !== undefined){
+      return result.color;
+    }
+  }else if (d.type === STATUSNODETYPE){
+    return "#999999";
+  }else if (d.type === "tnl:Person"){
+    return "#999999";
+  }else if (d.type.startsWith("tnl:")){
+    var result = sectorToNameAndColor(d.sector);
+    if (result !== undefined){
+      return result.color;
+    }
+  }
+
+  return "red";
 }

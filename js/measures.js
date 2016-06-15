@@ -19,6 +19,30 @@ const tnPersonEndPoint = "https://api.transparantnederland.nl/search?type=tnl%3A
 const tnRelationEndPoint = "https://api.transparantnederland.nl/relations?id=";
 const tnLinkedPeopleEndPoint = "https://api.transparantnederland.nl/peopleFromOrgsFromPerson?id=";
 
+const sectorColorTable = {
+  "Human health and social work activities" : {	name : "Human health and social work", color : "#F1C7DD"},
+  "Real estate activities" : {name : "Real estate activities", color : "#E3337E"},
+  "Wholesale and retail trade; repair of motor vehicles and motorcycles" :	{name: "Wholesale and retail trade", color: "#7A2A90"},
+  "Mining and quarrying" : {name : "Mining and quarrying", color: "#F5BD42"},
+  "Activities of extraterritorial organisations and bodies"	: {name: "Extraterritorial organisations", color : "#B5A01F"},
+  "Education"	: {name : "Education", color : "#F05129"},
+  "Financial and insurance activities" : {name: "Financial and insurance", color: "#966EAC"},
+  "Construction"	: {name : "Construction", color : "#4EBDE5"},
+  "Agriculture, forestry and fishing"	: {name : "Agriculture, forestry and fishing", color : "#DE5C8E"},
+  "Activities of household as employers; undifferentiated goods- and services-producing activities of households for own use"	: {name : "Activities of household as employers", color : "#F89C5B"},
+  "Public administration and defence; compulsory social security"	: {name : "Public administration and defence", color : "#0B326B"},
+  "Information and communication"	: {name : "Information and communication", color : "#7BCBC0"},
+  "Water supply; sewerage, waste management and remediation activities"	: {name : "Water supply; sewerage and waste", color : "#006FBA"},
+  "Other service activities" : {name : "Other service activities", color : "#CCCCCC"},
+  "Administrative and support service activities"	: {name : "Administrative and support", color : "#B09977"},
+  "Accommodation and food service activities"	: {name : "Accommodation and food", color : "#D0DD28"},
+  "Electricity, gas, steam and air conditioning supply" : {name : "Electricity, gas and air", color : "#7B0165"},
+  "Arts, entertainment and recreation"	: {name : "Arts, entertainment and recreation", color : "#B7CC95"},
+  "Professional, scientific and technical activities"	: {name : "Professional, scientific and technical", color : "#145F1F"},
+  "Transportation and storage"	: {name : "Transportation and storage", color : "#00A390"},
+  "Manufacturing"	: {name : "Manufacturing", color : "#EE202E"}
+};
+
 //https://api.transparantnederland.nl/ontology
 //const dateRange = ["01/01/1989", "3/15/2016"];
 
@@ -43,17 +67,11 @@ var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc +
 var yPoint = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop + titlespacing; }; // y top triangle point
 var dxStart = function(d) {return d.start + paddingdoc + marginleft; }; // startpoint bar plus extra left padding
 var dxEnd = function(d) {return d.end + paddingdoc + marginleft; }; // endpoint bar
-var sectorfill = function(d) {return colorScale(d.sector); }; // color sector
 var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft - (radius / 2) + 0.5 ; }; // x top-triangle point
 var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop + titlespacing + (radius / 2); }; // y top triangle point
 
 
 var types = [];
-
-var colorScale = d3.scale.ordinal()
-  .domain(types)
-  .range(["#f1c7dd", "#0b326b", "#f5bd42", "#7bcbc0",   "#f05129",  "#b7cc94", "#e3337e", "#827775", "#966eac", "#b09977",]);
-
 
 // trim data...
  /*
@@ -369,4 +387,13 @@ function setScales(dataset){
 
 function handleError(message){
   console.log(message);
+}
+
+function sectorToNameAndColor(sector){
+  var entry = sectorColorTable[sector];
+  if ( entry === undefined){
+    handleError("Sector not found: " + sector);
+  }else{
+    return {name : entry.name, color: entry.color};
+  }
 }

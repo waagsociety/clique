@@ -143,6 +143,7 @@ function brushes (xTimeAxis,svg){
 
 function createEgoData(extent){
   displaySet = {};
+  var uniqueNodeIndex=0;
   displaySet.id  = egoDataSet.id;
   displaySet.name  = egoDataSet.name;
   displaySet.type  = egoDataSet.type;
@@ -185,6 +186,7 @@ function createEgoData(extent){
       sectorNode.name = instToCopy.sector;
       sectorNode.cliqueStatus = timeRelation;
       sectorNode.type = SECTORNODETYPE;
+      sectorNode.id = sectorNode.type + "_" + uniqueNodeIndex++;
       sectorNode._children = [];
       sectorNode._children.push(instNode);
       displaySet._children.push(sectorNode);
@@ -224,6 +226,7 @@ function createEgoData(extent){
       statusNode.name = timeRelation;
       statusNode.cliqueStatus = timeRelation;
       statusNode.type = STATUSNODETYPE;
+      statusNode.id = statusNode.type + "_" + uniqueNodeIndex++;
       statusNode._children = [];
       statusNode._children.push(personNode);
       instNode._children.push(statusNode);

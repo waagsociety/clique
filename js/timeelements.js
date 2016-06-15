@@ -61,7 +61,7 @@ function timeElements (dataset,svg) {
       "y": htimeline + paddingdoc + margintop + titlespacing, // to move from top to bottom
       "height": function(d) {return d.dy; }, //meaning d.dy??
       "width": function(d) {return d.end - d.start; },
-      "fill": sectorfill,
+      "fill": function(d){return sectorToNameAndColor(d.sector).color},
       "class": function(d) {return triangleIds[0] + d.sector.replace(/\W/gi, '-').toLowerCase()},
       "id": function(d) {
         idcounterbar += 1;
@@ -103,7 +103,7 @@ function timeElements (dataset,svg) {
           "d": function(d) {
             return lineFunction(makeTrianglePoints(d));
           },
-          "stroke": sectorfill,
+          "stroke": function(d){return sectorToNameAndColor(d.sector).color},
           "stroke-width": 1,
           "fill-opacity": 0,
           "class": function(d) {return triangleIds[1] + d.sector.replace(/\W/gi, '-').toLowerCase()},
@@ -137,7 +137,7 @@ function timeElements (dataset,svg) {
         "r": radius, //radius
         "cx": xPoint, // startpoint
         "cy": yPoint, // positioning
-        "fill": sectorfill,
+        "fill": function(d){return sectorToNameAndColor(d.sector).color},
         "class": function(d) {return "dot-" + d.sector.replace(/\W/gi, '-').toLowerCase()},
         "id": function(d) {
               idcounterdot += 1;

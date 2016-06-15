@@ -40,7 +40,7 @@ var timeLegend = function(dataset,svg) { // legend
 
   var legend = legendSelector
     .selectAll("g.legenditem")
-    .data(colorScale.domain())
+    .data(types)
     .enter()
     .append("g")
     .attr("class","legenditem")
@@ -89,8 +89,8 @@ var timeLegend = function(dataset,svg) { // legend
   legend.append("rect")
     .attr("width", legendRectSize)
     .attr("height", legendRectSize)
-    .style("fill", colorScale)
-    .style("stroke", colorScale)
+    .style("fill", function(d){return sectorToNameAndColor(d).color;})
+    .style("stroke", function(d){return sectorToNameAndColor(d).color;})
     ;
 
   legend.append("text")
@@ -98,7 +98,7 @@ var timeLegend = function(dataset,svg) { // legend
     .attr("y", legendRectSize - legendSpacing + 2)
     .text(function(d) {
       var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.typeis != "Political Party"});
-      return d.split(';')[0] + " (" + onlyThisType.length + ")";
+      return sectorToNameAndColor(d).name + " (" + onlyThisType.length + ")";
     })
     ;
 } // end timeLegend
