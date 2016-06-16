@@ -97,7 +97,7 @@ var timeLegend = function(dataset,svg) { // legend
     .attr("x", legendRectSize + legendSpacing)
     .attr("y", legendRectSize - legendSpacing + 2)
     .text(function(d) {
-      var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.typeis != "Political Party"});
+      var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.type != "tnl:PoliticalParty"});
       return sectorToNameAndColor(d).name + " (" + onlyThisType.length + ")";
     })
     ;
