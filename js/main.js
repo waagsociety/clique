@@ -14,7 +14,6 @@ const defaultStartDate = "2012-01-01"
 const defaultEndDate = "2016-06-01"
 
 const triangleIds = ["bar-", "tri-"];
-const ppText = ["#txtpp-"];
 
 const sectorColorTable = {
   "Human health and social work activities" : {	name : "Human health and social work", color : "#F1C7DD"},
@@ -40,6 +39,8 @@ const sectorColorTable = {
   "Manufacturing"	: {name : "Manufacturing", color : "#EE202E"}
 };
 
+const dataReadyEvent = new Event('dataReady');
+
 //https://api.transparantnederland.nl/ontology
 //const dateRange = ["01/01/1989", "3/15/2016"];
 
@@ -50,8 +51,9 @@ var done = 0;
 
 //var name="Jan Anthonie Bruijn";
 var name="Femke Halsema";
+var tooltip;
 
-var bar;
+
 
 
 
@@ -82,9 +84,11 @@ function startClique(filename) {
 
   egoDataSet = {};
   linkedDataSet = {};
+
+
   //d3.select("div#viz").append("h1").html( "Timeline " + name );
 
-  progressBar();
+  progressBar("#progressstart");
 
   var myUrl = tnPersonEndPoint + encodeURIComponent(name);
 
@@ -103,6 +107,9 @@ function startClique(filename) {
       egoDataSet["_children"] = [];
 
 
+      // Listen for the event.
+      window.addEventListener('dataReady', makeGraphics, false);
+
       done = 0;
       getRelations(id,egoDataSet,linkedDataSet);
 
@@ -114,33 +121,14 @@ function startClique(filename) {
 }
 
 
-function mergeDatasets(dataSet,linkedSet) {
+function makeGraphics(e) {
 
-  var elements = 2 + dataSet["_children"].length;
-  if (done != elements){
-    bar.animate(done*1.0/elements);  // Number from 0.0 to 1.0
-    return;
-  }
-
-  d3.select("#progressbar").remove();
+  d3.select("#progressstart").remove();
   bar = {};
 
-  for(index=0;index<dataSet._children.length;++index){
-    var childId = dataSet._children[index].id;
-    if(linkedSet[childId] !== undefined){
-      for(index1=0;index1<linkedSet[childId].length;++index1){
-        // Set the type of the _children using the type of the parent node
-        // They need to be the same because this is the relation
-        linkedSet[childId][index1].relation.type = dataSet._children[index].type;
-        dataSet._children[index]._children.push(linkedSet[childId][index1]);
-      }
-    }
-  }
-  makeGraphics(dataSet._children)
-}
+  window.removeEventListener('dataReady',makeGraphics,false);
 
-function makeGraphics(dataset) {
-
+  var dataset = egoDataSet._children;
 
   var svgContainer1 = d3.select("#viz1")
     .append("svg")
@@ -155,6 +143,10 @@ function makeGraphics(dataset) {
 
   setScales(dataset);
 
+  tooltip = d3.select("section.content").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
   timeAxes(dataset, svgContainer1);
 
   timeElements(dataset,svgContainer1);
@@ -162,6 +154,7 @@ function makeGraphics(dataset) {
   timeLegend(dataset,svgContainer1);
 
   var svgContainer2 = d3.select("#viz2")
+    .append("div").attr("id","graphdiv")
     .append("svg")
     .attr({
       width: width,
@@ -172,42 +165,6 @@ function makeGraphics(dataset) {
 
   initEgonetwork(svgContainer2,width,height);
 }
-
-function progressBar(){
-  // progressbar.js@1.0.0 version is used
-// Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
-
-  bar = new ProgressBar.Circle(progressbar, {
-    color: '#aaa',
-    // This has to be the same size as the maximum width to
-    // prevent clipping
-    strokeWidth: 4,
-    trailWidth: 1,
-    easing: 'easeInOut',
-    duration: 1400,
-    text: {
-      autoStyleContainer: false
-    },
-    from: { color: '#aaa', width: 1 },
-    to: { color: '#333', width: 4 },
-    // Set default step function for all animate calls
-    step: function(state, circle) {
-      circle.path.setAttribute('stroke', state.color);
-      circle.path.setAttribute('stroke-width', state.width);
-
-      var value = Math.round(circle.value() * 100);
-      if (value === 0) {
-        circle.setText('');
-      } else {
-        circle.setText(value);
-      }
-
-    }
-  });
-  bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-  bar.text.style.fontSize = '2rem';
-}
-// array sectors to determine colors -------> counter? Biggest first?
 
 function sectorTypes (dataset){
   dataset.forEach(function(data){

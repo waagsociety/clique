@@ -2,6 +2,8 @@ const tnPersonEndPoint = "https://api.transparantnederland.nl/search?type=tnl%3A
 const tnRelationEndPoint = "https://api.transparantnederland.nl/relations?id=";
 const tnLinkedPeopleEndPoint = "https://api.transparantnederland.nl/peopleFromOrgsFromPerson?id=";
 
+var bar;
+
 function getRelations(id,dataSet,linkedSet){
 
   var theUrl = tnRelationEndPoint + encodeURIComponent(id);
@@ -11,7 +13,7 @@ function getRelations(id,dataSet,linkedSet){
       handleError("Error in getRelations: " + error);
     }else if (response != null) {
 
-      for (index = 0; index < response.length; ++index) {
+      for (var index = 0; index < response.length; ++index) {
         var name = response[index].pit.name;
         var id = response[index].pit.id;
         var position = response[index].relation.type;
@@ -54,7 +56,7 @@ function makeSectorCallback(index,dataSet,linkedSet) {
       handleError("Error in makeSectorCallback: " + error);
     }else if (response != null) {
       //console.log("Dim reply " + response.length)
-      for(i=0;i<response.length;++i){
+      for (var i=0;i<response.length;++i){
         //console.log("Type " + response[i].pit.type)
         if(response[i].pit.type === "tnl:Sector"){
           dataSet["_children"][index].sector = response[i].pit.name;
@@ -72,7 +74,7 @@ function makeSectorCallback(index,dataSet,linkedSet) {
 
 function getCompanySectors(dataSet,linkedSet){
 
-  for(index=0;index<dataSet["_children"].length;++index){
+  for (var index=0;index<dataSet["_children"].length;++index){
     var id = dataSet["_children"][index].id;
 
     var theUrl = tnRelationEndPoint + encodeURIComponent(id);
@@ -92,7 +94,7 @@ function getLinkedPeople(id, dataSet,linkedSet){
     if (error != null){
       handleError("Error in getLinkedPeople: " + error);
     }else if (response != null) {
-      for (index = 0; index < response.length; ++index) {
+      for (var index = 0; index < response.length; ++index) {
         var id = response[index][0].pit.id;
         var name = response[index][0].pit.name;
         var type = response[index][0].pit.type; // must be person
@@ -141,4 +143,62 @@ function getLinkedPeople(id, dataSet,linkedSet){
     }
   });
 
+}
+
+function mergeDatasets(dataSet,linkedSet) {
+
+  var elements = 2 + dataSet["_children"].length;
+  if (done != elements){
+    bar.animate(done*1.0/elements);  // Number from 0.0 to 1.0
+    return;
+  }
+
+  for (var index=0;index<dataSet._children.length;++index){
+    var childId = dataSet._children[index].id;
+    if(linkedSet[childId] !== undefined){
+      for (var index1=0;index1<linkedSet[childId].length;++index1){
+        // Set the type of the _children using the type of the parent node
+        // They need to be the same because this is the relation
+        linkedSet[childId][index1].relation.type = dataSet._children[index].type;
+        linkedSet[childId][index1].relation.sector = dataSet._children[index].sector;
+        dataSet._children[index]._children.push(linkedSet[childId][index1]);
+      }
+    }
+  }
+  window.dispatchEvent(dataReadyEvent);
+}
+
+function progressBar(elementID){
+  // progressbar.js@1.0.0 version is used
+// Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
+
+  bar = new ProgressBar.Circle(elementID, {
+    color: '#aaa',
+    // This has to be the same size as the maximum width to
+    // prevent clipping
+    strokeWidth: 4,
+    trailWidth: 1,
+    easing: 'easeInOut',
+    duration: 1400,
+    text: {
+      autoStyleContainer: false
+    },
+    from: { color: '#aaa', width: 1 },
+    to: { color: '#333', width: 4 },
+    // Set default step function for all animate calls
+    step: function(state, circle) {
+      circle.path.setAttribute('stroke', state.color);
+      circle.path.setAttribute('stroke-width', state.width);
+
+      var value = Math.round(circle.value() * 100);
+      if (value === 0) {
+        circle.setText('');
+      } else {
+        circle.setText(value);
+      }
+
+    }
+  });
+  bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+  bar.text.style.fontSize = '2rem';
 }

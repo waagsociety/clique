@@ -1,12 +1,4 @@
 
-var root;
-var force;
-var graphW;
-var graphH;
-var display;
-
-
-// rest of vars
 const nodeSize = 18;
 const x_browser = nodeSize/2;
 const y_browser = nodeSize*1.2;
@@ -41,6 +33,14 @@ const cliqueStatusEnum = {
 };
 
 var displaySet = {};
+var root;
+var force;
+var graphW;
+var graphH;
+var display;
+var clicked = false;
+
+// rest of vars
 
 function createEgoData(extent){
   displaySet = {};
@@ -50,7 +50,7 @@ function createEgoData(extent){
   displaySet.type  = egoDataSet.type;
   displaySet._children = [];
 
-  for(i=0;i<egoDataSet._children.length;++i){
+  for (var i=0;i<egoDataSet._children.length;++i){
 
     // Is the node in scope?
     var timeRelation = filterExtent(egoDataSet._children[i],extent);
@@ -73,7 +73,7 @@ function createEgoData(extent){
 
     var sectorStatusExist = false;
 
-    for (ii=0;ii<displaySet._children.length;++ii){
+    for (var ii=0;ii<displaySet._children.length;++ii){
 
       if (displaySet._children[ii].name === instToCopy.sector && displaySet._children[ii].cliqueStatus === timeRelation){
 
@@ -93,7 +93,7 @@ function createEgoData(extent){
       displaySet._children.push(sectorNode);
     }
 
-    for (j=0;j<instToCopy._children.length;++j){
+    for (var j=0;j<instToCopy._children.length;++j){
 
       timeRelation = filterExtent(instToCopy._children[j].relation,extent);
       if (timeRelation === cliqueStatusEnum.NONE){
@@ -112,7 +112,7 @@ function createEgoData(extent){
 
       var statusExist = false;
 
-      for (ii=0;ii<instNode._children.length;++ii){
+      for (var ii=0;ii<instNode._children.length;++ii){
 
         if (instNode._children[ii].cliqueStatus === timeRelation){
 
@@ -474,19 +474,29 @@ function click(d) {
 }
 
 function contextmenu(d){
+  if(clicked){
+    return;
+  }
+  clicked = true;
+
   if (d.type === "tnl:Person" && d.id !== root.id){
     d3.event.preventDefault();
     // alert("You click me!!!");
 
     var popup = d3.select("div#viz2")
               .append("div")
-              .attr("class", "popup")
-              .style("width", graphW)
-              .style("height", graphH)
+              .attr("id", "popupdiv")
               ;
 
     popup.append("h2").text(d.name);
-    popup.append("p").text("Succhiamelo deficiente")
+    popup.append("div").attr("id","progresspopup");
+    progressBar("#progresspopup");
+    sharedConnections(d);
+
+    popup.append("p").text("Shared positions")
+
+
+
     // popup.append("p")
     //         .append("a")
     //         .attr("href",d.link)

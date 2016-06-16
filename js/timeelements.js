@@ -33,7 +33,7 @@ function timeElements (dataset,svg) {
 
   var timeline = d3.layout.timeline()
       .size([w - marginleft - marginright,htimeline])
-      .extent(xTimeExtent)
+      .extent(xEgoTimeExtent)
       .padding(4)
       .maxBandHeight(12); // height bands
 
@@ -151,7 +151,7 @@ function timeElements (dataset,svg) {
 
     dots.transition()
       .delay(function(d) {
-        counterdot += 1;
+        //counterdot += 1;
         return counterdot * 100;
       })
       .ease("linear")
@@ -271,7 +271,7 @@ function timeElements (dataset,svg) {
 
     textDot.transition()
       .delay(function(d) {
-        counterdot += 1;
+        //counterdot += 1;
         return counterdot * 100;
       })
       .ease("linear")
@@ -281,11 +281,6 @@ function timeElements (dataset,svg) {
         "z-index": "1"
       })
     ;
-
-
-    var tooltip = d3.select("body").append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
 
 
       // political party bars
@@ -315,12 +310,6 @@ function timeElements (dataset,svg) {
           tooltip.html("<p class='bgtexttime'>Company: " + d['name'] + " <br/> Position: " + d['position'].split(':')[1] + " <br/> Period: "
                     + shortFormat(new Date(d['originalStart'])) + " - " + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['source'] + "</p>");
 
-        var obj = this.id.substr(6,7);
-
-        d3.select(ppText + obj).each(function() {
-        this.setAttribute("visibility", "visible");
-
-        });
       })
       .on("mousemove", function(d){
         tooltip.style("left", (d3.event.pageX + 5) + "px")
@@ -331,12 +320,6 @@ function timeElements (dataset,svg) {
           .duration(500)
           .style("opacity", 0);
 
-        var obj = this.id.substr(6,7);
-
-        d3.select(ppText + obj).each(function() {
-        this.setAttribute("visibility", "hidden");
-
-        });
       })
     ;
 

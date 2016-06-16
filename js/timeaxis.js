@@ -1,16 +1,17 @@
+const dateFormat = d3.time.format('%Y-%m-%d');
+
 var xTimeScale;
 var yTimeScale;
-var xTimeExtent;
+var xEgoTimeExtent;
 
 function setScales(dataset){
 
-  var dateFormat = d3.time.format('%Y-%m-%d');
   // scales & axes
-  xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
+  xEgoTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
                     d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
 
   xTimeScale = d3.time.scale() // input domain , output range
-    .domain(xTimeExtent)
+    .domain(xEgoTimeExtent)
     .range([paddingdoc + marginleft, w + paddingdoc - marginright]); // change in figures as well!!
 
   var yTimeExtent = [0 ,
@@ -28,13 +29,13 @@ function setScales(dataset){
 function timeAxes (dataset,svg) {
   // img timeline
 
-  var showTimeAxis = true, // variable, meerdere vars door komma's
-    beginning = 0,
-    ending = 0,
-    width = null,
-    height = null,
-    orient = "bottom"
-    ;
+  // var showTimeAxis = true, // variable, meerdere vars door komma's
+  //   beginning = 0,
+  //   ending = 0,
+  //   width = null,
+  //   height = null,
+  //   orient = "bottom"
+  //   ;
 
 
   var xTimeAxis = d3.svg.axis()
