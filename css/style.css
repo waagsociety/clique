@@ -46,13 +46,6 @@ section:first-of-type {
     background-color: #58595B;
 }
 
-.footer p {
-    color: #FFF;
-    font: 1.2em "brandon-grotesque", sans-serif;
-    margin-top: 1em;
-    margin-right: 2em;
-}
-
 em {
   font-weight: bold;
   font-style: normal;
@@ -64,6 +57,8 @@ em {
   text-align: right;
 }
 
+/*Header styling*/
+
 .logo {
   float: left;
   margin-top: 0.7em;
@@ -73,6 +68,28 @@ em {
 .searchperson {
   float: right;
   margin-top: 0.5em;
+}
+
+.searchperson form {
+  float: left;
+}
+
+.searchperson a {
+  float: right;
+  margin: 0.7em 0 0 2em;
+}
+
+.inf {
+  height: 2em;
+  width: 2em;
+}
+
+.inf path{
+  fill: #FFF;
+}
+
+.inf:hover path{
+  fill: #BCBEC0;
 }
 
 .search { 
@@ -102,6 +119,72 @@ em {
 input {
   font: 1.4em "brandon-grotesque", sans-serif;
 }
+
+/*Footer styling*/
+
+.footermenu {
+  float: left;
+  margin-left: 2em;
+}
+
+.footer p, .footer a {
+    color: #FFF;
+    font: 1.2em "brandon-grotesque", sans-serif;
+    margin-top: 1em;
+    margin-right: 2em;
+    text-decoration: none;
+}
+
+.footer a:hover {
+  color: #BCBEC0;
+}
+
+
+#userguide:hover > #inffooter path { /*change fill svg on mouseover a href*/
+  fill: #BCBEC0;
+} 
+
+#userguide {
+  vertical-align: top;
+  margin-top: 0;
+  line-height: 2em;
+}
+
+/*Styling user guide*/
+
+#guide {
+  width: 56em;
+  margin: 4em 0 22em 2em;
+}
+
+h1 {
+  font: 3em "brandon-grotesque", sans-serif;
+  color: #58595B;
+  margin-bottom: 0.8em;
+}
+
+h2 {
+  font: 2em "brandon-grotesque", sans-serif;
+  color: #58595B;
+  margin: 0.8em 0 0.4em 0;
+}
+
+h3 {
+  font: 1.5em "brandon-grotesque", sans-serif;
+  color: #58595B;
+  margin: 1em 0 0em 0;
+  font-style: italic;
+}
+
+#guide p {
+  font: 1.5em "brandon-grotesque", sans-serif;
+  color: #58595B;
+}
+
+
+/*Page styling*/
+
+/*Timeline styling*/
 
 text {
     font-size: 1.2em ;
