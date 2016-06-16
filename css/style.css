@@ -204,8 +204,17 @@ path.link {
   fill: #130C0E;
 }
 
-
-/*circle[id^=dot-]:hover {
-  stroke: #000;
-  stroke-width: 1;
-}*/
+.popup {
+    /*position: absolute;*/
+    left: 8px;
+    top: 8px;
+    background-color: #fff;
+    border: 1px #ccc solid;
+    border-radius: 6px;
+    box-shadow: #333 2px 2px 4px;
+    padding: 8px;
+    font-family: arial, helvetica, sans-serif;
+}
+.popup h2 {
+    margin: 0 0 1rem 0;
+}

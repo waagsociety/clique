@@ -15,9 +15,6 @@ const defaultEndDate = "2016-06-01"
 
 const triangleIds = ["bar-", "tri-"];
 const ppText = ["#txtpp-"];
-const tnPersonEndPoint = "https://api.transparantnederland.nl/search?type=tnl%3APerson&q=";
-const tnRelationEndPoint = "https://api.transparantnederland.nl/relations?id=";
-const tnLinkedPeopleEndPoint = "https://api.transparantnederland.nl/peopleFromOrgsFromPerson?id=";
 
 const sectorColorTable = {
   "Human health and social work activities" : {	name : "Human health and social work", color : "#F1C7DD"},
@@ -56,11 +53,6 @@ var name="Femke Halsema";
 
 var bar;
 
-var dateFormat;
-var xTimeExtent;
-var xTimeScale;
-var yTimeExtent;
-var yTimeScale;
 
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
@@ -110,155 +102,21 @@ function startClique(filename) {
       egoDataSet["type"] = personType;
       egoDataSet["_children"] = [];
 
-      var myUrl = tnRelationEndPoint + encodeURIComponent(id);
+
       done = 0;
-      getRelations(myUrl);
-      myUrl = tnLinkedPeopleEndPoint + encodeURIComponent(id);
-      getLinkedPeople(myUrl);
+      getRelations(id,egoDataSet,linkedDataSet);
+
+      getLinkedPeople(id,egoDataSet,linkedDataSet);
 
     }
 
   });
 }
 
-function getRelations(theUrl){
-  d3.json(theUrl,function(error,response){
-    if (error != null){
-      handleError("Error in getRelations: " + error);
-    }else if (response != null) {
 
-      for (index = 0; index < response.length; ++index) {
-        var name = response[index].pit.name;
-        var id = response[index].pit.id;
-        var position = response[index].relation.type;
-        var start = response[index].relation.since;
-        var end = response[index].relation.until;
-        var source = response[index].pit.dataset;
-        var type = response[index].pit.type;
+function mergeDatasets(dataSet,linkedSet) {
 
-        start = (start != "" ? start : defaultStartDate);
-        end = (end != "" ? end : defaultEndDate);
-
-        // https://api.transparantnederland.nl/search?id=urn:hgid:pdc/vvd
-        egoDataSet["_children"].push(
-          {
-            "name"       : name,
-            "id"            : id,
-            "position"    : position,
-            "positionLabel" : null,
-            "start"         : start,
-            "end"           : end,
-            "sector"        : "",
-            "source"      : source,
-            "type"        : type,
-            "_children"  : []
-          }
-        );
-
-      }
-      done++
-      getCompanySectors();
-      mergeDatasets();
-    }
-  });
-}
-
-function makeSectorCallback(index) {
-  return function(error,response) {
-
-    if (error != null){
-      handleError("Error in makeSectorCallback: " + error);
-    }else if (response != null) {
-      //console.log("Dim reply " + response.length)
-      for(i=0;i<response.length;++i){
-        //console.log("Type " + response[i].pit.type)
-        if(response[i].pit.type === "tnl:Sector"){
-          egoDataSet["_children"][index].sector = response[i].pit.name;
-          done++
-          mergeDatasets();
-          return
-        }
-      }
-      egoDataSet["_children"][index].sector = "Other service activities";
-      done++
-      mergeDatasets();
-    }
-  }
-}
-
-function getCompanySectors(){
-
-  for(index=0;index<egoDataSet["_children"].length;++index){
-    var id = egoDataSet["_children"][index].id;
-
-    var theUrl = tnRelationEndPoint + encodeURIComponent(id);
-
-    var myfunct = makeSectorCallback(index);
-
-    d3.json(theUrl,myfunct);
-
-  }
-}
-
-function getLinkedPeople(theUrl){
-  d3.json(theUrl,function(error,response){
-    if (error != null){
-      handleError("Error in getLinkedPeople: " + error);
-    }else if (response != null) {
-      for (index = 0; index < response.length; ++index) {
-        var id = response[index][0].pit.id;
-        var name = response[index][0].pit.name;
-        var type = response[index][0].pit.type; // must be person
-
-        var element = {};
-        element["id"] = id;
-        element["name"] = name;
-        element["type"] = type;
-
-        var relationName = response[index][0].relation.to_name
-        var relationId = response[index][0].relation.to;
-        var relationPosition = response[index][0].relation.type;
-        var relationPositionLabel = response[index][0].pit.data.waarde;
-
-        var relationStart = response[index][0].relation.since;
-        relationStart = (relationStart != "" ? relationStart : defaultStartDate);
-        var relationEnd = response[index][0].relation.until;
-        relationEnd = (relationEnd != "" ? relationEnd : defaultEndDate);
-
-        var relationsource = response[index][0].pit.dataset;
-        // response[index][0].relation.type is the type of relation,
-        // not the type of the related to, we will set this later on
-        var relationType = response[index][0].relation.type;
-
-        // https://api.transparantnederland.nl/search?id=urn:hgid:pdc/vvd
-        element["relation"] =
-          {
-            "name"          : relationName,
-            "id"            : relationId  ,
-            "position"      : relationPosition,
-            "positionLabel" : relationPositionLabel,
-            "start"         : relationStart,
-            "end"           : relationEnd,
-            "source"        : relationsource,
-            "relationType"  : relationType,
-            "type"          : null
-          };
-
-        if(linkedDataSet[relationId] === undefined){
-          linkedDataSet[relationId] = [];
-        }
-        linkedDataSet[relationId].push(element);
-      }
-      done++
-      mergeDatasets();
-    }
-  });
-
-}
-
-function mergeDatasets() {
-
-  var elements = 2 + egoDataSet["_children"].length;
+  var elements = 2 + dataSet["_children"].length;
   if (done != elements){
     bar.animate(done*1.0/elements);  // Number from 0.0 to 1.0
     return;
@@ -267,24 +125,24 @@ function mergeDatasets() {
   d3.select("#progressbar").remove();
   bar = {};
 
-  for(index=0;index<egoDataSet._children.length;++index){
-    var childId = egoDataSet._children[index].id;
-    if(linkedDataSet[childId] !== undefined){
-      for(index1=0;index1<linkedDataSet[childId].length;++index1){
+  for(index=0;index<dataSet._children.length;++index){
+    var childId = dataSet._children[index].id;
+    if(linkedSet[childId] !== undefined){
+      for(index1=0;index1<linkedSet[childId].length;++index1){
         // Set the type of the _children using the type of the parent node
         // They need to be the same because this is the relation
-        linkedDataSet[childId][index1].relation.type = egoDataSet._children[index].type;
-        egoDataSet._children[index]._children.push(linkedDataSet[childId][index1]);
+        linkedSet[childId][index1].relation.type = dataSet._children[index].type;
+        dataSet._children[index]._children.push(linkedSet[childId][index1]);
       }
     }
   }
-  makeGraphics(egoDataSet._children)
+  makeGraphics(dataSet._children)
 }
 
 function makeGraphics(dataset) {
 
 
-  var svgContainer1 = d3.select("#viz")
+  var svgContainer1 = d3.select("#viz1")
     .append("svg")
     .attr({
       width: width,
@@ -303,7 +161,7 @@ function makeGraphics(dataset) {
 
   timeLegend(dataset,svgContainer1);
 
-  var svgContainer2 = d3.select("#viz")
+  var svgContainer2 = d3.select("#viz2")
     .append("svg")
     .attr({
       width: width,
@@ -362,28 +220,6 @@ function sectorTypes (dataset){
 
 //timeline(dataset); //draw bars & dots
 
-function setScales(dataset){
-
-  var dateFormat = d3.time.format('%Y-%m-%d');
-  // scales & axes
-  xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
-                    d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
-
-  xTimeScale = d3.time.scale() // input domain , output range
-    .domain(xTimeExtent)
-    .range([paddingdoc + marginleft, w + paddingdoc - marginright]); // change in figures as well!!
-
-  yTimeExtent = [0 ,
-        ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
-      ];
-
-  yTimeScale = d3.scale.linear()
-    .domain(yTimeExtent)
-    .range([htimeline + margintop + titlespacing + paddingdoc, paddingdoc + margintop + titlespacing])
-    ;
-
-
-}
 
 function handleError(message){
   console.log(message);

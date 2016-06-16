@@ -1,21 +1,231 @@
 
-// var linkDistance = 80;
-// var charge = -120;
-// var gravity = .05;
 var root;
 var force;
-// var link;
-// var node;
 var graphW;
 var graphH;
 var display;
 
 
 // rest of vars
-var nodeSize = 18;
-var x_browser = nodeSize/2;
-var y_browser = nodeSize*1.2;
-var increaseIcon = 1.5;
+const nodeSize = 18;
+const x_browser = nodeSize/2;
+const y_browser = nodeSize*1.2;
+const increaseIcon = 1.5;
+
+const SECTORNODETYPE = "SECTORNODETYPE";
+const STATUSNODETYPE = "STATUSNODETYPE";
+
+const TimeRelEnum = {
+  BEFORE: "before",
+  BEFORESTARTS: "starts",
+  BEFOREOVERLAP: "beforeoverlap",
+  BEFOREEND: "beforeend",
+  BEFOREAFTER: "beforeafter",
+  STARTSOVERLAP: "startsoverlap",
+  STARTSEND: "startsend",
+  STARTSAFTER: "startsafter",
+  OVERLAP: "overlap",
+  OVERLAPEND: "overlapend",
+  OVERLAPAFTER: "overlapafter",
+  ENDAFTER: "endafter",
+  AFTER: "after"
+};
+
+const cliqueStatusEnum = {
+  BEFORE: "before",
+  MINUS: "minus",
+  EQUAL: "equal",
+  DURING: "during",
+  PLUS: "plus",
+  NONE: "none"
+};
+
+var displaySet = {};
+
+function createEgoData(extent){
+  displaySet = {};
+  var uniqueNodeIndex=0;
+  displaySet.id  = egoDataSet.id;
+  displaySet.name  = egoDataSet.name;
+  displaySet.type  = egoDataSet.type;
+  displaySet._children = [];
+
+  for(i=0;i<egoDataSet._children.length;++i){
+
+    // Is the node in scope?
+    var timeRelation = filterExtent(egoDataSet._children[i],extent);
+    if (timeRelation === cliqueStatusEnum.NONE){
+      continue;
+    }
+
+    var instNode = {}, instToCopy = egoDataSet._children[i];
+    instNode.id = instToCopy.id;
+    instNode.name = instToCopy.name;
+    instNode.type = instToCopy.type;
+    instNode.position = instToCopy.position;
+    instNode.positionLabel = instToCopy.positionLabel;
+    instNode.sector = instToCopy.sector;
+    instNode.source = instToCopy.source;
+    instNode.start = instToCopy.start;
+    instNode.end = instToCopy.end;
+
+    instNode._children = [];
+
+    var sectorStatusExist = false;
+
+    for (ii=0;ii<displaySet._children.length;++ii){
+
+      if (displaySet._children[ii].name === instToCopy.sector && displaySet._children[ii].cliqueStatus === timeRelation){
+
+        displaySet._children[ii]._children.push(instNode);
+        sectorStatusExist = true;
+        break;
+      }
+    }
+    if (!sectorStatusExist){
+      var sectorNode = {};
+      sectorNode.name = instToCopy.sector;
+      sectorNode.cliqueStatus = timeRelation;
+      sectorNode.type = SECTORNODETYPE;
+      sectorNode.id = sectorNode.type + "_" + uniqueNodeIndex++;
+      sectorNode._children = [];
+      sectorNode._children.push(instNode);
+      displaySet._children.push(sectorNode);
+    }
+
+    for (j=0;j<instToCopy._children.length;++j){
+
+      timeRelation = filterExtent(instToCopy._children[j].relation,extent);
+      if (timeRelation === cliqueStatusEnum.NONE){
+        continue;
+      }
+      var personNode = {}, personToCopy = instToCopy._children[j];
+      personNode.id = personToCopy.id;
+      personNode.name = personToCopy.name;
+      personNode.type = personToCopy.type;
+      personNode.position = personToCopy.relation.position;
+      personNode.positionLabel = personToCopy.relation.positionLabel;
+      personNode.source = personToCopy.source;
+      personNode.start = personToCopy.relation.start;
+      personNode.end = personToCopy.relation.end;
+
+
+      var statusExist = false;
+
+      for (ii=0;ii<instNode._children.length;++ii){
+
+        if (instNode._children[ii].cliqueStatus === timeRelation){
+
+          instNode._children[ii]._children.push(personNode);
+          statusExist = true;
+          break;
+        }
+      }
+      if (!statusExist){
+        var statusNode = {};
+        statusNode.name = "";
+        statusNode.cliqueStatus = timeRelation;
+        statusNode.type = STATUSNODETYPE;
+        statusNode.id = statusNode.type + "_" + uniqueNodeIndex++;
+        statusNode._children = [];
+        statusNode._children.push(personNode);
+        instNode._children.push(statusNode);
+      }
+    }
+  }
+  // setNumberOfChildren(displaySet);
+  setEgoData(displaySet);
+}
+
+function filterExtent(nodeToFilter,extent){
+
+    var timeRelation = TimeRelEnum.BEFORE;
+    var nodeStart = new Date(nodeToFilter.start);
+    var nodeEnd = new Date(nodeToFilter.end);
+    if( nodeEnd < extent[0] ){
+      timeRelation = TimeRelEnum.BEFORE;
+    }else if ( nodeEnd === extent[0] ){
+      timeRelation = TimeRelEnum.BEFORESTARTS;
+    }else if ( nodeStart < extent[0] && nodeEnd < extent[1] ){
+      timeRelation = TimeRelEnum.BEFOREOVERLAP;
+    }else if ( nodeStart < extent[0] && nodeEnd === extent[1] ){
+      timeRelation = TimeRelEnum.BEFOREEND;
+    }else if ( nodeStart < extent[0] && nodeEnd > extent[1] ){
+      timeRelation = TimeRelEnum.BEFOREAFTER;
+    }else if ( nodeStart === extent[0] && nodeEnd < extent[1] ){
+      timeRelation = TimeRelEnum.STARTSOVERLAP;
+    }else if ( nodeStart === extent[0] && nodeEnd === extent[1] ){
+      timeRelation = TimeRelEnum.STARTSEND;
+    }else if ( nodeStart === extent[0] && nodeEnd > extent[1] ){
+      timeRelation = TimeRelEnum.STARTSAFTER;
+    }else if ( nodeStart > extent[0] && nodeEnd < extent[1] ){
+      timeRelation = TimeRelEnum.OVERLAP;
+    }else if ( nodeStart > extent[0] && nodeEnd === extent[1] ){
+      timeRelation = TimeRelEnum.OVERLAPEND;
+    }else if ( nodeStart > extent[0] && nodeEnd > extent[1] ){
+      timeRelation = TimeRelEnum.OVERLAPAFTER;
+    }else if ( nodeStart === extent[1] ){
+      timeRelation = TimeRelEnum.ENDAFTER;
+    }else if ( nodeStart > extent[1] ){
+      timeRelation = TimeRelEnum.AFTER;
+    }else{
+      handleError("ERROR: uncaugth relation for start " + nodeToFilter.start + ", end " + nodeToFilter.end + ", and extent " + extent);
+    }
+    switch(timeRelation) {
+      case TimeRelEnum.BEFORE:
+        return cliqueStatusEnum.BEFORE;
+        break;
+      case TimeRelEnum.BEFORESTARTS:
+        return cliqueStatusEnum.MINUS;
+        break;
+      case TimeRelEnum.BEFOREOVERLAP:
+        return cliqueStatusEnum.MINUS;
+        break;
+      case TimeRelEnum.BEFOREEND:
+        return cliqueStatusEnum.MINUS;
+        break;
+      case TimeRelEnum.BEFOREAFTER:
+        return cliqueStatusEnum.EQUAL;
+        break;
+      case TimeRelEnum.STARTSOVERLAP:
+        return cliqueStatusEnum.DURING;
+        break;
+      case TimeRelEnum.STARTSEND:
+        return cliqueStatusEnum.DURING;
+        break;
+      case TimeRelEnum.STARTSAFTER:
+        return cliqueStatusEnum.PLUS;
+        break;
+      case TimeRelEnum.OVERLAP:
+        return cliqueStatusEnum.DURING;
+        break;
+      case TimeRelEnum.OVERLAPEND:
+        return cliqueStatusEnum.DURING;
+        break;
+      case TimeRelEnum.OVERLAPAFTER:
+        return cliqueStatusEnum.PLUS;
+        break;
+      case TimeRelEnum.ENDAFTER:
+        return cliqueStatusEnum.PLUS;
+        break;
+      case TimeRelEnum.AFTER:
+        return cliqueStatusEnum.NONE;
+        break;
+      default:
+        handleError("ERROR: unknown time relation: " + timeRelation);
+
+    }
+
+}
+
+// function setNumberOfChildren(set){
+//
+//   if (set._children !== undefined && set._children.length >0){
+//     set._children.forEach(setNumberOfChildren);
+//     set.name = set.name + " (" + set._children.length + ")";
+//   }
+//
+// }
 
 function initEgonetwork (svg, width, height){
 
@@ -144,6 +354,7 @@ function update() {
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .on("click", click)
+      .on("contextmenu", contextmenu)
       .call(force.drag);
 
   // Append a circle
@@ -164,33 +375,31 @@ function update() {
         .attr("height", nodeSize)
         .attr("width", nodeSize);
 
-  // make the image grow a little on mouse over and add the text details on click
-  var setEvents = images
-          // Append hero text
-          .on( 'click', function (d) {
-              // d3.select("h1").html(d.hero);
-              // d3.select("h2").html(d.name);
-              // d3.select("h3").html ("Take me to " + "<a href='" + d.link + "' >"  + d.hero + " web page ⇢"+ "</a>" );
-           })
-
-          .on( 'mouseenter', function() {
-            // select element in current context
-            d3.select( this )
-              .transition()
-              .attr("x", function(d) { return -nodeSize*(increaseIcon-1)/2;})
-              .attr("y", function(d) { return -nodeSize*(increaseIcon-1)/2;})
-              .attr("height", nodeSize*increaseIcon)
-              .attr("width", nodeSize*increaseIcon);
-          })
-          // set back
-          .on( 'mouseleave', function() {
-            d3.select( this )
-              .transition()
-              .attr("x", function(d) { return 0;})
-              .attr("y", function(d) { return 0;})
-              .attr("height", nodeSize)
-              .attr("width", nodeSize);
-          });
+  // // make the image grow a little on mouse over and add the text details on click
+  // var setEvents = images
+  //
+  //         .on( 'click', function (d) {
+  //
+  //          })
+  //
+  //         .on( 'mouseenter', function() {
+  //           // select element in current context
+  //           d3.select( this )
+  //             .transition()
+  //             .attr("x", function(d) { return -nodeSize*(increaseIcon-1)/2;})
+  //             .attr("y", function(d) { return -nodeSize*(increaseIcon-1)/2;})
+  //             .attr("height", nodeSize*increaseIcon)
+  //             .attr("width", nodeSize*increaseIcon);
+  //         })
+  //         // set back
+  //         .on( 'mouseleave', function() {
+  //           d3.select( this )
+  //             .transition()
+  //             .attr("x", function(d) { return 0;})
+  //             .attr("y", function(d) { return 0;})
+  //             .attr("height", nodeSize)
+  //             .attr("width", nodeSize);
+  //         });
 
   // Append hero name on roll over next to the node as well
   nodeEnter.append("text")
@@ -264,6 +473,26 @@ function click(d) {
   update();
 }
 
+function contextmenu(d){
+  if (d.type === "tnl:Person" && d.id !== root.id){
+    d3.event.preventDefault();
+    // alert("You click me!!!");
+
+    var popup = d3.select("div#viz2")
+              .append("div")
+              .attr("class", "popup")
+              .style("width", graphW)
+              .style("height", graphH)
+              ;
+
+    popup.append("h2").text(d.name);
+    popup.append("p").text("Succhiamelo deficiente")
+    // popup.append("p")
+    //         .append("a")
+    //         .attr("href",d.link)
+    //         .text(d.link_text);
+  }
+}
 
 /**
  * Returns a list of all nodes under the root.

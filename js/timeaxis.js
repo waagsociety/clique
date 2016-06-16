@@ -1,32 +1,29 @@
-const SECTORNODETYPE = "SECTORNODETYPE";
-const STATUSNODETYPE = "STATUSNODETYPE";
+var xTimeScale;
+var yTimeScale;
+var xTimeExtent;
 
-var TimeRelEnum = {
-  BEFORE: "before",
-  BEFORESTARTS: "starts",
-  BEFOREOVERLAP: "beforeoverlap",
-  BEFOREEND: "beforeend",
-  BEFOREAFTER: "beforeafter",
-  STARTSOVERLAP: "startsoverlap",
-  STARTSEND: "startsend",
-  STARTSAFTER: "startsafter",
-  OVERLAP: "overlap",
-  OVERLAPEND: "overlapend",
-  OVERLAPAFTER: "overlapafter",
-  ENDAFTER: "endafter",
-  AFTER: "after"
-};
+function setScales(dataset){
 
-var cliqueStatusEnum = {
-  BEFORE: "before",
-  MINUS: "minus",
-  EQUAL: "equal",
-  DURING: "during",
-  PLUS: "plus",
-  NONE: "none"
-};
+  var dateFormat = d3.time.format('%Y-%m-%d');
+  // scales & axes
+  xTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
+                    d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
 
-var displaySet = {};
+  xTimeScale = d3.time.scale() // input domain , output range
+    .domain(xTimeExtent)
+    .range([paddingdoc + marginleft, w + paddingdoc - marginright]); // change in figures as well!!
+
+  var yTimeExtent = [0 ,
+        ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
+      ];
+
+  yTimeScale = d3.scale.linear()
+    .domain(yTimeExtent)
+    .range([htimeline + margintop + titlespacing + paddingdoc, paddingdoc + margintop + titlespacing])
+    ;
+
+
+}
 
 function timeAxes (dataset,svg) {
   // img timeline
@@ -140,188 +137,3 @@ function brushes (xTimeAxis,svg){
 
   }
 };
-
-function createEgoData(extent){
-  displaySet = {};
-  var uniqueNodeIndex=0;
-  displaySet.id  = egoDataSet.id;
-  displaySet.name  = egoDataSet.name;
-  displaySet.type  = egoDataSet.type;
-  displaySet._children = [];
-
-  for(i=0;i<egoDataSet._children.length;++i){
-
-    // Is the node in scope?
-    var timeRelation = filterExtent(egoDataSet._children[i],extent);
-    if (timeRelation === cliqueStatusEnum.NONE){
-      continue;
-    }
-
-    var instNode = {}, instToCopy = egoDataSet._children[i];
-    instNode.id = instToCopy.id;
-    instNode.name = instToCopy.name;
-    instNode.type = instToCopy.type;
-    instNode.position = instToCopy.position;
-    instNode.positionLabel = instToCopy.positionLabel;
-    instNode.sector = instToCopy.sector;
-    instNode.source = instToCopy.source;
-    instNode.start = instToCopy.start;
-    instNode.end = instToCopy.end;
-
-    instNode._children = [];
-
-    var sectorStatusExist = false;
-
-    for (ii=0;ii<displaySet._children.length;++ii){
-
-      if (displaySet._children[ii].name === instToCopy.sector && displaySet._children[ii].cliqueStatus === timeRelation){
-
-        displaySet._children[ii]._children.push(instNode);
-        sectorStatusExist = true;
-        break;
-      }
-    }
-    if (!sectorStatusExist){
-      var sectorNode = {};
-      sectorNode.name = instToCopy.sector;
-      sectorNode.cliqueStatus = timeRelation;
-      sectorNode.type = SECTORNODETYPE;
-      sectorNode.id = sectorNode.type + "_" + uniqueNodeIndex++;
-      sectorNode._children = [];
-      sectorNode._children.push(instNode);
-      displaySet._children.push(sectorNode);
-    }
-
-    for (j=0;j<instToCopy._children.length;++j){
-
-      timeRelation = filterExtent(instToCopy._children[j].relation,extent);
-      if (timeRelation === cliqueStatusEnum.NONE){
-        continue;
-      }
-      var personNode = {}, personToCopy = instToCopy._children[j];
-      personNode.id = personToCopy.id;
-      personNode.name = personToCopy.name;
-      personNode.type = personToCopy.type;
-      personNode.position = personToCopy.relation.position;
-      personNode.positionLabel = personToCopy.relation.positionLabel;
-      personNode.source = personToCopy.source;
-      personNode.start = personToCopy.relation.start;
-      personNode.end = personToCopy.relation.end;
-
-
-      var statusExist = false;
-
-      for (ii=0;ii<instNode._children.length;++ii){
-
-        if (instNode._children[ii].cliqueStatus === timeRelation){
-
-          instNode._children[ii]._children.push(personNode);
-          statusExist = true;
-          break;
-        }
-      }
-      if (!statusExist){
-        var statusNode = {};
-        statusNode.name = "";
-        statusNode.cliqueStatus = timeRelation;
-        statusNode.type = STATUSNODETYPE;
-        statusNode.id = statusNode.type + "_" + uniqueNodeIndex++;
-        statusNode._children = [];
-        statusNode._children.push(personNode);
-        instNode._children.push(statusNode);
-      }
-    }
-  }
-  // setNumberOfChildren(displaySet);
-  setEgoData(displaySet);
-}
-
-function filterExtent(nodeToFilter,extent){
-
-    var timeRelation = TimeRelEnum.BEFORE;
-    var nodeStart = new Date(nodeToFilter.start);
-    var nodeEnd = new Date(nodeToFilter.end);
-    if( nodeEnd < extent[0] ){
-      timeRelation = TimeRelEnum.BEFORE;
-    }else if ( nodeEnd === extent[0] ){
-      timeRelation = TimeRelEnum.BEFORESTARTS;
-    }else if ( nodeStart < extent[0] && nodeEnd < extent[1] ){
-      timeRelation = TimeRelEnum.BEFOREOVERLAP;
-    }else if ( nodeStart < extent[0] && nodeEnd === extent[1] ){
-      timeRelation = TimeRelEnum.BEFOREEND;
-    }else if ( nodeStart < extent[0] && nodeEnd > extent[1] ){
-      timeRelation = TimeRelEnum.BEFOREAFTER;
-    }else if ( nodeStart === extent[0] && nodeEnd < extent[1] ){
-      timeRelation = TimeRelEnum.STARTSOVERLAP;
-    }else if ( nodeStart === extent[0] && nodeEnd === extent[1] ){
-      timeRelation = TimeRelEnum.STARTSEND;
-    }else if ( nodeStart === extent[0] && nodeEnd > extent[1] ){
-      timeRelation = TimeRelEnum.STARTSAFTER;
-    }else if ( nodeStart > extent[0] && nodeEnd < extent[1] ){
-      timeRelation = TimeRelEnum.OVERLAP;
-    }else if ( nodeStart > extent[0] && nodeEnd === extent[1] ){
-      timeRelation = TimeRelEnum.OVERLAPEND;
-    }else if ( nodeStart > extent[0] && nodeEnd > extent[1] ){
-      timeRelation = TimeRelEnum.OVERLAPAFTER;
-    }else if ( nodeStart === extent[1] ){
-      timeRelation = TimeRelEnum.ENDAFTER;
-    }else if ( nodeStart > extent[1] ){
-      timeRelation = TimeRelEnum.AFTER;
-    }else{
-      handleError("ERROR: uncaugth relation for start " + nodeToFilter.start + ", end " + nodeToFilter.end + ", and extent " + extent);
-    }
-    switch(timeRelation) {
-      case TimeRelEnum.BEFORE:
-        return cliqueStatusEnum.BEFORE;
-        break;
-      case TimeRelEnum.BEFORESTARTS:
-        return cliqueStatusEnum.MINUS;
-        break;
-      case TimeRelEnum.BEFOREOVERLAP:
-        return cliqueStatusEnum.MINUS;
-        break;
-      case TimeRelEnum.BEFOREEND:
-        return cliqueStatusEnum.MINUS;
-        break;
-      case TimeRelEnum.BEFOREAFTER:
-        return cliqueStatusEnum.EQUAL;
-        break;
-      case TimeRelEnum.STARTSOVERLAP:
-        return cliqueStatusEnum.DURING;
-        break;
-      case TimeRelEnum.STARTSEND:
-        return cliqueStatusEnum.DURING;
-        break;
-      case TimeRelEnum.STARTSAFTER:
-        return cliqueStatusEnum.PLUS;
-        break;
-      case TimeRelEnum.OVERLAP:
-        return cliqueStatusEnum.DURING;
-        break;
-      case TimeRelEnum.OVERLAPEND:
-        return cliqueStatusEnum.DURING;
-        break;
-      case TimeRelEnum.OVERLAPAFTER:
-        return cliqueStatusEnum.PLUS;
-        break;
-      case TimeRelEnum.ENDAFTER:
-        return cliqueStatusEnum.PLUS;
-        break;
-      case TimeRelEnum.AFTER:
-        return cliqueStatusEnum.NONE;
-        break;
-      default:
-        handleError("ERROR: unknown time relation: " + timeRelation);
-
-    }
-
-}
-
-// function setNumberOfChildren(set){
-//
-//   if (set._children !== undefined && set._children.length >0){
-//     set._children.forEach(setNumberOfChildren);
-//     set.name = set.name + " (" + set._children.length + ")";
-//   }
-//
-// }
