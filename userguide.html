@@ -17,7 +17,7 @@
   <header class="header clearfix">
     <div class="container">
       <div class="logo">
-        <a href=""><img src="img/TNL_logoClique_wit.svg" alt="Clique" height="31" width="79"></a>
+        <a href="index.html"><img src="img/TNL_logoClique_wit.svg" alt="Clique" height="31" width="79"></a>
       </div>
 
       <div class="searchperson">
@@ -46,47 +46,46 @@
     <div class="container">
       <div id="guide">
         <h1>User Guide</h1>
-        <p>Clique is an application to research the political influence network of a politician from various angles.</p>
+        <p class="intro">Clique is an application to research the political influence network of a politician from various angles.</p>
 
-<h2>Timeline</h2>
-<p>After selecting a person of interest, a personal timeline is generated. The timeline summarizes the politicians resume.</p>
+        <div id="col1">
+          <h2>Timeline</h2>
+          <p>After selecting a person of interest, a personal timeline is generated. The timeline summarizes the politicians resume.</p>
 
-<p>The x axis represents the time in years, the y axis the duration of a period. Every point represents a period on the timeline; building from the begin- and endpoint of the period, it is the top of a isosceles triangle. The height of the triangle indicates the duration of the period. The points are constructed as illustrated here:</p>
+          <p>The x axis represents the time in years, the y axis the duration of a period. Every point represents a period on the timeline; building from the begin- and endpoint of the period, it is the top of a isosceles triangle. The height of the triangle indicates the duration of the period. The points are constructed as illustrated here:</p>
 
-(figure 4 from thesis)
+          <img src="img/guide/tm.svg" alt="construction points on the timeline with the Triangular Model" class="imgguide" />
 
+          <p>The numbers in the points indicate the amount of overlapping nodes. By clicking a point selects the one below, clicking again, te one below that; in that way it is possible to browse through the overlapping points. All points are restored when clicking any other point.</p>
 
-<p>The numbers in the points indicate the amount of overlapping nodes. By clicking a point selects the one below, clicking again, te one below that; in that way it is possible to browse through the overlapping points. All points are restored when clicking any other point.</p>
+          <h3>Sector colors</h3>
+          <p>The sector in which companies are classified, is the <a href="http://ec.europa.eu/eurostat/documents/3859598/5902521/KS-RA-07-015-EN.PDF" target="_blank">’Statistical classification of economic activity in the European Community’</a>. The number behind the sector in the legend, is the amount of points in the timeline.</p>
 
-<h3>Sector colors</h3>
-<p>The sector in which companies are classified, is the ’Statistical classification of economic activity in the European Community’ (link pdf). The number behind the sector in the legend, is the amount of points in the timeline.</p>
+          <p>These are only the positions with a start- and end date. Positions without dates are not listed. Positions with only a known start date are listed. The end date that is generated is placed half a year in the future in order to  be able to distinguish them from listed recent positions.</p>
 
-<p>These are only the positions with a start- and end date. Positions without dates are not listed. Positions with only a known start date are listed. The end date that is generated is placed half a year in the future in order to  be able to distinguish them from listed recent positions.</p>
+          <h3>Selecting periods</h3>
 
-<h3>Selecting periods</h3>
+          <p>By dragging the cursor, it is possible to select a period on the timeline. From this selection a network difference graph is generated.</p>
+        </div>
+        <div id="col2">
+          <h2>Network difference graph</h2>
+          <p>This graph summarizes the changes in the personal network between the start- and the end date in the timeline.</p>
 
-<p>By dragging the cursor, it is possible to select a period on the timeline. From this selection a network difference graph is generated.</p>
+          <p>Squares represent companies, circles represent people. People are always attached to companies, never directly to other people. The symbols in the squares and circles represent the different types of change as illustrated below:</p>
 
-<h2>Network difference graph</h2>
-<p>This graph summarizes the changes in the personal network between the start- and the end date in the timeline.</p>
+          <img src="img/guide/connections.svg" alt="Different types of change" class="imgguide" />
 
-<p>Squares represent companies, circles represent people. People are always attached to companies, never directly to other people. The symbols in the squares and circles represent the different types of change as illustrated below:</p>
+          <p>Nodes are merged per sector, per type of change. The size of the node indicate the amount of merged companies. By clicking the summarized nodes they collapse to the actual nodes.</p>
 
-(figure 1 from the thesis)
+          <p>In the graph persons can be selected to research their shared connections in a pop-up.</p>
 
-<p>Nodes are merged per sector, per type of change. The size of the node indicate the amount of merged companies. By clicking the summarized nodes they collapse to the actual nodes.</p>
+          <h2>Shared connections</h2>
+          <p>Three kinds of connections are explored: shared companies during the same period, shared sectors and shared contacts.</p>
 
-<p>In the graph persons can be selected to research their shared connections in a pop-up.</p>
+          <p>The selected person in the search field above can be changed to any other person.</p>
 
-<h2>Shared connections</h2>
-<p>Three kinds of connections are explored: shared companies during the same period, shared sectors and shared contacts.</p>
-
-<p>The selected person in the search field above can be changed to any other person.</p>
-
-<p>By clicking the button below the personal timeline of the selected person is generated.</p>
-
-
-
+          <p>By clicking the button below the personal timeline of the selected person is generated.</p>
+        </div>
       </div>
     </div>
   </section>
