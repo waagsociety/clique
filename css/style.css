@@ -306,7 +306,17 @@ p.bgtexttime {
   stroke-opacity: .5;
 }
 
+.timeinstructtop {
+  font: 1.5em "brandon-grotesque";
+  fill: #FFF;
+  font-weight: bold;
+}
 
+.timeinstructbottom {
+  font: 1.4em "brandon-grotesque";
+  fill: #FFF;
+  font-weight: normal;
+}
 
 
 /*circle[id^=dot-]:hover {
