@@ -82,6 +82,7 @@ em {
 .inf {
   height: 2em;
   width: 2em;
+  margin-right: 2em; 
 }
 
 .inf path{
@@ -160,13 +161,13 @@ input {
 #col1 {
   width: 48%;
   float: left;
-  margin-bottom: 22em;
+  margin: 2em 0 22em 0;
 }
 
 #col2 {
   width: 48%;
   float: right;
-  margin-bottom: 22em;
+  margin: 2em 0 22em 0;
 }
 
 h1 {
@@ -194,6 +195,7 @@ h3 {
 #col1 p, #col2 p {
   font: 1.5em "brandon-grotesque", sans-serif;
   color: #58595B;
+  margin-bottom: 0.5em;
 }
 
 .intro {

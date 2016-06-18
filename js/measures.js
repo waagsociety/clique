@@ -5,7 +5,7 @@ const paddingdoc = 20;
 const margintop = 50;
 const titlespacing = 24
 const marginleft = 240;
-const marginright = 150;
+const marginright = 180;
 const marginbottom = 200;
 const htimeline = (w - marginleft - marginright) / 2
 
@@ -67,6 +67,8 @@ function startClique(filename) {
     ;
 
   timeAxes(dataset, svgContainer);
+
+  timeInstructions(dataset, svgContainer);
 
   timeElements(dataset,svgContainer);
 

@@ -110,4 +110,7 @@ var timeLegend = function(dataset,svg) { // legend
       return d + " (" + onlyThisType.length + ")";
     })
     ;
+
+    
+
 } // end timeLegend
