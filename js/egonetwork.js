@@ -35,6 +35,7 @@ const cliqueStatusEnum = {
 var displaySet = {};
 var root;
 var force;
+var nodes;
 var graphW;
 var graphH;
 var display;
@@ -93,9 +94,12 @@ function createEgoData(extent){
       displaySet._children.push(sectorNode);
     }
 
+    var scopedExtent = [instToCopy.start>extent[0]?instToCopy.start:extent[0],
+                        instToCopy.end<extent[1]?instToCopy.end:extent[1]];
+
     for (var j=0;j<instToCopy._children.length;++j){
 
-      timeRelation = filterExtent(instToCopy._children[j].relation,extent);
+      timeRelation = filterExtent(instToCopy._children[j].relation,scopedExtent);
       if (timeRelation === cliqueStatusEnum.NONE){
         continue;
       }
@@ -140,10 +144,14 @@ function createEgoData(extent){
 function filterExtent(nodeToFilter,extent){
 
     var timeRelation = TimeRelEnum.BEFORE;
-    var nodeStart = new Date(nodeToFilter.start);
-    var nodeEnd = new Date(nodeToFilter.end);
+    // Start of working day
+    var nodeStart = new Date(nodeToFilter.start + "T08:00:00+01:00");
+    // End of working day
+    var nodeEnd = new Date(nodeToFilter.end + "T17:00:00+01:00");
     if( nodeEnd < extent[0] ){
       timeRelation = TimeRelEnum.BEFORE;
+    }else if ( nodeStart > extent[1] ){
+      timeRelation = TimeRelEnum.AFTER;
     }else if ( nodeEnd === extent[0] ){
       timeRelation = TimeRelEnum.BEFORESTARTS;
     }else if ( nodeStart < extent[0] && nodeEnd < extent[1] ){
@@ -166,8 +174,6 @@ function filterExtent(nodeToFilter,extent){
       timeRelation = TimeRelEnum.OVERLAPAFTER;
     }else if ( nodeStart === extent[1] ){
       timeRelation = TimeRelEnum.ENDAFTER;
-    }else if ( nodeStart > extent[1] ){
-      timeRelation = TimeRelEnum.AFTER;
     }else{
       handleError("ERROR: uncaugth relation for start " + nodeToFilter.start + ", end " + nodeToFilter.end + ", and extent " + extent);
     }
@@ -239,18 +245,25 @@ function initEgonetwork (svg, width, height){
   graphW = width;
   graphH = height;
 
-  var defs = display.insert("svg:defs")
-      .data(["end"]);
-
-
-  defs.enter().append("svg:path")
-      .attr("d", "M0,-5L10,0L0,5");
+  // var defs = display.insert("svg:defs")
+  //     .data(["end"]);
+  //
+  //
+  // defs.enter().append("svg:path")
+  //     .attr("d", "M0,-5L10,0L0,5");
 
   force = d3.layout.force();
 
 }
 
 function setEgoData(jsonData){
+  if (nodes !== undefined){
+    nodes.length = 0;
+    display.selectAll("g.node").data(nodes).exit().remove();
+  }
+
+
+
   root = jsonData;
   root.fixed = true;
   root.x = graphW / 2;
@@ -314,8 +327,8 @@ function getImage(d){
  *
  */
 function update() {
-  var nodes = flatten(root),
-      links = d3.layout.tree().links(nodes);
+  nodes = flatten(root);
+  var links = d3.layout.tree().links(nodes);
 
   // Restart the force layout.
   force.nodes(nodes)
@@ -330,7 +343,7 @@ function update() {
         .start();
 
    var path = display.selectAll("path.link")
-      .data(links, function(d) { return d.target.id; });
+      .data(links, function(d) { return giveNodeKey(d.target); });
 
     path.enter().insert("svg:path")
       .attr("class", "link")
@@ -346,7 +359,7 @@ function update() {
 
   // Update the nodes…
   var node = display.selectAll("g.node")
-      .data(nodes, function(d) { return d.id; });
+      .data(nodes, function(d) { return giveNodeKey(d); });
 
 
   // Enter any new nodes.
@@ -401,7 +414,6 @@ function update() {
   //             .attr("width", nodeSize);
   //         });
 
-  // Append hero name on roll over next to the node as well
   nodeEnter.append("text")
       .attr("class", "nodetext")
       .attr("x", x_browser)
@@ -504,6 +516,12 @@ function contextmenu(d){
   }
 }
 
+function giveNodeKey(d){
+  if (d.start !== undefined && d.end !== undefined){
+    return d.id + d.start + d.end;
+  }
+  return d.id
+}
 /**
  * Returns a list of all nodes under the root.
  */

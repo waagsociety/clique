@@ -37,16 +37,15 @@ function timeElements (dataset,svg) {
       .padding(4)
       .maxBandHeight(12); // height bands
 
-  var theseBands = timeline(dataset);
   // bars
 
-  var noPolPartydata = theseBands.filter(function(b) {
+  var noPolPartydata = timeline(dataset.filter(function(b) {
                   return b.type !== 'tnl:PoliticalParty';
-              });
+              }));
 
-  var isPolPartydata = theseBands.filter(function(b) {
+  var isPolPartydata = timeline(dataset.filter(function(b) {
                   return b.type === 'tnl:PoliticalParty';
-              });
+              }));
 
   svg.append("g")
     .attr({
