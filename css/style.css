@@ -79,17 +79,21 @@ em {
   margin: 0.7em 0 0 2em;
 }
 
-.inf {
+.inf, .inf2 {
   height: 2em;
   width: 2em;
   margin-right: 2em; 
 }
 
-.inf path{
+.inf2 {
+  margin-right: 0.5em;
+}
+
+.inf path, .inf2 path{
   fill: #FFF;
 }
 
-.inf:hover path{
+.inf:hover path, .inf2:hover path{
   fill: #BCBEC0;
 }
 
