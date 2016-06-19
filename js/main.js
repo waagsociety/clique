@@ -50,7 +50,7 @@ var linkedDataSet = {};
 var done = 0;
 
 //var name="Jan Anthonie Bruijn";
-var name="Femke Halsema";
+var egoName="Femke Halsema";
 var tooltip;
 
 
@@ -90,7 +90,7 @@ function startClique(filename) {
 
   progressBar("#progressstart");
 
-  var myUrl = tnPersonEndPoint + encodeURIComponent(name);
+  var myUrl = tnPersonEndPoint + encodeURIComponent(egoName);
 
   d3.json(myUrl,function(error,response){
     if (error != null){

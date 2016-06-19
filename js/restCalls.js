@@ -97,6 +97,9 @@ function getLinkedPeople(id, dataSet,linkedSet){
       for (var index = 0; index < response.length; ++index) {
         var id = response[index][0].pit.id;
         var name = response[index][0].pit.name;
+        if (name == egoName){
+          continue;
+        }
         var type = response[index][0].pit.type; // must be person
 
         var element = {};

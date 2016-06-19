@@ -47,6 +47,8 @@ var graphH;
 var graphSvg;
 var clicked = false;
 
+var selectedNodes;
+
 // rest of vars
 
 function createEgoData(extent){
@@ -402,33 +404,45 @@ function update() {
         .attr("x", function(d) { return 0;})
         .attr("y", function(d) { return 0;})
         .attr("height", nodeSize)
-        .attr("width", nodeSize);
+        .attr("width", nodeSize)
+        .attr("class", "img");
 
-  // // make the image grow a little on mouse over and add the text details on click
-  // var setEvents = images
-  //
-  //         .on( 'click', function (d) {
-  //
-  //          })
-  //
-  //         .on( 'mouseenter', function() {
-  //           // select element in current context
-  //           d3.select( this )
-  //             .transition()
-  //             .attr("x", function(d) { return -nodeSize*(increaseIcon-1)/2;})
-  //             .attr("y", function(d) { return -nodeSize*(increaseIcon-1)/2;})
-  //             .attr("height", nodeSize*increaseIcon)
-  //             .attr("width", nodeSize*increaseIcon);
-  //         })
-  //         // set back
-  //         .on( 'mouseleave', function() {
-  //           d3.select( this )
-  //             .transition()
-  //             .attr("x", function(d) { return 0;})
-  //             .attr("y", function(d) { return 0;})
-  //             .attr("height", nodeSize)
-  //             .attr("width", nodeSize);
-  //         });
+  // make the image grow a little on mouse over and add the text details on click
+  var setEvents = images
+
+          .on( 'click', function (d) {
+
+           })
+
+          .on( 'mouseenter', function(d) {
+            // select element in current context
+            if (d.id !== root.id && d.type == "tnl:Person"){
+              selectedNodes = [];
+              findNodes(displaySet,d.name);
+
+              graphSvg.selectAll("g.node").filter(function(d){return selectedNodes.indexOf(d.nodeid) > -1;}).select("image").each(function (d){
+
+                d3.select( this )
+                  .transition()
+                  .attr("x", function(d) { return -nodeSize*(increaseIcon-1)/2;})
+                  .attr("y", function(d) { return -nodeSize*(increaseIcon-1)/2;})
+                  .attr("height", nodeSize*increaseIcon)
+                  .attr("width", nodeSize*increaseIcon);
+
+              });
+            }
+          })
+          // set back
+          .on( 'mouseleave', function() {
+            graphSvg.selectAll("g.node").select("image").each(function (d){
+              d3.select( this )
+                .transition()
+                .attr("x", function(d) { return 0;})
+                .attr("y", function(d) { return 0;})
+                .attr("height", nodeSize)
+                .attr("width", nodeSize);
+              });
+            });
 
   nodeEnter.append("text")
       .attr("class", "nodetext")
@@ -484,8 +498,8 @@ function tick() {
  * http://bl.ocks.org/mbostock/1129492
  */
 function nodeTransform(d) {
-  d.x =  Math.max(nodeSize/2, Math.min(graphW - nodeSize/2, d.x));
-    d.y =  Math.max(nodeSize/2, Math.min(graphH - nodeSize/2, d.y));
+  d.x =  Math.max(nodeSize, Math.min(graphW - nodeSize, d.x));
+    d.y =  Math.max(nodeSize, Math.min(graphH - nodeSize, d.y));
     return "translate(" + d.x + "," + d.y + ")";
    }
 
@@ -493,46 +507,19 @@ function nodeTransform(d) {
  * Toggle children on click.
  */
 function click(d) {
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-  } else {
+  if (typeof(d._children) == "undefined"){
+    return;
+  }
+  
+  if (d._children) {
     d.children = d._children;
     d._children = null;
+  } else {
+    d._children = d.children;
+    d.children = null;
   }
 
   update();
-}
-
-function contextmenu(d){
-  if(clicked){
-    return;
-  }
-  clicked = true;
-
-  if (d.type === "tnl:Person" && d.nodeid !== root.nodeid){
-    d3.event.preventDefault();
-    // alert("You click me!!!");
-
-    var popup = d3.select("div#viz2")
-              .append("div")
-              .attr("id", "popupdiv")
-              ;
-
-    popup.append("h2").text(d.name);
-    popup.append("div").attr("id","progresspopup");
-    progressBar("#progresspopup");
-    sharedConnections(d);
-
-    popup.append("p").text("Shared positions")
-
-
-
-    // popup.append("p")
-    //         .append("a")
-    //         .attr("href",d.link)
-    //         .text(d.link_text);
-  }
 }
 
 /**
@@ -576,4 +563,73 @@ function determineColor(d){
   }
 
   return "red";
+}
+
+function findNodes(node,name){
+  var alreadyFound = false, addMySelf = true;
+
+  if( typeof(node._children) !== "undefined" || typeof(node.children) !== "undefined"){
+    var children;
+    if (node._children){
+      addMySelf = true;
+      children = node._children;
+    }else{
+      addMySelf = false;
+      children = node.children;
+    }
+    if( typeof(children) == "undefined" ){
+      handleError("should not be undefined: " + node);
+    }
+    if (children.length > 0){
+      for(var i=0;i<children.length;++i){
+        if (findNodes(children[i],name)){
+          if (!alreadyFound){
+            alreadyFound = true;
+            if(addMySelf){
+              selectedNodes.push(node.nodeid);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (!alreadyFound){
+    if (node.name == name){
+      selectedNodes.push(node.nodeid);
+      return true;
+    }
+  }
+  return false;
+}
+
+
+function contextmenu(d){
+  if(clicked){
+    return;
+  }
+  clicked = true;
+
+  if (d.type === "tnl:Person" && d.nodeid !== root.nodeid){
+    d3.event.preventDefault();
+    // alert("You click me!!!");
+
+    var popup = d3.select("div#viz2")
+              .append("div")
+              .attr("id", "popupdiv")
+              ;
+
+    popup.append("h2").text(d.name);
+    popup.append("div").attr("id","progresspopup");
+    progressBar("#progresspopup");
+    sharedConnections(d);
+
+    popup.append("p").text("Shared positions")
+
+
+
+    // popup.append("p")
+    //         .append("a")
+    //         .attr("href",d.link)
+    //         .text(d.link_text);
+  }
 }
