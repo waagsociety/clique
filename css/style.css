@@ -35,7 +35,7 @@ section:first-of-type {
 
 /* Tell the footer to always stay at the bottom */
 .footer {
-  /*position: absolute;*/
+  position: absolute;
   left: 0;
   bottom: 0;
   height: 16.5em;
@@ -208,7 +208,7 @@ path.link {
 
 
 #graphdiv, #popupdiv {
-    position: absolute;
+    /*position: absolute;*/
     /*width: 100%;
     height: 100%;*/
   }

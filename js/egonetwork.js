@@ -33,12 +33,18 @@ const cliqueStatusEnum = {
 };
 
 var displaySet = {};
+
 var root;
-var force;
 var nodes;
+var links;
+
+var force;
+var node;
+var link;
+
 var graphW;
 var graphH;
-var display;
+var graphSvg;
 var clicked = false;
 
 // rest of vars
@@ -47,8 +53,10 @@ function createEgoData(extent){
   displaySet = {};
   var uniqueNodeIndex=0;
   displaySet.id  = egoDataSet.id;
+  displaySet.nodeid = uniqueNodeIndex++;
   displaySet.name  = egoDataSet.name;
   displaySet.type  = egoDataSet.type;
+  displaySet.nodeid = uniqueNodeIndex++;
   displaySet._children = [];
 
   for (var i=0;i<egoDataSet._children.length;++i){
@@ -61,6 +69,7 @@ function createEgoData(extent){
 
     var instNode = {}, instToCopy = egoDataSet._children[i];
     instNode.id = instToCopy.id;
+    instNode.nodeid = uniqueNodeIndex++;
     instNode.name = instToCopy.name;
     instNode.type = instToCopy.type;
     instNode.position = instToCopy.position;
@@ -85,17 +94,19 @@ function createEgoData(extent){
     }
     if (!sectorStatusExist){
       var sectorNode = {};
-      sectorNode.name = instToCopy.sector;
+      sectorNode.name = sectorToNameAndColor(instToCopy.sector).name;
       sectorNode.cliqueStatus = timeRelation;
       sectorNode.type = SECTORNODETYPE;
-      sectorNode.id = sectorNode.type + "_" + uniqueNodeIndex++;
+      sectorNode.sector = instToCopy.sector;
+      sectorNode.nodeid = uniqueNodeIndex++;
       sectorNode._children = [];
       sectorNode._children.push(instNode);
       displaySet._children.push(sectorNode);
     }
 
-    var scopedExtent = [instToCopy.start>extent[0]?instToCopy.start:extent[0],
-                        instToCopy.end<extent[1]?instToCopy.end:extent[1]];
+    var instExtent = convertDates(instToCopy);
+    var scopedExtent = [instExtent[0]>extent[0]?instExtent[0]:extent[0],
+                        instExtent[1]<extent[1]?instExtent[1]:extent[1]];
 
     for (var j=0;j<instToCopy._children.length;++j){
 
@@ -105,6 +116,7 @@ function createEgoData(extent){
       }
       var personNode = {}, personToCopy = instToCopy._children[j];
       personNode.id = personToCopy.id;
+      personNode.nodeid = uniqueNodeIndex++;
       personNode.name = personToCopy.name;
       personNode.type = personToCopy.type;
       personNode.position = personToCopy.relation.position;
@@ -112,7 +124,6 @@ function createEgoData(extent){
       personNode.source = personToCopy.source;
       personNode.start = personToCopy.relation.start;
       personNode.end = personToCopy.relation.end;
-
 
       var statusExist = false;
 
@@ -130,7 +141,7 @@ function createEgoData(extent){
         statusNode.name = "";
         statusNode.cliqueStatus = timeRelation;
         statusNode.type = STATUSNODETYPE;
-        statusNode.id = statusNode.type + "_" + uniqueNodeIndex++;
+        statusNode.nodeid = uniqueNodeIndex++;
         statusNode._children = [];
         statusNode._children.push(personNode);
         instNode._children.push(statusNode);
@@ -141,38 +152,46 @@ function createEgoData(extent){
   setEgoData(displaySet);
 }
 
+function convertDates(node){
+  // Start of working day
+  var nodeStart = new Date(node.start + "T08:00:00+01:00");
+  // End of working day
+  var nodeEnd = new Date(node.end + "T17:00:00+01:00");
+  return [nodeStart, nodeEnd];
+}
+
 function filterExtent(nodeToFilter,extent){
 
     var timeRelation = TimeRelEnum.BEFORE;
-    // Start of working day
-    var nodeStart = new Date(nodeToFilter.start + "T08:00:00+01:00");
-    // End of working day
-    var nodeEnd = new Date(nodeToFilter.end + "T17:00:00+01:00");
+
+    var dates = convertDates(nodeToFilter);
+    var nodeStart = dates[0], nodeEnd = dates[1];
+
     if( nodeEnd < extent[0] ){
       timeRelation = TimeRelEnum.BEFORE;
     }else if ( nodeStart > extent[1] ){
       timeRelation = TimeRelEnum.AFTER;
-    }else if ( nodeEnd === extent[0] ){
+    }else if ( nodeEnd.getTime() === extent[0].getTime() ){
       timeRelation = TimeRelEnum.BEFORESTARTS;
     }else if ( nodeStart < extent[0] && nodeEnd < extent[1] ){
       timeRelation = TimeRelEnum.BEFOREOVERLAP;
-    }else if ( nodeStart < extent[0] && nodeEnd === extent[1] ){
+    }else if ( nodeStart < extent[0] && nodeEnd.getTime() === extent[1].getTime() ){
       timeRelation = TimeRelEnum.BEFOREEND;
     }else if ( nodeStart < extent[0] && nodeEnd > extent[1] ){
       timeRelation = TimeRelEnum.BEFOREAFTER;
-    }else if ( nodeStart === extent[0] && nodeEnd < extent[1] ){
+    }else if ( nodeStart.getTime() === extent[0].getTime() && nodeEnd < extent[1] ){
       timeRelation = TimeRelEnum.STARTSOVERLAP;
-    }else if ( nodeStart === extent[0] && nodeEnd === extent[1] ){
+    }else if ( nodeStart.getTime() === extent[0].getTime() && nodeEnd.getTime() === extent[1].getTime() ){
       timeRelation = TimeRelEnum.STARTSEND;
-    }else if ( nodeStart === extent[0] && nodeEnd > extent[1] ){
+    }else if ( nodeStart.getTime() === extent[0].getTime() && nodeEnd > extent[1] ){
       timeRelation = TimeRelEnum.STARTSAFTER;
     }else if ( nodeStart > extent[0] && nodeEnd < extent[1] ){
       timeRelation = TimeRelEnum.OVERLAP;
-    }else if ( nodeStart > extent[0] && nodeEnd === extent[1] ){
+    }else if ( nodeStart > extent[0] && nodeEnd.getTime() === extent[1].getTime() ){
       timeRelation = TimeRelEnum.OVERLAPEND;
     }else if ( nodeStart > extent[0] && nodeEnd > extent[1] ){
       timeRelation = TimeRelEnum.OVERLAPAFTER;
-    }else if ( nodeStart === extent[1] ){
+    }else if ( nodeStart.getTime() === extent[1].getTime() ){
       timeRelation = TimeRelEnum.ENDAFTER;
     }else{
       handleError("ERROR: uncaugth relation for start " + nodeToFilter.start + ", end " + nodeToFilter.end + ", and extent " + extent);
@@ -235,7 +254,7 @@ function filterExtent(nodeToFilter,extent){
 
 function initEgonetwork (svg, width, height){
 
-  display = svg.append("g")
+  graphSvg = svg.append("g")
     .attr({
       "class": "graph"
     })
@@ -245,7 +264,7 @@ function initEgonetwork (svg, width, height){
   graphW = width;
   graphH = height;
 
-  // var defs = display.insert("svg:defs")
+  // var defs = graphSvg.insert("svg:defs")
   //     .data(["end"]);
   //
   //
@@ -259,7 +278,7 @@ function initEgonetwork (svg, width, height){
 function setEgoData(jsonData){
   if (nodes !== undefined){
     nodes.length = 0;
-    display.selectAll("g.node").data(nodes).exit().remove();
+    graphSvg.selectAll("g.node").data(nodes).exit().remove();
   }
 
 
@@ -328,38 +347,35 @@ function getImage(d){
  */
 function update() {
   nodes = flatten(root);
-  var links = d3.layout.tree().links(nodes);
+  links = d3.layout.tree().links(nodes);
 
   // Restart the force layout.
   force.nodes(nodes)
-        .links(links)
-        .gravity(0.05)
-    .charge(-1500)
-    .linkDistance(100)
-    .friction(0.5)
-    .linkStrength(function(l, i) {return 1; })
-    .size([graphW, graphH])
-    .on("tick", tick)
-        .start();
+      .links(links)
+      .gravity(0.05)
+      .charge(-1500)
+      .linkDistance(100)
+      .friction(0.5)
+      .linkStrength(function(l, i) {return 1; })
+      .size([graphW, graphH])
+      .on("tick", tick)
+      .start();
 
-   var path = display.selectAll("path.link")
-      .data(links, function(d) { return giveNodeKey(d.target); });
+  link = graphSvg.selectAll("path.link")
+      .data(links, function(d) { return d.target.nodeid; });
 
-    path.enter().insert("svg:path")
+  link.enter().insert("svg:path")
       .attr("class", "link")
       // .attr("marker-end", "url(#end)")
       //.style("stroke", "#eee")
       ;
 
-
   // Exit any old paths.
-  path.exit().remove();
-
-
+  link.exit().remove();
 
   // Update the nodes…
-  var node = display.selectAll("g.node")
-      .data(nodes, function(d) { return giveNodeKey(d); });
+  node = graphSvg.selectAll("g.node")
+      .data(nodes, function(d) { return d.nodeid; });
 
 
   // Enter any new nodes.
@@ -435,28 +451,31 @@ function update() {
   // Exit any old nodes.
   node.exit().remove();
 
-
   // Re-select for update.
-  path = display.selectAll("path.link");
-  node = display.selectAll("g.node");
+  link = graphSvg.selectAll("path.link");
+  node = graphSvg.selectAll("g.node");
+
+}
 
 function tick() {
 
+    link.attr("d", function(d) {
 
-    path.attr("d", function(d) {
+      var dx = d.target.x - d.source.x;
+      var dy = d.target.y - d.source.y;
+      var dr = Math.sqrt(dx * dx + dy * dy);
 
-     var dx = d.target.x - d.source.x,
-           dy = d.target.y - d.source.y,
-           dr = Math.sqrt(dx * dx + dy * dy);
-           return   "M" + d.source.x + ","
-            + d.source.y
-            + "A" + dr + ","
-            + dr + " 0 0,1 "
-            + d.target.x + ","
-            + d.target.y;
-  });
+      return "M" + d.source.x + "," + d.source.y
+              + "A" + dr + ","  + dr + " 0 0,1 "
+              + d.target.x + "," + d.target.y;
+    });
+
+    // link.attr("x1", function(d) { return d.source.x; })
+    //        .attr("y1", function(d) { return d.source.y; })
+    //        .attr("x2", function(d) { return d.target.x; })
+    //        .attr("y2", function(d) { return d.target.y; });
+
     node.attr("transform", nodeTransform);
-  }
 }
 
 
@@ -465,8 +484,8 @@ function tick() {
  * http://bl.ocks.org/mbostock/1129492
  */
 function nodeTransform(d) {
-  d.x =  Math.max(nodeSize, Math.min(graphW - (d.imgwidth/2 || 16), d.x));
-    d.y =  Math.max(nodeSize, Math.min(graphH - (d.imgheight/2 || 16), d.y));
+  d.x =  Math.max(nodeSize/2, Math.min(graphW - nodeSize/2, d.x));
+    d.y =  Math.max(nodeSize/2, Math.min(graphH - nodeSize/2, d.y));
     return "translate(" + d.x + "," + d.y + ")";
    }
 
@@ -491,7 +510,7 @@ function contextmenu(d){
   }
   clicked = true;
 
-  if (d.type === "tnl:Person" && d.id !== root.id){
+  if (d.type === "tnl:Person" && d.nodeid !== root.nodeid){
     d3.event.preventDefault();
     // alert("You click me!!!");
 
@@ -516,12 +535,6 @@ function contextmenu(d){
   }
 }
 
-function giveNodeKey(d){
-  if (d.start !== undefined && d.end !== undefined){
-    return d.id + d.start + d.end;
-  }
-  return d.id
-}
 /**
  * Returns a list of all nodes under the root.
  */
@@ -533,8 +546,8 @@ function flatten(root) {
     if (node.children){
       node.children.forEach(recurse);
     }
-    if (!node.id){
-      node.id = ++i;
+    if (!node.nodeid){
+      handleError("nodeid NOT defined")
     }
     nodes.push(node);
   }
@@ -544,10 +557,10 @@ function flatten(root) {
 }
 
 function determineColor(d){
-  if(d.id === root.id){
+  if(d.nodeid === root.nodeid){
     return "#000000";
   }else if (d.type === SECTORNODETYPE){
-    var result = sectorToNameAndColor(d.name);
+    var result = sectorToNameAndColor(d.sector);
     if (result !== undefined){
       return result.color;
     }
