@@ -63,13 +63,16 @@ function createEgoData(extent){
 
   for (var i=0;i<egoDataSet._children.length;++i){
 
+    var instNode = {}, instToCopy = egoDataSet._children[i];
+
     // Is the node in scope?
-    var timeRelation = filterExtent(egoDataSet._children[i],extent);
+    var instExtent = convertDates(instToCopy);
+    
+    var timeRelation = filterExtent(instExtent,extent);
     if (timeRelation === cliqueStatusEnum.NONE){
       continue;
     }
 
-    var instNode = {}, instToCopy = egoDataSet._children[i];
     instNode.id = instToCopy.id;
     instNode.nodeid = uniqueNodeIndex++;
     instNode.name = instToCopy.name;
@@ -106,13 +109,15 @@ function createEgoData(extent){
       displaySet._children.push(sectorNode);
     }
 
-    var instExtent = convertDates(instToCopy);
-    var scopedExtent = [instExtent[0]>extent[0]?instExtent[0]:extent[0],
-                        instExtent[1]<extent[1]?instExtent[1]:extent[1]];
 
     for (var j=0;j<instToCopy._children.length;++j){
 
-      timeRelation = filterExtent(instToCopy._children[j].relation,scopedExtent);
+      var personExtent = convertDates(instToCopy._children[j].relation);
+
+      var scopedExtent = [instExtent[0]>personExtent[0]?instExtent[0]:personExtent[0],
+                          instExtent[1]<personExtent[1]?instExtent[1]:personExtent[1]];
+
+      timeRelation = filterExtent(scopedExtent,extent);
       if (timeRelation === cliqueStatusEnum.NONE){
         continue;
       }
@@ -162,12 +167,11 @@ function convertDates(node){
   return [nodeStart, nodeEnd];
 }
 
-function filterExtent(nodeToFilter,extent){
+function filterExtent(nodeExtent,extent){
 
     var timeRelation = TimeRelEnum.BEFORE;
 
-    var dates = convertDates(nodeToFilter);
-    var nodeStart = dates[0], nodeEnd = dates[1];
+    var nodeStart = nodeExtent[0], nodeEnd = nodeExtent[1];
 
     if( nodeEnd < extent[0] ){
       timeRelation = TimeRelEnum.BEFORE;
@@ -510,7 +514,7 @@ function click(d) {
   if (typeof(d._children) == "undefined"){
     return;
   }
-  
+
   if (d._children) {
     d.children = d._children;
     d._children = null;
