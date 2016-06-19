@@ -260,6 +260,7 @@ text {
   font-weight: normal;
   text-transform: lowercase;
   fill: #000;
+  color: #000;
 }
 
 .titlename {
@@ -267,6 +268,7 @@ text {
   font-weight: 900;
   text-transform: uppercase;
   fill: #58595B;
+  color: #58595B;
 }
 
 .legendexplain {

@@ -6,12 +6,17 @@
 
   <link href="css/reset.css" rel="stylesheet" type="text/css">
   <link href="css/style.css" rel="stylesheet" type="text/css">
+  <link href="css/jquery.fancybox.css"rel="stylesheet"  type="text/css" media="screen" />
 
   <script src="https://use.typekit.net/kdv7wym.js"></script>
   <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
   <script src="d3/d3.min.js" charset="utf-8" type="text/javascript"></script>
   <script src="d3/d3.layout.timeline.js" charset="utf-8" type="text/javascript"></script>
+
+  <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <script type="text/javascript" src="js/fancybox/jquery.fancybox.js"></script>
+  <script type="text/javascript" src="js/fancybox/jquery.fancybox.pack.js"></script>
 
   <script src="js/timeelements.js" charset="utf-8" type="text/javascript"></script>
   <script src="js/timelegend.js" charset="utf-8" type="text/javascript"></script>
@@ -79,6 +84,14 @@ startClique("cvbruijn.csv")
           </svg>
           User guide
         </a>
+         <script type="text/javascript">
+        $(document).ready(function() {
+          $(".fancybox").fancybox({
+            closeBtn : 'true'
+          });
+        });
+        </script>
+        <br /><a href="shared.html" class="fancybox fancybox.iframe" data-fancybox-type="iframe">---> test fancybox</a>
       </div>
       <div class="ref">
       <p><em>CLIQUE by Marieke van Kouwen</em><br />
