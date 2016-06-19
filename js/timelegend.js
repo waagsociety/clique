@@ -10,7 +10,7 @@ var timeLegend = function(dataset,svg) { // legend
     ;
 
   titlegraph.append("tspan")
-    .text(name + " / timeline") // function name!
+    .text(egoName + " / timeline") // function name!
     .attr({
       "class": "titlename",
       "x": paddingdoc,
