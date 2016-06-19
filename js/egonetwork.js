@@ -67,7 +67,7 @@ function createEgoData(extent){
 
     // Is the node in scope?
     var instExtent = convertDates(instToCopy);
-    
+
     var timeRelation = filterExtent(instExtent,extent);
     if (timeRelation === cliqueStatusEnum.NONE){
       continue;
@@ -511,7 +511,7 @@ function nodeTransform(d) {
  * Toggle children on click.
  */
 function click(d) {
-  if (typeof(d._children) == "undefined"){
+  if (d._children === undefined){
     return;
   }
 
@@ -548,7 +548,7 @@ function flatten(root) {
 }
 
 function determineColor(d){
-  if(d.nodeid === root.nodeid){
+  if (d.nodeid === root.nodeid){
     return "#000000";
   }else if (d.type === SECTORNODETYPE){
     var result = sectorToNameAndColor(d.sector);
@@ -572,7 +572,7 @@ function determineColor(d){
 function findNodes(node,name){
   var alreadyFound = false, addMySelf = true;
 
-  if( typeof(node._children) !== "undefined" || typeof(node.children) !== "undefined"){
+  if( node._children !== undefined || node.children !== undefined){
     var children;
     if (node._children){
       addMySelf = true;
@@ -581,15 +581,15 @@ function findNodes(node,name){
       addMySelf = false;
       children = node.children;
     }
-    if( typeof(children) == "undefined" ){
+    if (children === undefined){
       handleError("should not be undefined: " + node);
     }
     if (children.length > 0){
-      for(var i=0;i<children.length;++i){
+      for (var i=0;i<children.length;++i){
         if (findNodes(children[i],name)){
           if (!alreadyFound){
             alreadyFound = true;
-            if(addMySelf){
+            if (addMySelf){
               selectedNodes.push(node.nodeid);
             }
           }
@@ -608,7 +608,7 @@ function findNodes(node,name){
 
 
 function contextmenu(d){
-  if(clicked){
+  if (clicked){
     return;
   }
   clicked = true;

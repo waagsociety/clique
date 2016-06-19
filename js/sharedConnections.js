@@ -41,7 +41,7 @@ function makeTables(e){
 
   var popupHeight = height/2;
 
-  findCommonExperiences(egoDataSet,antaDataSet["name"]);
+  findCommonExperiences(displaySet,antaDataSet["name"]);
 
   var svgPopUp = d3.select("div#popupdiv")
                   .append("svg")
@@ -141,36 +141,61 @@ function drawBars(svg,data,shiftX,shiftY){
 
 }
 
-function findCommonExperiences(currentNode,name){
-  if (currentNode._children !== undefined && currentNode._children.length > 0){
-    var alreadyFound = false;
-    for (var i=0;i<currentNode._children.length;++i){
-      var found = findCommonExperiences(currentNode._children[i],name);
-      if (found && ! alreadyFound){
-        alreadyFound = true;
-        sharedExperiences.push({
-          name : currentNode.name,
-          type : EGO_TYPE,
-          start : currentNode.start,
-          end : currentNode.end,
-          position : currentNode.position,
-          positionLabel : currentNode.positionLabel,
-          sector : currentNode.sector
-        });
+function findCommonExperiences(currentNode,name,institute=null,sector=null){
+  var alreadyFound = false;
+
+  if( currentNode._children !== undefined || currentNode.children !== undefined){
+    var children;
+    if (currentNode._children){
+      children = currentNode._children;
+    }else{
+      children = currentNode.children;
+    }
+    if (children === undefined){
+      handleError("should not be undefined: " + currentNode);
+    }
+    if (children.length > 0){
+      for (var i=0;i<children.length;++i){
+        if (children[i].type === STATUSNODETYPE && children[i].cliqueStatus === cliqueStatusEnum.BEFORE){
+          // skip relations with no overlapping
+          continue;
+        }
+        if (currentNode.sector !== undefined){
+          sector = currentNode.sector;
+          institute = currentNode.name;
+        }
+        if (findCommonExperiences(children[i],name,institute,sector)){
+          if (currentNode.type === STATUSNODETYPE){
+            // pass it to the next level
+            return true;
+          }
+          if (!alreadyFound){
+            alreadyFound = true;
+            sharedExperiences.push({
+              name : currentNode.name,
+              type : EGO_TYPE,
+              start : currentNode.start,
+              end : currentNode.end,
+              position : currentNode.position,
+              positionLabel : currentNode.positionLabel,
+              sector : currentNode.sector
+            });
+          }
+        }
       }
     }
   }else if (name === currentNode.name){
-    var key = currentNode.relation.name+currentNode.relation.start+currentNode.relation.end;
+    var key = institute+currentNode.start+currentNode.end;
     if (experienceCache.indexOf(key) === -1 ) {
       experienceCache.push(key);
       sharedExperiences.push({
-        name : currentNode.relation.name,
+        name : institute,
         type : ANTA_TYPE,
-        start : currentNode.relation.start,
-        end : currentNode.relation.end,
-        position : currentNode.relation.position,
-        positionLabel : currentNode.relation.positionLabel,
-        sector : currentNode.relation.sector
+        start : currentNode.start,
+        end : currentNode.end,
+        position : currentNode.position,
+        positionLabel : currentNode.positionLabel,
+        sector : sector
       });
       return true;
     }

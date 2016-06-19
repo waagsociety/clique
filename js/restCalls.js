@@ -58,7 +58,7 @@ function makeSectorCallback(index,dataSet,linkedSet) {
       //console.log("Dim reply " + response.length)
       for (var i=0;i<response.length;++i){
         //console.log("Type " + response[i].pit.type)
-        if(response[i].pit.type === "tnl:Sector"){
+        if (response[i].pit.type === "tnl:Sector"){
           dataSet["_children"][index].sector = response[i].pit.name;
           done++
           mergeDatasets(dataSet,linkedSet);
@@ -136,7 +136,7 @@ function getLinkedPeople(id, dataSet,linkedSet){
             "type"          : null
           };
 
-        if(linkedSet[relationId] === undefined){
+        if (linkedSet[relationId] === undefined){
           linkedSet[relationId] = [];
         }
         linkedSet[relationId].push(element);
@@ -158,7 +158,7 @@ function mergeDatasets(dataSet,linkedSet) {
 
   for (var index=0;index<dataSet._children.length;++index){
     var childId = dataSet._children[index].id;
-    if(linkedSet[childId] !== undefined){
+    if (linkedSet[childId] !== undefined){
       for (var index1=0;index1<linkedSet[childId].length;++index1){
         // Set the type of the _children using the type of the parent node
         // They need to be the same because this is the relation
