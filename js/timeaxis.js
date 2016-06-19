@@ -1,8 +1,11 @@
 const dateFormat = d3.time.format('%Y-%m-%d');
 
+var currentExtent = [];
+
 var xTimeScale;
 var yTimeScale;
 var xEgoTimeExtent;
+
 
 function setScales(dataset){
 
@@ -123,14 +126,16 @@ function brushes (xTimeAxis,svg){
   function brushended() {
     if (!d3.event.sourceEvent) return; // only transition after input
     var initialExtent = brush.extent();
-    var roundedExtent = [];
-    roundedExtent[0] = d3.time.year.floor(initialExtent[0]);
-    roundedExtent[1] = new Date(d3.time.year.ceil(initialExtent[1])-1);;
+
+    currentExtent[0] = d3.time.year.floor(initialExtent[0]);
+    currentExtent[1] = new Date(d3.time.year.ceil(initialExtent[1])-1);;
 
     d3.select(this).transition()
-        .call(brush.extent(roundedExtent))
+        .call(brush.extent(currentExtent))
         .call(brush.event);
-    createEgoData(roundedExtent);
+        
+    egoTimeSnapshot = createEgoData(egoDataSet);
+    setEgoData(egoTimeSnapshot);
 
   }
 };

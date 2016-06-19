@@ -32,7 +32,7 @@ const cliqueStatusEnum = {
   NONE: "none"
 };
 
-var displaySet = {};
+var egoTimeSnapshot = {};
 
 var root;
 var nodes;
@@ -51,24 +51,24 @@ var selectedNodes;
 
 // rest of vars
 
-function createEgoData(extent){
-  displaySet = {};
+function createEgoData(dataSet){
+  snapshotSet = {};
   var uniqueNodeIndex=0;
-  displaySet.id  = egoDataSet.id;
-  displaySet.nodeid = uniqueNodeIndex++;
-  displaySet.name  = egoDataSet.name;
-  displaySet.type  = egoDataSet.type;
-  displaySet.nodeid = uniqueNodeIndex++;
-  displaySet._children = [];
+  snapshotSet.id  = dataSet.id;
+  snapshotSet.nodeid = uniqueNodeIndex++;
+  snapshotSet.name  = dataSet.name;
+  snapshotSet.type  = dataSet.type;
+  snapshotSet.nodeid = uniqueNodeIndex++;
+  snapshotSet._children = [];
 
-  for (var i=0;i<egoDataSet._children.length;++i){
+  for (var i=0;i<dataSet._children.length;++i){
 
-    var instNode = {}, instToCopy = egoDataSet._children[i];
+    var instNode = {}, instToCopy = dataSet._children[i];
 
     // Is the node in scope?
     var instExtent = convertDates(instToCopy);
 
-    var timeRelation = filterExtent(instExtent,extent);
+    var timeRelation = filterExtent(instExtent,currentExtent);
     if (timeRelation === cliqueStatusEnum.NONE){
       continue;
     }
@@ -88,11 +88,11 @@ function createEgoData(extent){
 
     var sectorStatusExist = false;
 
-    for (var ii=0;ii<displaySet._children.length;++ii){
+    for (var ii=0;ii<snapshotSet._children.length;++ii){
 
-      if (displaySet._children[ii].name === instToCopy.sector && displaySet._children[ii].cliqueStatus === timeRelation){
+      if (snapshotSet._children[ii].name === instToCopy.sector && snapshotSet._children[ii].cliqueStatus === timeRelation){
 
-        displaySet._children[ii]._children.push(instNode);
+        snapshotSet._children[ii]._children.push(instNode);
         sectorStatusExist = true;
         break;
       }
@@ -106,7 +106,7 @@ function createEgoData(extent){
       sectorNode.nodeid = uniqueNodeIndex++;
       sectorNode._children = [];
       sectorNode._children.push(instNode);
-      displaySet._children.push(sectorNode);
+      snapshotSet._children.push(sectorNode);
     }
 
 
@@ -117,7 +117,7 @@ function createEgoData(extent){
       var scopedExtent = [instExtent[0]>personExtent[0]?instExtent[0]:personExtent[0],
                           instExtent[1]<personExtent[1]?instExtent[1]:personExtent[1]];
 
-      timeRelation = filterExtent(scopedExtent,extent);
+      timeRelation = filterExtent(scopedExtent,currentExtent);
       if (timeRelation === cliqueStatusEnum.NONE){
         continue;
       }
@@ -155,8 +155,7 @@ function createEgoData(extent){
       }
     }
   }
-  // setNumberOfChildren(displaySet);
-  setEgoData(displaySet);
+  return snapshotSet;
 }
 
 function convertDates(node){
@@ -286,8 +285,6 @@ function setEgoData(jsonData){
     nodes.length = 0;
     graphSvg.selectAll("g.node").data(nodes).exit().remove();
   }
-
-
 
   root = jsonData;
   root.fixed = true;
@@ -422,7 +419,7 @@ function update() {
             // select element in current context
             if (d.id !== root.id && d.type == "tnl:Person"){
               selectedNodes = [];
-              findNodes(displaySet,d.name);
+              findNodes(egoTimeSnapshot,d.name);
 
               graphSvg.selectAll("g.node").filter(function(d){return selectedNodes.indexOf(d.nodeid) > -1;}).select("image").each(function (d){
 

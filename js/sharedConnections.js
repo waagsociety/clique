@@ -6,6 +6,8 @@ const paddingVert = 30;
 
 var antaDataSet = {};
 var antaLinkedDataSet = {};
+var antaTimeSnapshot;
+
 var sharedExperiences;
 var experienceCache;
 
@@ -35,70 +37,82 @@ function makeTables(e){
 
   window.removeEventListener('dataReady',makeTables,false);
 
+  antaTimeSnapshot = createEgoData(antaDataSet);
 
   sharedExperiences = [];
   experienceCache = [];
 
   var popupHeight = height/2;
 
-  findCommonExperiences(displaySet,antaDataSet["name"]);
+  findCommonExperiences(egoTimeSnapshot,antaDataSet["name"]);
 
-  var svgPopUp = d3.select("div#popupdiv")
-                  .append("svg")
-                  .attr({
-                    width: width,
-                    height: popupHeight
-                  })
-                  ;
+  if (sharedExperiences.length > 0){
 
-  var xCompTimeExtent = [d3.min(sharedExperiences, function(d) { return dateFormat.parse(d.start); }),
-                    d3.max(sharedExperiences, function(d) { return dateFormat.parse(d.end); })];
+    var svgPopUp = d3.select("div#popupdiv")
+                    .append("svg")
+                    .attr({
+                      width: width,
+                      height: popupHeight
+                    })
+                    ;
 
-  var xCompTimeScale = d3.time.scale() // input domain , output range
-    .domain(xCompTimeExtent)
-    .range([0, width-2*paddingPopUp]);
+    var xCompTimeExtent = [d3.min(sharedExperiences, function(d) { return dateFormat.parse(d.start); }),
+                      d3.max(sharedExperiences, function(d) { return dateFormat.parse(d.end); })];
 
-  var xCompTimeAxis = d3.svg.axis()
-      .scale(xCompTimeScale)
-      .orient("bottom") // text orient
-      .ticks(d3.time.year, 1)
-      .tickFormat(d3.time.format('%Y'))
-      .tickSize(3, 1) // inner tick size(value, length ticks themselves), outer tick size(line-thickness axis)
-      .tickPadding(6) // space between ticks and values
-      ;
+    var xCompTimeScale = d3.time.scale() // input domain , output range
+      .domain(xCompTimeExtent)
+      .range([0, width-2*paddingPopUp]);
 
-
-  var timeline = d3.layout.timeline()
-     .size([width-2*paddingPopUp, popupHeight/2])
-     .extent(xCompTimeExtent)
-     .padding(4)
-     .maxBandHeight(12); // height bands
-
-  var egoBars = timeline(sharedExperiences.filter(function(d){return d.type === EGO_TYPE;}));
-
-  drawBars(svgPopUp,egoBars,paddingPopUp,0);
-
-  var offset = d3.max(egoBars,function(d){return d.y;}) + paddingVert;
-
-  svgPopUp.append("g")
-     .attr({
-       "transform": "translate(" + paddingPopUp + "," + offset + ")",
-       "class": "x axis"
-     })
-     .call(xCompTimeAxis)
-     .append("text")
-     .text("Time in years")
-    //  .attr("transform", "translate(" + (w - paddingPopUp - marginright - 50) + " ," + (paddingPopUp + 8) + ")")
-     ;
-
-  var antaBars = timeline(sharedExperiences.filter(function(d){return d.type === ANTA_TYPE;}));
-
-  offset = offset + paddingVert;
-
-  drawBars(svgPopUp,antaBars,paddingPopUp,offset);
+    var xCompTimeAxis = d3.svg.axis()
+        .scale(xCompTimeScale)
+        .orient("bottom") // text orient
+        .ticks(d3.time.year, 1)
+        .tickFormat(d3.time.format('%Y'))
+        .tickSize(3, 1) // inner tick size(value, length ticks themselves), outer tick size(line-thickness axis)
+        .tickPadding(6) // space between ticks and values
+        ;
 
 
+    var timeline = d3.layout.timeline()
+       .size([width-2*paddingPopUp, popupHeight/2])
+       .extent(xCompTimeExtent)
+       .padding(4)
+       .maxBandHeight(12); // height bands
 
+    var egoBars = timeline(sharedExperiences.filter(function(d){return d.type === EGO_TYPE;}));
+
+    drawBars(svgPopUp,egoBars,paddingPopUp,0);
+
+    var offset = d3.max(egoBars,function(d){return d.y;}) + paddingVert;
+
+    svgPopUp.append("g")
+       .attr({
+         "transform": "translate(" + paddingPopUp + "," + offset + ")",
+         "class": "x axis"
+       })
+       .call(xCompTimeAxis)
+       .append("text")
+       .text("Time in years")
+      //  .attr("transform", "translate(" + (w - paddingPopUp - marginright - 50) + " ," + (paddingPopUp + 8) + ")")
+       ;
+
+    var antaBars = timeline(sharedExperiences.filter(function(d){return d.type === ANTA_TYPE;}));
+
+    offset = offset + paddingVert;
+
+    drawBars(svgPopUp,antaBars,paddingPopUp,offset);
+  }
+
+  var egoFriends = makePeopleList(egoTimeSnapshot,antaTimeSnapshot.name);
+  var antaFriends = makePeopleList(antaTimeSnapshot,egoTimeSnapshot.name);
+
+  var commonFriends = [];
+
+  Object.keys(egoFriends).forEach(function (key) {
+    if (antaFriends[key] !== undefined){
+      commonFriends[key] = {ego:egoFriends[key],anta:antaFriends[key]};
+    }
+  });
 }
 
 function drawBars(svg,data,shiftX,shiftY){
@@ -201,4 +215,45 @@ function findCommonExperiences(currentNode,name,institute=null,sector=null){
     }
   }
   return false;
+}
+
+function makePeopleList(currentNode,noname,institute=null){
+
+  var peopleList = [];
+  if( currentNode._children !== undefined || currentNode.children !== undefined){
+    var children;
+    if (currentNode._children){
+      children = currentNode._children;
+    }else{
+      children = currentNode.children;
+    }
+    if (children === undefined){
+      handleError("should not be undefined: " + currentNode);
+    }
+    if (children.length > 0){
+      for (var i=0;i<children.length;++i){
+        if (currentNode.sector !== undefined){
+          institute = currentNode.name;
+        }
+        var innerList = makePeopleList(children[i],noname,institute);
+        Object.keys(innerList).forEach(function (key) {
+          if (peopleList[key] === undefined){
+            peopleList[key] = [];
+          }
+          for (var ii=0;ii<innerList[key].length;ii++){
+            peopleList[key].push(innerList[key][ii]);
+          }
+        });
+      }
+    }
+  }else if (currentNode.type == "tnl:Person" && currentNode.name != noname){
+    peopleList[currentNode.name] = [{
+      name : institute,
+      start : currentNode.start,
+      end : currentNode.end,
+      position : currentNode.position,
+      positionLabel : currentNode.positionLabel
+    }];
+  }
+  return peopleList;
 }
