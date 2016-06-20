@@ -90,7 +90,7 @@ function createEgoData(dataSet){
 
     for (var ii=0;ii<snapshotSet._children.length;++ii){
 
-      if (snapshotSet._children[ii].name === instToCopy.sector && snapshotSet._children[ii].cliqueStatus === timeRelation){
+      if (snapshotSet._children[ii].sector === instToCopy.sector && snapshotSet._children[ii].cliqueStatus === timeRelation){
 
         snapshotSet._children[ii]._children.push(instNode);
         sectorStatusExist = true;
@@ -451,13 +451,9 @@ function update() {
       .attr("y", y_browser)
       .text(function(d) {
         if (d.children) {
-          if (d.children.length > 0){
-            return d.name + " (" + d.children.length + ")";
-          }
+          return d.name + " (" + d.children.length + ")";
         }else if( d._children ){
-          if (d._children.length > 0){
-            return d.name + " (" + d._children.length + ")";
-          }
+          return d.name + " (" + d._children.length + ")";
         }
         return d.name;
       });
