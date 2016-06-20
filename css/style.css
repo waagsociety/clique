@@ -75,13 +75,16 @@ em {
   margin-top: 0.5em;
 }
 
-.search {
+.searchinput {
   padding: 0.2em 0 0 0.2em;
   margin: 0 0.2em 0.3em 0;
   height: 1.6em;
   border: 0;
   background-color: #58595B;
   border-bottom: 1px solid #FFF;
+  font-family: brandon-grotesque;
+  font: 1.4em "brandon-grotesque", sans-serif;
+  color: white;
 }
 
 #submit {
@@ -99,9 +102,6 @@ em {
   fill: #BCBEC0;
 }
 
-input {
-  font: 1.4em "brandon-grotesque", sans-serif;
-}
 
 text {
     font-size: 1.2em ;

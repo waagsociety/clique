@@ -67,26 +67,32 @@ var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + padding
 
 var types = [];
 
-// trim data...
- /*
-   var clean = dataset.map(function(d) {
-    var cleanD = {};
-    d3.keys(d).forEach(function(k) {
-      cleanD[_.trim(k)] = _.trim(d[k]);
-    });
-    return cleanD;
-  });
+function handleClick(event){
+    egoName = document.getElementById("egoName").value;
+    resetClique();
+    startClique();
+    return false;
+}
 
-  console.log(JSON.stringify(clean));
-  */
+function resetClique() {
+  d3.select("#progressstart").remove();
+  bar = {};
+  d3.select("#viz1").select("svg").remove();
+  d3.select("section.content").select("div.tooltip").remove();
+  d3.select("#viz2").select("div#graphdiv").remove();
+  d3.select("#viz2").select("div#popupdiv").remove();
+}
 
-function startClique(filename) {
+function startClique() {
 
   egoDataSet = {};
   linkedDataSet = {};
 
 
-  //d3.select("div#viz").append("h1").html( "Timeline " + name );
+  d3.select("section.content")
+    .select("div.container")
+    .append("div")
+    .attr("id","progressstart");
 
   progressBar("#progressstart");
 
@@ -167,6 +173,7 @@ function makeGraphics(e) {
 }
 
 function sectorTypes (dataset){
+  types = [];
   dataset.forEach(function(data){
     if (types.indexOf(data.sector) === -1 ) {
       types.push(data.sector);
