@@ -101,4 +101,7 @@ var timeLegend = function(dataset,svg) { // legend
       return sectorToNameAndColor(d).name + " (" + onlyThisType.length + ")";
     })
     ;
+
+    
+
 } // end timeLegend

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Clique / shared positions</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link href="css/reset.css" rel="stylesheet" type="text/css">
+  	<link href="css/style.css" rel="stylesheet" type="text/css">
+  	<link href="css/sharedstyle.css" rel="stylesheet" type="text/css">
+
+  	<script src="https://use.typekit.net/kdv7wym.js"></script>
+  	<script>try{Typekit.load({ async: true });}catch(e){}</script>
+</head>
+<body id="shared">
+	<div id="sharedtitle"><p><span class="titlename">name </span><span class="titlegraph">/ shared connections</span></p>
+	</div>
+	
+	<div id="sharedsearch">
+		<img src="img/icon_connect.svg" width="27" class="connecticon">
+		<div class="searchperson">
+	        <form>
+	          <input type="text" class="search input" style="font-family:brandon-grotesque;color:white" placeholder="Name second person">
+	          <button id="submit" type="submit">
+	              <svg class="magnifier" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 409.6 409.6">
+	              <path class="mag-1" d="M398.35,344.05l-94-94a180.78,180.78,0,0,1-54.3,54.3l94,94a38.4,38.4,0,1,0,54.3-54.3h0Zm0,0"/>
+	              <path class="mag-1" d="M307.2,153.6A153.6,153.6,0,1,0,153.6,307.2,153.6,153.6,0,0,0,307.2,153.6h0ZM153.6,268.8A115.2,115.2,0,1,1,268.8,153.6,115.33,115.33,0,0,1,153.6,268.8h0Zm0,0"/>
+	              <path class="mag-1" d="M64,153.6H89.6a64.07,64.07,0,0,1,64-64V64A89.71,89.71,0,0,0,64,153.6h0Zm0,0"/>
+	              </svg>
+	          </button>
+	        </form>
+		</div>
+	</div>
+
+	<div id="contentshared">
+		<h3 class="sharedh3">Shared positions</h3>
+		<p>(d3 timeline)</p>
+
+		<h3 class="sharedh3">Shared sectors</h3>
+		<p>(d3 shared sectors)</p>
+
+		<h3 class="sharedh3">Shared (assumed) contacts</h3>
+		<p>
+		<table>
+			<tr>
+				<td class="tabhead">Contact</td>
+				<td class="tabhead">Name ego</td>
+				<td class="tabhead">Name second person</td>
+			</tr>
+			<tr>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+			</tr>
+		</table>
+	</p>
+	</div>
+	<div class="sharedsubmit">
+		<a href="javascript:parent.jQuery.fancybox.close();" type="button" class="sharedbutton" >Build timeline</a><span>/ name second person</span>
+	</div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+#shared p, #shared text{
+	font-weight: normal;
+}
+
+#sharedtitle {
+	float: left;
+	margin-top: 0.7em;
+}
+
+#sharedsearch {
+	float: right;
+}
+
+#sharedsearch .searchperson{
+	margin: 0 2em 0 0;
+}
+
+.connecticon {
+	margin: 1.2em 1.1em 0 0;
+}
+
+#sharedsearch .search { 
+  background-color: #FFF;
+  border-bottom: 1px solid #58595B;
+  width: 18em;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 2em;
+  margin-top: -0.6em;
+}
+
+#sharedsearch #submit {
+  background-color: #FFF;
+  margin-top: 0.6em;
+}
+
+#sharedsearch #submit svg path{
+  fill: #58595B;
+}
+
+#sharedsearch #submit:hover svg path{
+  fill: #BCBEC0;
+}
+
+#contentshared {
+	clear: both;
+	margin-top: 5em;
+}
+
+#sharedsearch input {
+  color: #BCBEC0 !important;
+}
+
+h3.sharedh3:nth-of-type(1) {
+	clear: both;
+	margin: 1.5em 0 0 0;
+}
+
+h3.sharedh3 {
+	font-weight: bold;
+	font-style: normal;
+	margin: 1em 0 0 0;
+}
+
+.sharedsubmit {
+	text-align: center;
+}
+
+.sharedsubmit span {
+	font: 2em "brandon-grotesque";
+	font-weight: normal;
+	text-transform: capitalize;
+	fill: #000;
+	color: #000;
+	margin-left: 0.8em;
+}
+
+
+.sharedbutton {
+    background-color: #58595B; 
+    border: none;
+    color: white;
+    font: 2em "brandon-grotesque";
+  	font-weight: 900;
+  	text-transform: uppercase;
+    padding: 0.2em 0.5em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 0.4em;
+    margin: 1em auto;
+}
+
+.sharedbutton:hover {
+	background-color: #BCBEC0;
+}
+

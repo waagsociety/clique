@@ -5,11 +5,12 @@ const paddingdoc = 20;
 const margintop = 50;
 const titlespacing = 24
 const marginleft = 240;
-const marginright = 150;
+const marginright = 180;
 const marginbottom = 200;
 const htimeline = (w - marginleft - marginright) / 2
 const width = w + (2 * paddingdoc);
 const height = htimeline + (2 * paddingdoc) + marginbottom + margintop + titlespacing;
+
 const defaultStartDate = "2012-01-01"
 const defaultEndDate = "2016-06-01"
 
@@ -94,7 +95,7 @@ function startClique() {
     .append("div")
     .attr("id","progressstart");
 
-  progressBar("#progressstart");
+
 
   var myUrl = tnPersonEndPoint + encodeURIComponent(egoName);
 
@@ -103,6 +104,11 @@ function startClique() {
       handleError("Error in getting " + myUrl + ", " + error);
     }else if (response !=null ){
 
+      if (response.length == 0){
+        alert("No results found for " + egoName);
+        return;
+      }
+      progressBar("#progressstart");
       var id = response[0][0].pit.id;
       var name = response[0][0].pit.name;
       var personType = response[0][0].pit.type;
@@ -155,6 +161,8 @@ function makeGraphics(e) {
 
   timeAxes(dataset, svgContainer1);
 
+  timeInstructions(svgContainer1);
+
   timeElements(dataset,svgContainer1);
 
   timeLegend(dataset,svgContainer1);
@@ -163,13 +171,12 @@ function makeGraphics(e) {
     .append("div").attr("id","graphdiv")
     .append("svg")
     .attr({
-      width: width,
-      height: height
+      width: w,
+      height: 3*h
     })
-    .style("border", "0 solid black")
     ;
 
-  initEgonetwork(svgContainer2,width,height);
+  initEgonetwork(svgContainer2,w,3*h);
 }
 
 function sectorTypes (dataset){
@@ -181,9 +188,7 @@ function sectorTypes (dataset){
   });
 }
 
-
 //timeline(dataset); //draw bars & dots
-
 
 function handleError(message){
   console.log(message);

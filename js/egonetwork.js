@@ -612,23 +612,53 @@ function contextmenu(d){
 
   if (d.type === "tnl:Person" && d.nodeid !== root.nodeid){
     d3.event.preventDefault();
+
+
+   var popup = d3.select("div#viz2")
+              .append("div")
+              .attr("id", "popupdiv");
+
+
+  var ancor = popup.append("a")
+              .attr("href","shared.html")
+              .attr("class","fancybox fancybox.iframe")
+              .attr("data-fancybox-type","iframe")
+
+  $.fancybox({
+            'closeBtn' : true,
+            'autoScale': true,
+            'transitionIn': 'fade',
+            'transitionOut': 'fade',
+            'type': 'iframe',
+            'href': 'shared.html',
+            'afterShow': afterShowFancyBox,
+            'afterClose': afterCloseFancyBox
+        });
+
+    // d3.select("div#sharedtitle").select("p").select("span.titlename").text(function(){return egoDataSet.name});
+
     // alert("You click me!!!");
 
-    var popup = d3.select("div#viz2")
-              .append("div")
-              .attr("id", "popupdiv")
-              ;
-
-    popup.append("h2").text(d.name);
-    popup.append("div").attr("id","progresspopup");
-    progressBar("#progresspopup");
-    popup.append("p").text("Shared positions")
-
-    sharedConnections(d,popup);
+    // popup.append("div").attr("id","progresspopup");
+    // progressBar("#progresspopup");
 
     // popup.append("p")
     //         .append("a")
     //         .attr("href",d.link)
     //         .text(d.link_text);
   }
+}
+
+function afterShowFancyBox(){
+  var iframeElementx = document.getElementById("fancybox-frame1466436086330");
+  var iframeElementy = (iframeElementx.contentWindow || iframeElementx.contentDocument);
+  var iframeElementz = iframeElementy.document.body;
+  d3.select(iframeElementz);
+
+  d3.select("div#sharedtitle").select("p").select("span.titlename").text(function(){return egoDataSet.name});
+  sharedConnections(d,popup);
+}
+
+function afterCloseFancyBox(){
+  clicked = false;
 }
