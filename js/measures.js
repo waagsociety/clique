@@ -57,7 +57,7 @@ function startClique(filename) {
 
   setScales(dataset);
 
-  var svgContainer = d3.select("#viz")
+  var svgContainer = d3.select("#viz1")
     .append("svg")
     .attr({
       width: w + (2 * paddingdoc),
@@ -73,6 +73,17 @@ function startClique(filename) {
   timeElements(dataset,svgContainer);
 
   timeLegend(dataset,svgContainer);
+
+  var svgContainer2 = d3.select("#viz2")
+    .append("svg")
+    .attr({
+      width: w + (2 * paddingdoc),
+      height: htimeline + (2 * paddingdoc) + marginbottom + margintop + titlespacing
+    })
+    .style("border", "0 solid black")
+    ;
+
+  graphLegend(dataset,svgContainer2);
 
   });
 }
