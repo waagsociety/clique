@@ -45,7 +45,7 @@ function timeAxes (dataset,svg) {
     .scale(xTimeScale)
     .orient("bottom") // text orient
     .ticks(d3.time.year, 1)
-    .tickFormat(d3.time.format('%Y'))
+    .tickFormat(d3.time.format('%y'))
     .tickSize(3, 1) // inner tick size(value, length ticks themselves), outer tick size(line-thickness axis)
     .tickPadding(6) // space between ticks and values
     ;
@@ -133,7 +133,7 @@ function brushes (xTimeAxis,svg){
     d3.select(this).transition()
         .call(brush.extent(currentExtent))
         .call(brush.event);
-        
+
     egoTimeSnapshot = createEgoData(egoDataSet);
     setEgoData(egoTimeSnapshot);
 

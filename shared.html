@@ -12,10 +12,10 @@
   	<script>try{Typekit.load({ async: true });}catch(e){}</script>
 </head>
 <body id="shared">
-	<div id="sharedtitle"><p><span class="titlename">name </span><span class="titlegraph">/ shared connections</span></p>
+	<div id="sharedtitle"><p><span class="titlename">name </span><span class="titlegraph"></span></p>
 	</div>
-	
-	<div id="sharedsearch">
+
+	<!-- <div id="sharedsearch">
 		<img src="img/icon_connect.svg" width="27" class="connecticon">
 		<div class="searchperson">
 	        <form>
@@ -29,36 +29,21 @@
 	          </button>
 	        </form>
 		</div>
-	</div>
+	</div> -->
 
 	<div id="contentshared">
 		<h3 class="sharedh3">Shared positions</h3>
-		<p>(d3 timeline)</p>
+		<div id="_sharedpositions"></div>
 
-		<h3 class="sharedh3">Shared sectors</h3>
-		<p>(d3 shared sectors)</p>
+
+		<!-- <h3 class="sharedh3">Shared sectors</h3>
+		<div id="_sharedsectors"></div> -->
 
 		<h3 class="sharedh3">Shared (assumed) contacts</h3>
-		<p>
-		<table>
-			<tr>
-				<td class="tabhead">Contact</td>
-				<td class="tabhead">Name ego</td>
-				<td class="tabhead">Name second person</td>
-			</tr>
-			<tr>
-				<td>
-				</td>
-				<td>
-				</td>
-				<td>
-				</td>
-			</tr>
-		</table>
-	</p>
+		<div id="_sharedcontacts"></div>
 	</div>
 	<div class="sharedsubmit">
-		<a href="javascript:parent.jQuery.fancybox.close();" type="button" class="sharedbutton" >Build timeline</a><span>/ name second person</span>
+		<a href="javascript:parent.submitSearch();" type="button" class="sharedbutton" >Build timeline</a><span></span>
 	</div>
 </body>
 </html>

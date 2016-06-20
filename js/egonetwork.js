@@ -32,7 +32,7 @@ const cliqueStatusEnum = {
   NONE: "none"
 };
 
-var egoTimeSnapshot = {};
+var egoTimeSnapshot = null;
 
 var root;
 var nodes;
@@ -45,7 +45,7 @@ var link;
 var graphW;
 var graphH;
 var graphSvg;
-var clicked = false;
+var clicked = null;
 
 var selectedNodes;
 
@@ -608,32 +608,27 @@ function contextmenu(d){
   if (clicked){
     return;
   }
-  clicked = true;
+  clicked = d;
 
-  if (d.type === "tnl:Person" && d.nodeid !== root.nodeid){
+  if (clicked.type === "tnl:Person" && clicked.nodeid !== root.nodeid){
     d3.event.preventDefault();
 
 
    var popup = d3.select("div#viz2")
-              .append("div")
-              .attr("id", "popupdiv");
+            .append("div")
+            .attr("id","progresspopup")
+            .attr("left",w/2 + "px")
+            .attr("top",h + "px");
 
+    progressBar("#progresspopup");
 
-  var ancor = popup.append("a")
-              .attr("href","shared.html")
-              .attr("class","fancybox fancybox.iframe")
-              .attr("data-fancybox-type","iframe")
+    sharedConnections(clicked);
 
-  $.fancybox({
-            'closeBtn' : true,
-            'autoScale': true,
-            'transitionIn': 'fade',
-            'transitionOut': 'fade',
-            'type': 'iframe',
-            'href': 'shared.html',
-            'afterShow': afterShowFancyBox,
-            'afterClose': afterCloseFancyBox
-        });
+  // var ancor = popup.append("a")
+  //             .attr("href","shared.html")
+  //             .attr("class","fancybox fancybox.iframe")
+  //             .attr("data-fancybox-type","iframe")
+
 
     // d3.select("div#sharedtitle").select("p").select("span.titlename").text(function(){return egoDataSet.name});
 
@@ -647,18 +642,4 @@ function contextmenu(d){
     //         .attr("href",d.link)
     //         .text(d.link_text);
   }
-}
-
-function afterShowFancyBox(){
-  var iframeElementx = document.getElementById("fancybox-frame1466436086330");
-  var iframeElementy = (iframeElementx.contentWindow || iframeElementx.contentDocument);
-  var iframeElementz = iframeElementy.document.body;
-  d3.select(iframeElementz);
-
-  d3.select("div#sharedtitle").select("p").select("span.titlename").text(function(){return egoDataSet.name});
-  sharedConnections(d,popup);
-}
-
-function afterCloseFancyBox(){
-  clicked = false;
 }

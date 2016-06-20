@@ -318,7 +318,8 @@ p.bgtexttime {
   margin: 20px;
   width: 200px;
   height: 200px;
-  position: relative;
+  position: absolute;
+  z-index: 5;
 }
 
 path.link {
@@ -343,14 +344,7 @@ path.link {
   font-weight: normal;
 }
 
-
-#graphdiv, #popupdiv {
-    /*position: absolute;*/
-    /*width: 100%;
-    height: 100%;*/
-  }
-
-#popupdiv {
+/*#popupdiv {
     z-index: 5;
     background-color: #fff;
     border: 1px #ccc solid;
@@ -358,4 +352,4 @@ path.link {
     box-shadow: #333 2px 2px 4px;
     padding: 8px;
     font-family: arial, helvetica, sans-serif;
-}
+}*/

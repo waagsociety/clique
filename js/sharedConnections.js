@@ -6,8 +6,8 @@ const dateFormatter = d3.time.format("%d-%m-%Y");
 const paddingPopUp = 20;
 const paddingVert = 30;
 
-var sharedConnDiv;
 var columns;
+var popupTooltip;
 
 var antaDataSet = {};
 var antaLinkedDataSet = {};
@@ -16,7 +16,7 @@ var antaTimeSnapshot;
 var sharedExperiences;
 var experienceCache;
 
-function sharedConnections(node, theDiv){
+function sharedConnections(node){
   antaDataSet = {};
   antaLinkedDataSet = {};
 
@@ -25,11 +25,9 @@ function sharedConnections(node, theDiv){
   antaDataSet["type"] = node.type;
   antaDataSet["_children"] = [];
 
-  sharedConnDiv = theDiv;
-
 
   // Listen for the event.
-  window.addEventListener('dataReady', makeTables, false);
+  window.addEventListener('dataReady', showPopUp, false);
 
   done = 0;
   getRelations(node.id,antaDataSet,antaLinkedDataSet);
@@ -37,14 +35,58 @@ function sharedConnections(node, theDiv){
   getLinkedPeople(node.id,antaDataSet,antaLinkedDataSet);
 }
 
-
-function makeTables(e){
+function showPopUp(e){
   d3.select("#progresspopup").remove();
   bar = {};
 
-  window.removeEventListener('dataReady',makeTables,false);
+  window.removeEventListener('dataReady',showPopUp,false);
 
-  var svgPopUp = sharedConnDiv
+  $.fancybox({
+            'closeBtn' : true,
+            'autoScale': true,
+            'width': width,
+            'transitionIn': 'fade',
+            'transitionOut': 'fade',
+            'type': 'iframe',
+            'href': 'shared.html',
+            'afterShow': makeTables,
+            'afterClose': afterCloseFancyBox
+  });
+}
+
+function afterCloseFancyBox(){
+  clicked = null;
+}
+
+function submitSearch(){
+  $.fancybox(function(){close();})
+  resetClique();
+  egoName = antaDataSet.name;
+  egoDataSet = antaDataSet;
+  // egoTimeSnapshot = antaTimeSnapshot;
+  makeGraphics();
+}
+
+function makeTables(){
+
+  var id = d3.selectAll("iframe").attr("id");
+  var iframeElementx = document.getElementById(id);
+  var iframeElementy = (iframeElementx.contentWindow || iframeElementx.contentDocument);
+  var iframeElementz = iframeElementy.document.body;
+
+  var shared = d3.select(iframeElementz);
+  shared.select("div#sharedtitle").select("span.titlename").text(function(){return egoDataSet.name});
+  shared.select("div#sharedtitle").select("span.titlegraph").text(function(){return "/ shared connections with " + clicked.name});
+  shared.select("div.sharedsubmit").select("span").text(function(){return "/ " + clicked.name});
+
+  var containerDiv = shared.select("div#contentshared");
+
+  popupTooltip = containerDiv.append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  var svgPopUp = containerDiv
+                .select("#_sharedpositions")
                 .append("svg")
                 .attr({
                   width: width,
@@ -124,7 +166,7 @@ function makeTables(e){
   if (Object.keys(commonFriends).length > 0){
     var suff = "'s link";
     columns = ["Contact",egoDataSet.name + suff, antaDataSet.name + suff];
-    tabulate(commonFriends);
+    tabulate(containerDiv,commonFriends);
   }
 }
 
@@ -146,20 +188,20 @@ function drawBars(svg,data,shiftX,shiftY){
        "pointer-events": "visible"
      })
      .on("mouseover", function(d) {
-       tooltip.transition()
+       popupTooltip.transition()
          .duration(200)
          .style("opacity", .9);
 
-       tooltip.html("<p class='bgtexttime'>Organization: " + d['name'] + " <br/> Position: " + d['position'].split(':')[1] + " <br/> Period: "
-                 + shortFormat(new Date(d['originalStart'])) + " - " + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['source'] + "</p>");
+       popupTooltip.html("<p class='bgtexttime'>Organization: " + d['name'] + " <br/> Position: " + d['position'].split(':')[1] + " <br/> Period: "
+                 + shortFormat(new Date(d['originalStart'])) + " - " + shortFormat(new Date(d['originalEnd'])) + "</p>");
 
      })
      .on("mousemove", function(d){
-       tooltip.style("left", (d3.event.pageX + 5) + "px")
+       popupTooltip.style("left", (d3.event.pageX + 5) + "px")
            .style("top", (d3.event.pageY - 30) + "px");
      })
      .on("mouseout", function(d) {
-       tooltip.transition()
+       popupTooltip.transition()
          .duration(500)
          .style("opacity", 0);
 
@@ -169,9 +211,9 @@ function drawBars(svg,data,shiftX,shiftY){
 }
 
 // The table generation function
-function tabulate(data) {
+function tabulate(theDiv,data) {
 
-  var table = sharedConnDiv.append("table")
+  var table = theDiv.select("#_sharedcontacts").append("table")
           .attr("class", "sharedtable");
 
   var thead = table.append("thead");

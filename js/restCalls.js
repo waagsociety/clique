@@ -8,7 +8,7 @@ function getRelations(id,dataSet,linkedSet){
 
   var theUrl = tnRelationEndPoint + encodeURIComponent(id);
 
-  d3.json(theUrl,function(error,response){
+  var request = d3.json(theUrl,function(error,response){
     if (error != null){
       handleError("Error in getRelations: " + error);
     }else if (response != null) {
@@ -47,6 +47,7 @@ function getRelations(id,dataSet,linkedSet){
       mergeDatasets(dataSet,linkedSet);
     }
   });
+  requests.push(request);
 }
 
 function makeSectorCallback(index,dataSet,linkedSet) {
@@ -81,7 +82,9 @@ function getCompanySectors(dataSet,linkedSet){
 
     var myfunct = makeSectorCallback(index,dataSet,linkedSet);
 
-    d3.json(theUrl,myfunct);
+    var request = d3.json(theUrl,myfunct);
+
+    requests.push(request);
 
   }
 }
@@ -90,7 +93,7 @@ function getLinkedPeople(id, dataSet,linkedSet){
 
   var theUrl = tnLinkedPeopleEndPoint + encodeURIComponent(id);
 
-  d3.json(theUrl,function(error,response){
+  var request = d3.json(theUrl,function(error,response){
     if (error != null){
       handleError("Error in getLinkedPeople: " + error);
     }else if (response != null) {
@@ -145,6 +148,8 @@ function getLinkedPeople(id, dataSet,linkedSet){
       mergeDatasets(dataSet,linkedSet);
     }
   });
+
+  requests.push(request);
 
 }
 

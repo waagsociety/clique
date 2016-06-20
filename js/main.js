@@ -46,16 +46,14 @@ const dataReadyEvent = new Event('dataReady');
 //const dateRange = ["01/01/1989", "3/15/2016"];
 
 
-var egoDataSet={};
-var linkedDataSet = {};
+var egoDataSet = null;
+var linkedDataSet = null;
+var requests = null;
 var done = 0;
 
 //var name="Jan Anthonie Bruijn";
-var egoName="Femke Halsema";
+var egoName = "";
 var tooltip;
-
-
-
 
 
 var xPoint = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdoc + marginleft; }; // x top-triangle point
@@ -66,7 +64,7 @@ var xPointTxt = function(d) {return ((d.end - d.start)/ 2) + d.start + paddingdo
 var yPointTxt = function(d) {return htimeline - ((d.end - d.start)/ 2) + paddingdoc + margintop + titlespacing + (radius / 2); }; // y top triangle point
 
 
-var types = [];
+var types = null;
 
 function handleClick(event){
     egoName = document.getElementById("egoName").value;
@@ -76,6 +74,21 @@ function handleClick(event){
 }
 
 function resetClique() {
+  if (requests !== null){
+    for (var i=0;i<requests.length;++i){
+      requests[i].abort();
+    }
+    requests = null;
+  }
+
+  egoDataSet = null;
+  linkedDataSet = null;
+  egoTimeSnapshot = null;
+  types = null;
+
+  window.removeEventListener('dataReady',makeGraphics,false);
+  window.removeEventListener('dataReady',showPopUp,false);
+
   d3.select("#progressstart").remove();
   bar = {};
   d3.select("#viz1").select("svg").remove();
@@ -85,10 +98,9 @@ function resetClique() {
 }
 
 function startClique() {
-
   egoDataSet = {};
   linkedDataSet = {};
-
+  requests = [];
 
   d3.select("section.content")
     .select("div.container")
@@ -99,7 +111,7 @@ function startClique() {
 
   var myUrl = tnPersonEndPoint + encodeURIComponent(egoName);
 
-  d3.json(myUrl,function(error,response){
+  var request = d3.json(myUrl,function(error,response){
     if (error != null){
       handleError("Error in getting " + myUrl + ", " + error);
     }else if (response !=null ){
@@ -136,6 +148,8 @@ function startClique() {
     }
 
   });
+
+  requests.push(request);
 }
 
 
