@@ -126,7 +126,7 @@ function startClique() {
       var personType = response[0][0].pit.type;
 
       for (var i=0;i<response.length;++i){
-        if (response[i][0].pit.name == egoName){
+        if (response[i][0].pit.name.toUpperCase() === egoName.toUpperCase()){
           id = response[i][0].pit.id;
           name = response[i][0].pit.name;
           personType = response[i][0].pit.type;
@@ -134,7 +134,7 @@ function startClique() {
         }
       }
 
-      if (name != egoName){
+      if (name.toUpperCase() !== egoName.toUpperCase()){
         alert("No results found for " + egoName);
         return;
       }
