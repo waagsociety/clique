@@ -226,7 +226,7 @@ h3 {
 
 /*Timeline styling*/
 
-text {
+text, p {
     font-size: 1.2em ;
     font-family: "brandon-grotesque";
     font-weight: bold;

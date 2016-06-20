@@ -1,3 +1,6 @@
+#shared p, #shared text{
+	font-weight: normal;
+}
 
 #sharedtitle {
 	float: left;
@@ -41,7 +44,7 @@
 
 #contentshared {
 	clear: both;
-	margin-top: 4em;
+	margin-top: 5em;
 }
 
 #sharedsearch input {
@@ -49,10 +52,46 @@
 }
 
 h3.sharedh3:nth-of-type(1) {
-	clear: both
+	clear: both;
+	margin: 1.5em 0 0 0;
 }
 
 h3.sharedh3 {
 	font-weight: bold;
 	font-style: normal;
+	margin: 1em 0 0 0;
 }
+
+.sharedsubmit {
+	text-align: center;
+}
+
+.sharedsubmit span {
+	font: 2em "brandon-grotesque";
+	font-weight: normal;
+	text-transform: capitalize;
+	fill: #000;
+	color: #000;
+	margin-left: 0.8em;
+}
+
+
+.sharedbutton {
+    background-color: #58595B; 
+    border: none;
+    color: white;
+    font: 2em "brandon-grotesque";
+  	font-weight: 900;
+  	text-transform: uppercase;
+    padding: 0.2em 0.5em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 0.4em;
+    margin: 1em auto;
+}
+
+.sharedbutton:hover {
+	background-color: #BCBEC0;
+}
+
