@@ -125,6 +125,15 @@ function startClique() {
       var name = response[0][0].pit.name;
       var personType = response[0][0].pit.type;
 
+      for (var i=0;i<response.length;++i){
+        if (response[i][0].pit.name == egoName){
+          id = response[i][0].pit.id;
+          name = response[i][0].pit.name;
+          personType = response[i][0].pit.type;
+          break;
+        }
+      }
+
       if (name != egoName){
         alert("No results found for " + egoName);
         return;
