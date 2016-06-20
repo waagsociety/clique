@@ -19,6 +19,7 @@ var experienceCache;
 function sharedConnections(node){
   antaDataSet = {};
   antaLinkedDataSet = {};
+  requests = [];
 
   antaDataSet["id"] = node.id;
   antaDataSet["name"] = node.name;

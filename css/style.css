@@ -320,6 +320,7 @@ p.bgtexttime {
   height: 200px;
   position: absolute;
   z-index: 5;
+  background-color: white;
 }
 
 path.link {
