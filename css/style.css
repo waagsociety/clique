@@ -155,6 +155,32 @@ input {
   line-height: 2em;
 }
 
+/*Styling home*/
+
+.homecomment {
+  width: 35em;
+  height: 9em;
+  padding: 1.8em 1em 1em 1em;
+  background: url(../img/homecomment.svg) top right no-repeat;
+  font-weight: normal;
+  float: right;
+  font: 1.4em "brandon-grotesque", sans-serif;
+  margin: 2em 5em 0 0;
+  overflow: hidden;
+}
+
+.homecomment a {
+  color: #58595B;
+}
+
+.homelogowrap {
+  text-align: center;
+}
+
+.homelogo {
+  margin: 1em auto 5em auto;
+}
+
 /*Styling user guide*/
 
 #guide {
