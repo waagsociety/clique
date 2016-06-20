@@ -108,15 +108,21 @@ function startClique() {
         alert("No results found for " + egoName);
         return;
       }
-      progressBar("#progressstart");
+
       var id = response[0][0].pit.id;
       var name = response[0][0].pit.name;
       var personType = response[0][0].pit.type;
 
+      if (name != egoName){
+        alert("No results found for " + egoName);
+        return;
+      }
       egoDataSet["id"] = id;
       egoDataSet["name"] = name;
       egoDataSet["type"] = personType;
       egoDataSet["_children"] = [];
+
+      progressBar("#progressstart");
 
 
       // Listen for the event.
