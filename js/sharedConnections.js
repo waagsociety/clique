@@ -1,8 +1,13 @@
 const EGO_TYPE = "ego";
 const ANTA_TYPE = "anta";
 
+const dateFormatter = d3.time.format("%d-%m-%Y");
+
 const paddingPopUp = 20;
 const paddingVert = 30;
+
+var sharedConnDiv;
+var columns;
 
 var antaDataSet = {};
 var antaLinkedDataSet = {};
@@ -11,7 +16,7 @@ var antaTimeSnapshot;
 var sharedExperiences;
 var experienceCache;
 
-function sharedConnections(node){
+function sharedConnections(node, theDiv){
   antaDataSet = {};
   antaLinkedDataSet = {};
 
@@ -19,6 +24,8 @@ function sharedConnections(node){
   antaDataSet["name"] = node.name;
   antaDataSet["type"] = node.type;
   antaDataSet["_children"] = [];
+
+  sharedConnDiv = theDiv;
 
 
   // Listen for the event.
@@ -37,6 +44,14 @@ function makeTables(e){
 
   window.removeEventListener('dataReady',makeTables,false);
 
+  var svgPopUp = sharedConnDiv
+                .append("svg")
+                .attr({
+                  width: width,
+                  height: popupHeight
+                })
+                ;
+
   antaTimeSnapshot = createEgoData(antaDataSet);
 
   sharedExperiences = [];
@@ -47,14 +62,6 @@ function makeTables(e){
   findCommonExperiences(egoTimeSnapshot,antaDataSet["name"]);
 
   if (sharedExperiences.length > 0){
-
-    var svgPopUp = d3.select("div#popupdiv")
-                    .append("svg")
-                    .attr({
-                      width: width,
-                      height: popupHeight
-                    })
-                    ;
 
     var xCompTimeExtent = [d3.min(sharedExperiences, function(d) { return dateFormat.parse(d.start); }),
                       d3.max(sharedExperiences, function(d) { return dateFormat.parse(d.end); })];
@@ -106,13 +113,19 @@ function makeTables(e){
   var egoFriends = makePeopleList(egoTimeSnapshot,antaTimeSnapshot.name);
   var antaFriends = makePeopleList(antaTimeSnapshot,egoTimeSnapshot.name);
 
-  var commonFriends = [];
+  var commonFriends = {};
 
   Object.keys(egoFriends).forEach(function (key) {
     if (antaFriends[key] !== undefined){
-      commonFriends[key] = {ego:egoFriends[key],anta:antaFriends[key]};
+      commonFriends[key] = {[EGO_TYPE]:egoFriends[key],[ANTA_TYPE]:antaFriends[key]};
     }
   });
+
+  if (Object.keys(commonFriends).length > 0){
+    var suff = "'s link";
+    columns = ["Contact",egoDataSet.name + suff, antaDataSet.name + suff];
+    tabulate(commonFriends);
+  }
 }
 
 function drawBars(svg,data,shiftX,shiftY){
@@ -153,6 +166,69 @@ function drawBars(svg,data,shiftX,shiftY){
      })
    ;
 
+}
+
+// The table generation function
+function tabulate(data) {
+
+  var table = sharedConnDiv.append("table")
+          .attr("class", "sharedtable");
+
+  var thead = table.append("thead");
+
+  var tbody = table.append("tbody");
+
+  // append the header row
+  thead.append("tr")
+      .selectAll("th")
+      .data(columns)
+      .enter()
+      .append("th")
+          .text(function(column) { return column; });
+
+  // create a row for each object in the data
+  var rows = tbody.selectAll("tr")
+      .data(d3.entries(data).sort(function (a,b){
+        if (a.key > b.key) {
+          return 1;
+        }
+        if (a.key < b.key) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      }),function (d){return d.key})
+      .enter()
+      .append("tr");
+
+  // create a cell in each row for each column
+  var cells = rows.selectAll("td")
+      .data(function(row) {
+        return [
+                {column: columns[0], value: row.key},
+                {column: columns[1], value: row.value[EGO_TYPE]},
+                {column: columns[2], value: row.value[ANTA_TYPE]},
+              ];
+      })
+      .enter()
+      .append("td")
+      .html(function(d) { return printPositions(d); });
+
+  return table;
+}
+
+function printPositions(cellData){
+  if (cellData.column == columns[0]){
+    return cellData.value;
+  }else{
+    var cellText = "";
+    for (var i=0;i<cellData.value.length;++i){
+      cellText = cellText + cellData.value[i].name + ", " + cellData.value[i].position.split(':')[1]
+                    + " (" + dateFormatter(dateFormat.parse(cellData.value[i].start)) + ", "
+                    + dateFormatter(dateFormat.parse(cellData.value[i].end)) + ")<br/>";
+    }
+    return cellText;
+  }
 }
 
 function findCommonExperiences(currentNode,name,institute=null,sector=null){

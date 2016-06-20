@@ -28,7 +28,7 @@ section:first-of-type {
 }
 
 /* Tell the header and footer to stay put. If you have any absolutely or other fixed elements on your site, a z-index may be needed! */
-.header, .footer {
+.header {
   position: fixed;
   width: 100%;
 }
@@ -38,7 +38,7 @@ section:first-of-type {
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 16.5em;
+  /*height: 16.5em;*/
   width: 100%;
 }
 

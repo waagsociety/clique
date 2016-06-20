@@ -622,11 +622,9 @@ function contextmenu(d){
     popup.append("h2").text(d.name);
     popup.append("div").attr("id","progresspopup");
     progressBar("#progresspopup");
-    sharedConnections(d);
-
     popup.append("p").text("Shared positions")
 
-
+    sharedConnections(d,popup);
 
     // popup.append("p")
     //         .append("a")
