@@ -22,7 +22,10 @@ function getRelations(id,dataSet,linkedSet){
         var source = response[index].pit.dataset;
         var type = response[index].pit.type;
 
-        start = (start != "" ? start : defaultStartDate);
+        // start = (start != "" ? start : defaultStartDate);
+        if( start == "" ){
+          continue;
+        }
         end = (end != "" ? end : defaultEndDate);
 
         // https://api.transparantnederland.nl/search?id=urn:hgid:pdc/vvd
@@ -116,7 +119,11 @@ function getLinkedPeople(id, dataSet,linkedSet){
         var relationPositionLabel = response[index][0].pit.data.waarde;
 
         var relationStart = response[index][0].relation.since;
-        relationStart = (relationStart != "" ? relationStart : defaultStartDate);
+        if (relationStart == ""){
+          continue;
+        }
+        // relationStart = (relationStart != "" ? relationStart : defaultStartDate);
+
         var relationEnd = response[index][0].relation.until;
         relationEnd = (relationEnd != "" ? relationEnd : defaultEndDate);
 

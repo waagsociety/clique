@@ -176,10 +176,8 @@ function timeElements (dataset,svg) {
       var obj = this.id.substr(4,5);
 
       triangleIds.forEach(function(s){
-        d3.select("#" + s + obj).
-        each(function (t){
-          this.setAttribute("visibility", "visible");
-        });
+        d3.select("#" + s + obj)
+          .attr("visibility", "visible");
       })
     })
     .on("click", function(d) {
@@ -189,13 +187,11 @@ function timeElements (dataset,svg) {
           .duration(500)
           .style("opacity", 0);
           // triangle and bar
-          var obj = this.id.substr(4,5);
-          triangleIds.forEach(function(s){
-            d3.select("#" + s + obj).
-            each(function (t){
-              this.setAttribute("visibility", "hidden");
-            });
-          })
+        var obj = this.id.substr(4,5);
+        triangleIds.forEach(function(s){
+          d3.select("#" + s + obj)
+              .attr("visibility", "hidden");
+        });
         this.setAttribute("visibility", "hidden");
         this.parentNode.childNodes[1].setAttribute("visibility", "hidden");
       }else{
@@ -205,19 +201,14 @@ function timeElements (dataset,svg) {
           // triangle and bar
           var obj = this.id.substr(4,5);
           triangleIds.forEach(function(s){
-            d3.select("#" + s + obj).
-            each(function (t){
-              this.setAttribute("visibility", "hidden");
-            });
+            d3.select("#" + s + obj)
+              .attr("visibility", "hidden");
           })
-        d3.selectAll('*[class^="dot-"]').
-        each(function (t){
-          this.setAttribute("visibility", "visible");
-        });
-        d3.selectAll('*[class^="dottxt-"]').
-        each(function (t){
-          this.setAttribute("visibility", "visible");
-        });
+        d3.selectAll('*[class^="' + d3.select(this).attr("class") + '"]')
+        .attr("visibility", "visible");
+
+        d3.selectAll('*[class^="' + d3.select(this.parentNode).select("text").attr("class") + '"]')
+        .attr("visibility", "visible");
       }
       // triangleIds.forEach(function(s){
       //   d3.select("#" + s + obj).
@@ -233,19 +224,11 @@ function timeElements (dataset,svg) {
         .duration(500)
         .style("opacity", 0);
         // triangle and bar
-        var obj = this.id.substr(4,5);
-        triangleIds.forEach(function(s){
-          d3.select("#" + s + obj).
-          each(function (t){
-            this.setAttribute("visibility", "hidden");
-          });
+      var obj = this.id.substr(4,5);
+      triangleIds.forEach(function(s){
+          d3.select("#" + s + obj)
+            .attr("visibility", "hidden");
         })
-
-        // d3.selectAll('*[class^="dot-"]').
-        // each(function (t){
-        //   this.setAttribute("visibility", "visible");
-        // });
-
     })
   ;
 
