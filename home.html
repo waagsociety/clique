@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-  <title>Clique</title>
+  <title>Timeline Jan Anthonie Bruijn</title>
 
   <link href="css/reset.css" rel="stylesheet" type="text/css">
   <link href="css/style.css" rel="stylesheet" type="text/css">
@@ -11,30 +11,12 @@
   <script src="https://use.typekit.net/kdv7wym.js"></script>
   <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
-  <script src="d3/d3.min.js" charset="utf-8" type="text/javascript"></script>
-  <script src="d3/d3.layout.timeline.js" charset="utf-8" type="text/javascript"></script>
 
   <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
   <script type="text/javascript" src="js/fancybox/jquery.fancybox.js"></script>
   <script type="text/javascript" src="js/fancybox/jquery.fancybox.pack.js"></script>
 
-  <script src="js/main.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/timeelements.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/timelegend.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/timeinstruct.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/timeaxis.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/egonetwork.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/progressbar.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/restCalls.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/sharedConnections.js" charset="utf-8" type="text/javascript"></script>
-  <script src="js/graphlegend.js" charset="utf-8" type="text/javascript"></script>
 
-
-  <script type="text/javascript">
-
-  //window.onload = startClique
-
-</script>
 </head>
 
 <body>
@@ -46,8 +28,8 @@
       </div>
 
       <div class="searchperson">
-        <form name="searchform" onSubmit="return handleClick()">
-          <input type="text" class="searchinput" id="egoName" placeholder="Search...">
+        <form>
+          <input type="text" class="search input" style="font-family:brandon-grotesque;color:white" placeholder="Search...">
           <button id="submit" type="submit">
               <svg class="magnifier" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 409.6 409.6">
               <path class="mag-1" d="M398.35,344.05l-94-94a180.78,180.78,0,0,1-54.3,54.3l94,94a38.4,38.4,0,1,0,54.3-54.3h0Zm0,0"/>
@@ -69,12 +51,8 @@
 
   <section class="content">
     <div class="container">
-      <div id="introduction">
-        <p class="homecomment">Explore the political influence network in the Netherlands. Dig in the <a href="http://www.transparantnederland.nl" target="_blank">Transparant Nederland</a> data set. Start your exploration here by typing the name of a politician. Type first and last name, e.g. <a href="">Femke Halsema</a>, <a href="">Hans Dijkstal</a>, <a href="">Wim Kok</a> of <a href="">Anne Flierman</a></p>
-        <div class="homelogowrap"><img src="img/homelogo2.svg" alt="Clique beta" width="700" class="homelogo"></div>
-    </div>
-      <div id="viz1"></div>
-      <div id="viz2"></div>
+      <p class="homecomment">Explore the political influence network in the Netherlands. Dig in the <a href="http://www.transparantnederland.nl" target="_blank">Transparant Nederland</a> data set. Start your exploration here by typing the name of a politician. Type first and last name, e.g. <a href="">Femke Halsema</a>, <a href="">Hans Dijkstal</a>, <a href="">Wim Kok</a> of <a href="">Anne Flierman</a></p>
+      <div class="homelogowrap"><img src="img/homelogo2.svg" alt="Clique beta" width="700" class="homelogo"></div>
     </div>
   </section>
 
@@ -91,6 +69,14 @@
           </svg>
           User guide
         </a>
+         <script type="text/javascript">
+        $(document).ready(function() {
+          $(".fancybox").fancybox({
+            closeBtn : 'true'
+          });
+        });
+        </script>
+        <br /><a href="shared.html" class="fancybox fancybox.iframe" data-fancybox-type="iframe">---> test fancybox</a>
       </div>
       <div class="ref">
       <p><em>CLIQUE by Marieke van Kouwen</em><br />
@@ -102,5 +88,6 @@
       </div>
     </div>
   </footer>
+
 </body>
 </html>

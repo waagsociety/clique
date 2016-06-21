@@ -89,6 +89,7 @@ function resetClique() {
   window.removeEventListener('dataReady',makeGraphics,false);
   window.removeEventListener('dataReady',showPopUp,false);
 
+  d3.select("#introduction").remove();
   d3.select("#progressstart").remove();
   bar = {};
   d3.select("#viz1").select("svg").remove();
