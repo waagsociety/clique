@@ -377,7 +377,19 @@ function makePeopleList(currentNode,noname,institute=null){
             peopleList[key] = [];
           }
           for (var ii=0;ii<innerList[key].length;ii++){
-            peopleList[key].push(innerList[key][ii]);
+            var toAdd = true;
+            for (var iii=0;iii<peopleList[key].length;++iii){
+                if ( (peopleList[key][iii].name === innerList[key][ii].name) &&
+                      (peopleList[key][iii].start === innerList[key][ii].start) &&
+                      (peopleList[key][iii].end === innerList[key][ii].end) &&
+                      (peopleList[key][iii].position === innerList[key][ii].position) ){
+                        toAdd = false;
+                        break;
+                }
+            }
+            if (toAdd){
+              peopleList[key].push(innerList[key][ii]);
+            }
           }
         });
       }
