@@ -19,7 +19,7 @@ var grlegendSelector = svg.append("g");
     .attr({
       "class": "titlename",
       "x": paddingdoc,
-      "y": paddingdoc + margintop
+      "y": paddingdoc
     })
     ;
 
@@ -27,7 +27,7 @@ var grlegendSelector = svg.append("g");
     .text(" / social network changes (begindate - enddate)")
     .attr({
       "class": "titlegraph",
-      "y": paddingdoc + margintop
+      "y": paddingdoc
     })
     ;
 
@@ -38,7 +38,7 @@ var grlegendSelector = svg.append("g");
     .attr({
       "class": "legendtitle",
       "x": paddingdoc,
-      "y": paddingdoc + margintop + 30
+      "y": paddingdoc + 30
     })
   ;
 
@@ -52,7 +52,7 @@ var grlegendSelector = svg.append("g");
   var grsymbolimg = symbolEnter.append("svg:image")
     .attr("xlink:href", function(d) { return "./img/" + d.file + ".svg";})
     .attr("x", function(d, i) { return paddingdoc + 90 + 145 * i;})
-    .attr("y", function(d) { return paddingdoc + margintop + 15;})
+    .attr("y", function(d) { return paddingdoc + 15;})
     .attr("height", "2em")
     .attr("width", "2em")
     .attr("class", "img")
@@ -61,8 +61,45 @@ var grlegendSelector = svg.append("g");
 
   var grsymboltxt = symbolEnter.append("text")
     .text(function(d){return d.name;})
-    .attr("y", function(d) { return paddingdoc + margintop + 30;})
+    .attr("y", function(d) { return paddingdoc + 30;})
     .attr("x", function(d, i) { return paddingdoc + 115 + 145 * i;})
     .attr("class", "symboltxt")
+    ;
+
+  // graph comment
+
+  var graphcomment = grlegendSelector.append("g");
+
+  var graphcommentbg = graphcomment.append("svg:image")
+    .attr("xlink:href", function(d) { return "./img/graph_comment.svg";})
+    .attr("x", function(d, i) { return w - paddingdoc - marginright ;})
+    .attr("y", function(d) { return 0;})
+    .attr("height", "5.5em")
+    .attr("width", marginright)
+    .attr("class", "img")
+    ;
+
+  var iconright = graphcomment.append("svg:image")
+    .attr("xlink:href", function(d) { return "./img/rightclick.svg";})
+    .attr("x", function(d) { return w - paddingdoc - marginright + 17 ;})
+    .attr("y", function(d) { return 10;})
+    .attr("height", marginright / 5)
+    .attr("width", marginright / 5)
+    .attr("class", "img")
+    ;
+
+    graphcomment.append("text")
+    .text("Right click a person")
+    .attr("class", "timeinstructtop")
+    .attr("x", function(d) { return w - paddingdoc - marginright + (marginright / 5) + 23 ;})
+    .attr("y", function(d) { return 25;}) 
+    ;
+
+    graphcomment.append("text")
+    .text("to inspect the relation")
+    .attr("class", "timeinstructbottom")
+    .attr("x", function(d) { return w - paddingdoc - marginright + (marginright / 5) + 23 ;})
+    .attr("y", function(d) { return 40;}) 
+ 
     ;
 }
