@@ -117,6 +117,12 @@ function createEgoData(dataSet){
       var scopedExtent = [instExtent[0]>personExtent[0]?instExtent[0]:personExtent[0],
                           instExtent[1]<personExtent[1]?instExtent[1]:personExtent[1]];
 
+      if (scopedExtent[0] > scopedExtent[1]){
+        // there is no overlap between the period spent at the organization and the
+        // period the connected person spent at the organization
+        continue;
+      }
+
       timeRelation = filterExtent(scopedExtent,currentExtent);
       if (timeRelation === cliqueStatusEnum.NONE){
         continue;

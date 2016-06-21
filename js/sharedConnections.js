@@ -3,8 +3,14 @@ const ANTA_TYPE = "anta";
 
 const dateFormatter = d3.time.format("%d-%m-%Y");
 
+const popupHeight = height/2;;
+const popupWidth = width;
+
 const paddingPopUp = 20;
 const paddingVert = 30;
+
+const nameSwimLanes = 80;
+
 
 var columns;
 var popupTooltip;
@@ -12,6 +18,7 @@ var popupTooltip;
 var antaDataSet = {};
 var antaLinkedDataSet = {};
 var antaTimeSnapshot;
+
 
 var sharedExperiences;
 var experienceCache;
@@ -25,7 +32,6 @@ function sharedConnections(node){
   antaDataSet["name"] = node.name;
   antaDataSet["type"] = node.type;
   antaDataSet["_children"] = [];
-
 
   // Listen for the event.
   window.addEventListener('dataReady', showPopUp, false);
@@ -45,7 +51,7 @@ function showPopUp(e){
   $.fancybox({
             'closeBtn' : true,
             'autoScale': true,
-            'width': width,
+            'width': popupWidth,
             'transitionIn': 'fade',
             'transitionOut': 'fade',
             'type': 'iframe',
@@ -86,21 +92,10 @@ function makeTables(){
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-  var svgPopUp = containerDiv
-                .select("#_sharedpositions")
-                .append("svg")
-                .attr({
-                  width: width,
-                  height: popupHeight
-                })
-                ;
-
   antaTimeSnapshot = createEgoData(antaDataSet);
 
   sharedExperiences = [];
   experienceCache = [];
-
-  var popupHeight = height/2;
 
   findCommonExperiences(egoTimeSnapshot,antaDataSet["name"]);
 
@@ -111,7 +106,7 @@ function makeTables(){
 
     var xCompTimeScale = d3.time.scale() // input domain , output range
       .domain(xCompTimeExtent)
-      .range([0, width-2*paddingPopUp]);
+      .range([0, popupWidth-2*paddingPopUp-nameSwimLanes]);
 
     var xCompTimeAxis = d3.svg.axis()
         .scale(xCompTimeScale)
@@ -124,20 +119,35 @@ function makeTables(){
 
 
     var timeline = d3.layout.timeline()
-       .size([width-2*paddingPopUp, popupHeight/2])
+       .size([popupWidth-2*paddingPopUp-nameSwimLanes, popupHeight/2])
        .extent(xCompTimeExtent)
        .padding(4)
        .maxBandHeight(12); // height bands
 
     var egoBars = timeline(sharedExperiences.filter(function(d){return d.type === EGO_TYPE;}));
 
-    drawBars(svgPopUp,egoBars,paddingPopUp,0);
+    var upperLanesHeight = d3.max(egoBars,function(d){return d.y;}) + paddingVert;
 
-    var offset = d3.max(egoBars,function(d){return d.y;}) + paddingVert;
+    var antaBars = timeline(sharedExperiences.filter(function(d){return d.type === ANTA_TYPE;}));
+
+    var lowerLanesHeight = d3.max(egoBars,function(d){return d.y;}) + paddingVert;
+
+    var xAxisHeight = 30;
+
+    var svgPopUp = containerDiv
+                  .select("#_sharedpositions")
+                  .append("svg")
+                  .attr({
+                    width: popupWidth,
+                    height: paddingVert + upperLanesHeight + lowerLanesHeight + xAxisHeight
+                  })
+                  ;
+
+    drawBars(svgPopUp,egoBars,paddingPopUp+nameSwimLanes,paddingVert,egoDataSet.name);
 
     svgPopUp.append("g")
        .attr({
-         "transform": "translate(" + paddingPopUp + "," + offset + ")",
+         "transform": "translate(" + (paddingPopUp + nameSwimLanes) + "," + (paddingVert + upperLanesHeight) + ")",
          "class": "x axis"
        })
        .call(xCompTimeAxis)
@@ -146,11 +156,7 @@ function makeTables(){
       //  .attr("transform", "translate(" + (w - paddingPopUp - marginright - 50) + " ," + (paddingPopUp + 8) + ")")
        ;
 
-    var antaBars = timeline(sharedExperiences.filter(function(d){return d.type === ANTA_TYPE;}));
-
-    offset = offset + paddingVert;
-
-    drawBars(svgPopUp,antaBars,paddingPopUp,offset);
+    drawBars(svgPopUp,antaBars,paddingPopUp+nameSwimLanes,paddingVert + upperLanesHeight + xAxisHeight,antaDataSet.name);
   }
 
   var egoFriends = makePeopleList(egoTimeSnapshot,antaTimeSnapshot.name);
@@ -171,7 +177,18 @@ function makeTables(){
   }
 }
 
-function drawBars(svg,data,shiftX,shiftY){
+function drawBars(svg,data,shiftX,shiftY,name){
+
+  svg.append("g")
+    .append("text")
+    .text(name)
+    .attr({
+      // "class": "legendtitle",
+      "x": 0,
+      "y": shiftY
+    })
+    ;
+
   svg.append("g")
       .attr({
         "transform": "translate(" + shiftX + "," + shiftY + ")"
@@ -289,10 +306,10 @@ function findCommonExperiences(currentNode,name,institute=null,sector=null){
     }
     if (children.length > 0){
       for (var i=0;i<children.length;++i){
-        if (children[i].type === STATUSNODETYPE && children[i].cliqueStatus === cliqueStatusEnum.BEFORE){
-          // skip relations with no overlapping
-          continue;
-        }
+        // if (children[i].type === STATUSNODETYPE && children[i].cliqueStatus === cliqueStatusEnum.BEFORE){
+        //   // skip relations with no overlapping
+        //   continue;
+        // }
         if (currentNode.sector !== undefined){
           sector = currentNode.sector;
           institute = currentNode.name;
