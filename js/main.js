@@ -179,7 +179,7 @@ function makeGraphics(e) {
       width: width,
       height: height
     })
-    .style("border", "1px solid black")
+    // .style("border", "1px solid black")
     ;
 
   sectorTypes(dataset);
