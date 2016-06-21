@@ -265,17 +265,19 @@ function filterExtent(nodeExtent,extent){
 
 function initEgonetwork (svg, width, height){
 
+  graphW = width;
+  graphH = height;
+
+  graphLegend();
+
   graphSvg = svg.append("g")
     .attr({
       "class": "graph"
     })
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", graphW)
+    .attr("height", graphH);
 
-  graphW = width;
-  graphH = height;
-
-  // var defs = graphSvg.insert("svg:defs")
+// var defs = graphSvg.insert("svg:defs")
   //     .data(["end"]);
   //
   //
@@ -287,6 +289,8 @@ function initEgonetwork (svg, width, height){
 }
 
 function setEgoData(jsonData){
+
+  setTimeSpan();
   if (nodes !== undefined){
     nodes.length = 0;
     graphSvg.selectAll("g.node").data(nodes).exit().remove();

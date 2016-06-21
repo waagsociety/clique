@@ -94,6 +94,7 @@ function resetClique() {
   bar = {};
   d3.select("#viz1").select("svg").remove();
   d3.select("section.content").select("div.tooltip").remove();
+  d3.select("#viz2").select("div#graphlegenddiv").remove();
   d3.select("#viz2").select("div#graphdiv").remove();
   d3.select("#viz2").select("div#popupdiv").remove();
 }
@@ -198,6 +199,16 @@ function makeGraphics(e) {
   timeLegend(dataset,svgContainer1);
 
   var svgContainer2 = d3.select("#viz2")
+    .append("div").attr("id","graphlegenddiv")
+    .append("svg")
+    .attr({
+      width: w,
+      // height: 3*h
+    })
+    ;
+  initGraphLegend(svgContainer2);
+
+  var svgContainer3 = d3.select("#viz2")
     .append("div").attr("id","graphdiv")
     .append("svg")
     .attr({
@@ -206,7 +217,7 @@ function makeGraphics(e) {
     })
     ;
 
-  initEgonetwork(svgContainer2,w,3*h);
+  initEgonetwork(svgContainer3,w,3*h);
 }
 
 function sectorTypes (dataset){
