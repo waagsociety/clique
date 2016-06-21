@@ -103,7 +103,7 @@ function timeElements (dataset,svg) {
             return lineFunction(makeTrianglePoints(d));
           },
           "stroke": function(d){return sectorToNameAndColor(d.sector).color},
-          "stroke-width": 1,
+          "stroke-width": 1.5,
           "fill-opacity": 0,
           "class": function(d) {return triangleIds[1] + d.sector.replace(/\W/gi, '-').toLowerCase()},
           "id": function(d) {

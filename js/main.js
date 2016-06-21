@@ -30,7 +30,7 @@ const sectorColorTable = {
   "Public administration and defence; compulsory social security"	: {name : "Public administration and defence", color : "#0B326B"},
   "Information and communication"	: {name : "Information and communication", color : "#7BCBC0"},
   "Water supply; sewerage, waste management and remediation activities"	: {name : "Water supply; sewerage and waste", color : "#006FBA"},
-  "Other service activities" : {name : "Other service activities", color : "#CCCCCC"},
+  "Other service activities" : {name : "Other service activities", color : "#999999"},
   "Administrative and support service activities"	: {name : "Administrative and support", color : "#B09977"},
   "Accommodation and food service activities"	: {name : "Accommodation and food", color : "#D0DD28"},
   "Electricity, gas, steam and air conditioning supply" : {name : "Electricity, gas and air", color : "#7B0165"},
