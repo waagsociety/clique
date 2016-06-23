@@ -15,7 +15,7 @@ function initGraphLegend(svg){
 function setTimeSpan(){
 
   graphLegendSvg.select("tspan.titlegraph")
-    .text(" / social network changes (" + d3.time.format("%Y")(currentExtent[0]) + " - " +  d3.time.format("%Y")(currentExtent[1]) + ")");
+    .text(" / social network changes (" + d3.time.format("%d/%m/%y")(currentExtent[0]) + " - " +  d3.time.format("%d/%m/%y")(currentExtent[1]) + ")");
 }
 
 function graphLegend() {
