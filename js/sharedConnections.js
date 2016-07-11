@@ -293,10 +293,10 @@ function printPositions(cellData){
 
 function findCommonExperiences(currentNode,name,institute,sector){
 
-  if (typeof(institute)==='undefined'){
+  if (typeof(institute) === 'undefined'){
     institute = null;
   }
-  if (typeof(sector)==='undefined'){
+  if (typeof(sector) === 'undefined'){
     sector = null;
   }
 
@@ -361,7 +361,11 @@ function findCommonExperiences(currentNode,name,institute,sector){
   return false;
 }
 
-function makePeopleList(currentNode,noname,institute=null){
+function makePeopleList(currentNode,noname,institute){
+
+  if( typeof(institute) === 'undefined'){
+    institute = null;
+  }
 
   var peopleList = [];
   if( currentNode._children !== undefined || currentNode.children !== undefined){
