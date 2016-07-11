@@ -291,7 +291,15 @@ function printPositions(cellData){
   }
 }
 
-function findCommonExperiences(currentNode,name,institute=null,sector=null){
+function findCommonExperiences(currentNode,name,institute,sector){
+
+  if (typeof(institute)==='undefined'){
+    institute = null;
+  }
+  if (typeof(sector)==='undefined'){
+    sector = null;
+  }
+
   var alreadyFound = false;
 
   if( currentNode._children !== undefined || currentNode.children !== undefined){
