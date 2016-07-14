@@ -1,22 +1,51 @@
-// draw Axes
+const dateFormat = d3.time.format('%Y-%m-%d');
+
+var currentExtent = [];
+
+var xTimeScale;
+var yTimeScale;
+var xEgoTimeExtent;
+
+
+function setScales(dataset){
+
+  // scales & axes
+  xEgoTimeExtent = [d3.min(dataset, function(d) { return dateFormat.parse(d.start); }),
+                    d3.max(dataset, function(d) { return dateFormat.parse(d.end); })];
+
+  xTimeScale = d3.time.scale() // input domain , output range
+    .domain(xEgoTimeExtent)
+    .range([paddingdoc + marginleft, w + paddingdoc - marginright]); // change in figures as well!!
+
+  var yTimeExtent = [0 ,
+        ((d3.max(dataset, function(d) { return dateFormat.parse(d.end); }) - d3.min(dataset, function(d) { return dateFormat.parse(d.start); })) / (1000 * 60 * 60 * 24 * 365))
+      ];
+
+  yTimeScale = d3.scale.linear()
+    .domain(yTimeExtent)
+    .range([htimeline + margintop + titlespacing + paddingdoc, paddingdoc + margintop + titlespacing])
+    ;
+
+
+}
 
 function timeAxes (dataset,svg) {
   // img timeline
 
-  var showTimeAxis = true, // variable, meerdere vars door komma's
-    beginning = 0,
-    ending = 0,
-    width = null,
-    height = null,
-    orient = "bottom"
-    ;
+  // var showTimeAxis = true, // variable, meerdere vars door komma's
+  //   beginning = 0,
+  //   ending = 0,
+  //   width = null,
+  //   height = null,
+  //   orient = "bottom"
+  //   ;
 
 
   var xTimeAxis = d3.svg.axis()
     .scale(xTimeScale)
     .orient("bottom") // text orient
     .ticks(d3.time.year, 1)
-    .tickFormat(d3.time.format('%Y'))
+    .tickFormat(d3.time.format('%y'))
     .tickSize(3, 1) // inner tick size(value, length ticks themselves), outer tick size(line-thickness axis)
     .tickPadding(6) // space between ticks and values
     ;
@@ -80,33 +109,33 @@ function brushes (xTimeAxis,svg){
 
   var brush = d3.svg.brush()
       .x(xTimeScale)
-      .extent(xTimeExtent)
-      .on("brushend", brushended);
+      .on("brushend", brushended)
+      .clear();
 
   var gBrush = svg.append("g")
       .attr({
         "transform": "translate(" + 0 + ", " + (htimeline + paddingdoc + margintop + titlespacing - height) + " )",
         "class": "brush"
       })
-      .call(brush)
-      .call(brush.event);
+      .call(brush);
+//      .call(brush.event);
 
   gBrush.selectAll("rect")
       .attr("height", height);
 
   function brushended() {
     if (!d3.event.sourceEvent) return; // only transition after input
-    var extent0 = brush.extent(),
-        extent1 = extent0.map(d3.time.year.round);
+    var initialExtent = brush.extent();
 
-    // if empty when rounded, use floor & ceil instead
-    if (extent1[0] >= extent1[1]) {
-      extent1[0] = d3.time.year.floor(extent0[0]);
-      extent1[1] = d3.time.year.ceil(extent0[1]);
-    }
-    //debugger
+    currentExtent[0] = d3.time.year.floor(initialExtent[0]);
+    currentExtent[1] = new Date(d3.time.year.ceil(initialExtent[1])-1);;
+
     d3.select(this).transition()
-        .call(brush.extent(extent1))
+        .call(brush.extent(currentExtent))
         .call(brush.event);
+
+    egoTimeSnapshot = createEgoData(egoDataSet);
+    setEgoData(egoTimeSnapshot);
+
   }
 };

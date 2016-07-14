@@ -10,13 +10,12 @@ function dottxtfunc (d) {
   var current = (xPoint(d) + "," + yPoint(d)); //
 
   var mylabel = xy[current]; // get the index of current data point in array arr
-  //debugger
+
   if ( mylabel === undefined ) { // if index is -1, then no match found. unique data point
     xy[current] = 1; // push point onto array
     return "1";
 
   } else {
-    //debugger
     xy[current] = xy[current] + 1; // push point onto array
     return xy[current] + "";
   }
@@ -34,20 +33,19 @@ function timeElements (dataset,svg) {
 
   var timeline = d3.layout.timeline()
       .size([w - marginleft - marginright,htimeline])
-      .extent(xTimeExtent)
+      .extent(xEgoTimeExtent)
       .padding(4)
       .maxBandHeight(12); // height bands
 
-  var theseBands = timeline(dataset);
   // bars
 
-  var noPolPartydata = theseBands.filter(function(b) {
-                  return b.typeis !== 'Political Party';
-              });
+  var noPolPartydata = timeline(dataset.filter(function(b) {
+                  return b.type !== 'tnl:PoliticalParty';
+              }));
 
-  var isPolPartydata = theseBands.filter(function(b) {
-                  return b.typeis === 'Political Party';
-              });
+  var isPolPartydata = timeline(dataset.filter(function(b) {
+                  return b.type === 'tnl:PoliticalParty';
+              }));
 
   svg.append("g")
     .attr({
@@ -62,7 +60,7 @@ function timeElements (dataset,svg) {
       "y": htimeline + paddingdoc + margintop + titlespacing, // to move from top to bottom
       "height": function(d) {return d.dy; }, //meaning d.dy??
       "width": function(d) {return d.end - d.start; },
-      "fill": sectorfill,
+      "fill": function(d){return sectorToNameAndColor(d.sector).color},
       "class": function(d) {return triangleIds[0] + d.sector.replace(/\W/gi, '-').toLowerCase()},
       "id": function(d) {
         idcounterbar += 1;
@@ -104,8 +102,8 @@ function timeElements (dataset,svg) {
           "d": function(d) {
             return lineFunction(makeTrianglePoints(d));
           },
-          "stroke": sectorfill,
-          "stroke-width": 1,
+          "stroke": function(d){return sectorToNameAndColor(d.sector).color},
+          "stroke-width": 1.5,
           "fill-opacity": 0,
           "class": function(d) {return triangleIds[1] + d.sector.replace(/\W/gi, '-').toLowerCase()},
           "id": function(d) {
@@ -138,7 +136,7 @@ function timeElements (dataset,svg) {
         "r": radius, //radius
         "cx": xPoint, // startpoint
         "cy": yPoint, // positioning
-        "fill": sectorfill,
+        "fill": function(d){return sectorToNameAndColor(d.sector).color},
         "class": function(d) {return "dot-" + d.sector.replace(/\W/gi, '-').toLowerCase()},
         "id": function(d) {
               idcounterdot += 1;
@@ -152,7 +150,7 @@ function timeElements (dataset,svg) {
 
     dots.transition()
       .delay(function(d) {
-        counterdot += 1;
+        //counterdot += 1;
         return counterdot * 100;
       })
       .ease("linear")
@@ -171,33 +169,29 @@ function timeElements (dataset,svg) {
         .duration(200)
         .style("opacity", .9);
 
-      tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: "
-          + d['positionis'] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
-          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+      tooltip.html("<p class='bgtexttime'>Organization: " + d['name'] + " <br/> Position: "
+          + d['position'].split(':')[1] + " <br/> Period: " + shortFormat(new Date(d['originalStart'])) + " - "
+          + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['source'] + "</p>");
       //triangle and bar
       var obj = this.id.substr(4,5);
-      //debugger
+
       triangleIds.forEach(function(s){
-        d3.select("#" + s + obj).
-        each(function (t){
-          this.setAttribute("visibility", "visible");
-        });
+        d3.select("#" + s + obj)
+          .attr("visibility", "visible");
       })
     })
     .on("click", function(d) {
-      //debugger
+
       if( this.parentNode.childNodes[1].textContent !== "1"){
         tooltip.transition()
           .duration(500)
           .style("opacity", 0);
           // triangle and bar
-          var obj = this.id.substr(4,5);
-          triangleIds.forEach(function(s){
-            d3.select("#" + s + obj).
-            each(function (t){
-              this.setAttribute("visibility", "hidden");
-            });
-          })
+        var obj = this.id.substr(4,5);
+        triangleIds.forEach(function(s){
+          d3.select("#" + s + obj)
+              .attr("visibility", "hidden");
+        });
         this.setAttribute("visibility", "hidden");
         this.parentNode.childNodes[1].setAttribute("visibility", "hidden");
       }else{
@@ -207,19 +201,14 @@ function timeElements (dataset,svg) {
           // triangle and bar
           var obj = this.id.substr(4,5);
           triangleIds.forEach(function(s){
-            d3.select("#" + s + obj).
-            each(function (t){
-              this.setAttribute("visibility", "hidden");
-            });
+            d3.select("#" + s + obj)
+              .attr("visibility", "hidden");
           })
-        d3.selectAll('*[class^="dot-"]').
-        each(function (t){
-          this.setAttribute("visibility", "visible");
-        });
-        d3.selectAll('*[class^="dottxt-"]').
-        each(function (t){
-          this.setAttribute("visibility", "visible");
-        });
+        d3.selectAll('*[class^="' + d3.select(this).attr("class") + '"]')
+        .attr("visibility", "visible");
+
+        d3.selectAll('*[class^="' + d3.select(this.parentNode).select("text").attr("class") + '"]')
+        .attr("visibility", "visible");
       }
       // triangleIds.forEach(function(s){
       //   d3.select("#" + s + obj).
@@ -229,27 +218,17 @@ function timeElements (dataset,svg) {
       //})
     })
     .on("mousemove", function(d){
-      //debugger
     })
     .on("mouseout", function(d) {
-      //debugger
       tooltip.transition()
         .duration(500)
         .style("opacity", 0);
         // triangle and bar
-        var obj = this.id.substr(4,5);
-        triangleIds.forEach(function(s){
-          d3.select("#" + s + obj).
-          each(function (t){
-            this.setAttribute("visibility", "hidden");
-          });
+      var obj = this.id.substr(4,5);
+      triangleIds.forEach(function(s){
+          d3.select("#" + s + obj)
+            .attr("visibility", "hidden");
         })
-
-        // d3.selectAll('*[class^="dot-"]').
-        // each(function (t){
-        //   this.setAttribute("visibility", "visible");
-        // });
-
     })
   ;
 
@@ -274,7 +253,7 @@ function timeElements (dataset,svg) {
 
     textDot.transition()
       .delay(function(d) {
-        counterdot += 1;
+        //counterdot += 1;
         return counterdot * 100;
       })
       .ease("linear")
@@ -284,11 +263,6 @@ function timeElements (dataset,svg) {
         "z-index": "1"
       })
     ;
-
-
-    var tooltip = d3.select("body").append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
 
 
       // political party bars
@@ -315,15 +289,9 @@ function timeElements (dataset,svg) {
             .duration(200)
             .style("opacity", .9);
 
-          tooltip.html("<p class='bgtexttime'>Company: " + d['company'] + " <br/> Position: " + d['positionis'] + " <br/> Period: "
-                    + shortFormat(new Date(d['originalStart'])) + " - " + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['sourceis'] + "</p>");
+          tooltip.html("<p class='bgtexttime'>Organization: " + d['name'] + " <br/> Position: " + d['position'].split(':')[1] + " <br/> Period: "
+                    + shortFormat(new Date(d['originalStart'])) + " - " + shortFormat(new Date(d['originalEnd'])) + " <br/> Source: " + d['source'] + "</p>");
 
-        var obj = this.id.substr(6,7);
-
-        d3.select(ppText + obj).each(function() {
-        this.setAttribute("visibility", "visible");
-
-        });
       })
       .on("mousemove", function(d){
         tooltip.style("left", (d3.event.pageX + 5) + "px")
@@ -334,12 +302,6 @@ function timeElements (dataset,svg) {
           .duration(500)
           .style("opacity", 0);
 
-        var obj = this.id.substr(6,7);
-
-        d3.select(ppText + obj).each(function() {
-        this.setAttribute("visibility", "hidden");
-
-        });
       })
     ;
 

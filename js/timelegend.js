@@ -10,22 +10,13 @@ var timeLegend = function(dataset,svg) { // legend
     ;
 
   titlegraph.append("tspan")
-    .text("Jan Anthonie Bruijn") // function name!
+    .text(egoDataSet.name + " / timeline") // function name!
     .attr({
       "class": "titlename",
       "x": paddingdoc,
       "y": paddingdoc + margintop
     })
     ;
-
-  titlegraph.append("tspan")
-    .text(" / timeline")
-    .attr({
-      "class": "titlegraph",
-      "y": paddingdoc + margintop
-    })
-    ;
-
 
   var legendtitle = legendSelector
     .append("text")
@@ -49,7 +40,7 @@ var timeLegend = function(dataset,svg) { // legend
 
   var legend = legendSelector
     .selectAll("g.legenditem")
-    .data(colorScale.domain())
+    .data(types)
     .enter()
     .append("g")
     .attr("class","legenditem")
@@ -98,19 +89,19 @@ var timeLegend = function(dataset,svg) { // legend
   legend.append("rect")
     .attr("width", legendRectSize)
     .attr("height", legendRectSize)
-    .style("fill", colorScale)
-    .style("stroke", colorScale)
+    .style("fill", function(d){return sectorToNameAndColor(d).color;})
+    .style("stroke", function(d){return sectorToNameAndColor(d).color;})
     ;
 
   legend.append("text")
     .attr("x", legendRectSize + legendSpacing)
     .attr("y", legendRectSize - legendSpacing + 2)
     .text(function(d) {
-      var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.typeis != "Political Party"});
-      return d + " (" + onlyThisType.length + ")";
+      var onlyThisType = dataset.filter(function(data) {return data.sector === d && data.type != "tnl:PoliticalParty"});
+      return sectorToNameAndColor(d).name + " (" + onlyThisType.length + ")";
     })
     ;
 
-    
+
 
 } // end timeLegend

@@ -1,6 +1,4 @@
-var graphLegend = function(dataset,svg) {
-
-var symbolTable = [
+const symbolTable = [
     { name : "added active", file : "sym_plus"},
     { name : "added deactive", file : "sym_during"},
     { name : "changed to deactive", file : "sym_minus"},
@@ -8,14 +6,28 @@ var symbolTable = [
     { name : "unchanged deactive", file : "sym_before"}
   ];
 
-var grlegendSelector = svg.append("g");
+var graphLegendSvg;
+
+function initGraphLegend(svg){
+  graphLegendSvg = svg;
+}
+
+function setTimeSpan(){
+
+  graphLegendSvg.select("tspan.titlegraph")
+    .text(" / social network changes (" + d3.time.format("%d/%m/%y")(currentExtent[0]) + " - " +  d3.time.format("%d/%m/%y")(currentExtent[1]) + ")");
+}
+
+function graphLegend() {
+
+  var grlegendSelector = graphLegendSvg.append("g");
 
   var grtitlegraph = grlegendSelector.append("g")
     .append("text")
     ;
 
   grtitlegraph.append("tspan")
-    .text("Jan Anthonie Bruijn") // function name!
+    .text(egoDataSet.name) // function name!
     .attr({
       "class": "titlename",
       "x": paddingdoc,
@@ -24,7 +36,6 @@ var grlegendSelector = svg.append("g");
     ;
 
   grtitlegraph.append("tspan")
-    .text(" / social network changes (begindate - enddate)")
     .attr({
       "class": "titlegraph",
       "y": paddingdoc
@@ -92,14 +103,14 @@ var grlegendSelector = svg.append("g");
     .text("Right click a person")
     .attr("class", "timeinstructtop")
     .attr("x", function(d) { return w - paddingdoc - marginright + (marginright / 5) + 23 ;})
-    .attr("y", function(d) { return 25;}) 
+    .attr("y", function(d) { return 25;})
     ;
 
     graphcomment.append("text")
     .text("to inspect the relation")
     .attr("class", "timeinstructbottom")
     .attr("x", function(d) { return w - paddingdoc - marginright + (marginright / 5) + 23 ;})
-    .attr("y", function(d) { return 40;}) 
- 
+    .attr("y", function(d) { return 40;})
+
     ;
 }

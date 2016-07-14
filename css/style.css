@@ -1,7 +1,7 @@
 * {
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 html {
@@ -19,7 +19,7 @@ body {
 .container {
   margin: 0 auto;
   max-width: 114em; /* em not functioning?? */
- 
+
 }
 
 /* The first element after header needs a padding top equal to the height of your header. In this example it's a <section> tag. You may need to update the tag here to reflect your own code */
@@ -28,7 +28,7 @@ section:first-of-type {
 }
 
 /* Tell the header and footer to stay put. If you have any absolutely or other fixed elements on your site, a z-index may be needed! */
-.header, .footer {
+.header {
   position: fixed;
   width: 100%;
 }
@@ -38,7 +38,7 @@ section:first-of-type {
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 16.5em;
+  /*height: 16.5em;*/
   width: 100%;
 }
 
@@ -82,7 +82,7 @@ em {
 .inf, .inf2 {
   height: 2em;
   width: 2em;
-  margin-right: 2em; 
+  margin-right: 2em;
 }
 
 .inf2 {
@@ -97,13 +97,16 @@ em {
   fill: #BCBEC0;
 }
 
-.search { 
+.searchinput {
   padding: 0.2em 0 0 0.2em;
-  margin: 0 0.2em 0.3em 0; 
+  margin: 0 0.2em 0.3em 0;
   height: 1.6em;
   border: 0;
   background-color: #58595B;
   border-bottom: 1px solid #FFF;
+  font-family: brandon-grotesque;
+  font: 1.4em "brandon-grotesque", sans-serif;
+  color: white;
 }
 
 #submit {
@@ -121,9 +124,6 @@ em {
   fill: #BCBEC0;
 }
 
-input {
-  font: 1.4em "brandon-grotesque", sans-serif;
-}
 
 /*Footer styling*/
 
@@ -147,7 +147,7 @@ input {
 
 #userguide:hover > #inffooter path { /*change fill svg on mouseover a href*/
   fill: #BCBEC0;
-} 
+}
 
 #userguide {
   vertical-align: top;
@@ -318,6 +318,7 @@ p.bgtexttime {
 
 .tooltip {
   position: absolute;
+  z-index: 10;
   width: 20em;
   height: 2.8em;
   pointer-events: none;
@@ -338,6 +339,26 @@ p.bgtexttime {
   stroke-opacity: .5;
 }
 
+
+#progressstart,#progresspopup {
+  margin: 20px;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  z-index: 5;
+  background-color: white;
+}
+
+path.link {
+  fill: none;
+  stroke: #999999;
+  stroke-width: 1px;
+}
+
+.node .nodetext {
+  fill: #130C0E;
+}
+
 .timeinstructtop {
   font: 1.5em "brandon-grotesque";
   fill: #FFF;
@@ -350,8 +371,12 @@ p.bgtexttime {
   font-weight: normal;
 }
 
-
-/*circle[id^=dot-]:hover {
-  stroke: #000;
-  stroke-width: 1;
+/*#popupdiv {
+    z-index: 5;
+    background-color: #fff;
+    border: 1px #ccc solid;
+    border-radius: 6px;
+    box-shadow: #333 2px 2px 4px;
+    padding: 8px;
+    font-family: arial, helvetica, sans-serif;
 }*/

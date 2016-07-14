@@ -1,5 +1,5 @@
 
-var timeInstructions = function(dataset,svg) { // instructions right side
+function timeInstructions(svg) { // instructions right side
 
     var instruct = svg.append("g")
     .attr("class","instructable");
@@ -8,7 +8,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
     .attr("class","instructbg");
 
     //add svg bg
-    d3.xml("img/timeline_comment.svg", 
+    d3.xml("img/timeline_comment.svg",
         function(error, documentFragment) {
 
     if (error) {console.log(error); return;}
@@ -28,7 +28,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
       "width": marginright,
       "x": w - marginright + paddingdoc,
       "y": h - marginbottom - htimeline - paddingdoc - titlespacing
-      }) 
+      })
     ;
 
     // instructSVG.transition().duration(1000).delay(1000)
@@ -42,7 +42,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
     var icondrag = instruct.append("g")
     .attr("class","icondrag");
 
-        d3.xml("img/clickdrag.svg", 
+        d3.xml("img/clickdrag.svg",
         function(error, documentFragment) {
 
     if (error) {console.log(error); return;}
@@ -62,7 +62,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
       "width": marginright / 5,
       "x": w - marginright + paddingdoc + 20,
       "y": h - marginbottom - htimeline - paddingdoc - titlespacing - 25
-      }) 
+      })
     ;
 
     // instructSVG.transition().duration(1000).delay(1000)
@@ -77,7 +77,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
       "class": "timeinstructtop",
       "x": w - marginright + paddingdoc + (marginright / 5) + 20 + 10,
       "y": paddingdoc + titlespacing + 70
-      }) 
+      })
     ;
 
     icondrag.append("text")
@@ -86,7 +86,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
       "class": "timeinstructbottom",
       "x": w - marginright + paddingdoc + (marginright / 5) + 20 + 10,
       "y": paddingdoc + titlespacing + 85
-      }) 
+      })
     ;
 
 // add svg icon scrolldown
@@ -94,7 +94,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
     var iconscroll = instruct.append("g")
     .attr("class","iconscroll");
 
-        d3.xml("img/scrolldown.svg", 
+        d3.xml("img/scrolldown.svg",
         function(error, documentFragment) {
 
     if (error) {console.log(error); return;}
@@ -114,7 +114,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
       "width": marginright / 5,
       "x": w - marginright + paddingdoc + 20,
       "y": h - marginbottom - htimeline - paddingdoc - titlespacing + 25
-      }) 
+      })
     ;
 
     // instructSVG.transition().duration(1000).delay(1000)
@@ -129,7 +129,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
         "class": "timeinstructtop",
         "x": w - marginright + paddingdoc + (marginright / 5) + 20 + 10,
         "y": paddingdoc + titlespacing + 120
-        }) 
+        })
       ;
 
     icondrag.append("text")
@@ -138,7 +138,7 @@ var timeInstructions = function(dataset,svg) { // instructions right side
         "class": "timeinstructbottom",
         "x": w - marginright + paddingdoc + (marginright / 5) + 20 + 10,
         "y": paddingdoc + titlespacing + 135
-        }) 
+        })
     ;
 
   }
